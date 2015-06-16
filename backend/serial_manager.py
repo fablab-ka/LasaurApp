@@ -1,22 +1,23 @@
-
+import json
 import os
 import sys
 import time
 import serial
+import logging
+from datetime import datetime
 from serial.tools import list_ports
-from collections import deque
 
 
 # Class and method needed fpr datetime<->json conversion later
 class DateDecoder(json.JSONDecoder):
     # needed to convert json strings back to python datetime
-    def default(self, obj):
-       return json.JSONDecoder.default(self.obj)
-    def __init__(self, list_type=list,  **kwargs):
+    def default(self):
+        return json.JSONDecoder.default(self.obj)
+    def __init__(self, list_type=list, **kwargs):
         json.JSONDecoder.__init__(self, **kwargs)
         self.parse_array = self.JSONArray
         self.scan_once = json.scanner.py_make_scanner(self)
-        self.list_type=list_type
+        self.list_type = list_type
 
     def JSONArray(self, s_and_end, scan_once, **kwargs):
         values, end = json.decoder.JSONArray(s_and_end, scan_once, **kwargs)
@@ -35,7 +36,8 @@ def date_to_json(obj):
     #used to convert a datetime object into a json string
     if isinstance(obj, datetime):
         return obj.isoformat()
-    raise TypeError ("Type not serializable")
+
+    raise TypeError("Type not serializable")
 
 
 
@@ -73,7 +75,7 @@ class SerialManagerClass(object):
 
         # Added accounting related stuff
         # Log all Accounting information, change to valid logserver in Fablab instead local file
-        self.logger=logging.getLogger('Lasaur-Accounting')
+        self.logger = logging.getLogger('Lasaur-Accounting')
         if self.logger.handlers == []:
             #CHANGE_ME
             filehandler=logging.FileHandler('/path/to/lasaur.log')
@@ -105,7 +107,9 @@ class SerialManagerClass(object):
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name
         }
-        self.logger.info("Start Accounting: gcode-lines:",self.job_accounting['num_gcode_lines'], " jobname: ", self.job_accounting['job_name'])
+        self.logger.info(
+            "Start Accounting: gcode-lines:", self.job_accounting['num_gcode_lines'],
+            " jobname: ", self.job_accounting['job_name'])
 
     def stop_accounting(self):
         # final time calculation, write log information, cleanup
@@ -113,17 +117,21 @@ class SerialManagerClass(object):
         # Job summary
         jobtime = int(runtime.total_seconds()) - self.job_accounting['pause_time']
         #    start time, end time, job name, job duration (sec), gcode elements, cumulated time (sec)
-        job = [self.job_accounting['start_job'], datetime.now(), self.job_accounting['job_name'], jobtime, self.job_accounting['gcode_lines'], int(self.lastJobs[0][5]+jobtime) ]
+        job = [self.job_accounting['start_job'], datetime.now(), self.job_accounting['job_name'], jobtime,
+               self.job_accounting['gcode_lines'], int(self.lastJobs[0][5]+jobtime)]
 
-        self.lastJobs.insert(0,job)
+        self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
         #CHANGE_ME
         with open('/path/to/lasaur.json', 'w') as json_file:
             json.dump(self.lastJobs, json_file, default=date_to_json)
 
         self.reset_accounting()
-        self.logger.info("Stop Accounting: gcode-lines:",self.job_accounting['num_gcode_lines'], " jobname: ", self.job_accounting['job_name'], "job time: ", jobtime, " total time: ",int(self.lastJobs[0][5]+jobtime))
-
+        self.logger.info(
+            "Stop Accounting: gcode-lines:", self.job_accounting['num_gcode_lines'],
+            " jobname: ", self.job_accounting['job_name'],
+            " job time: ", jobtime,
+            " total time: ", int(self.lastJobs[0][5] + jobtime))
 
     def reset_accounting(self):
         self.job_accounting = {
@@ -153,8 +161,6 @@ class SerialManagerClass(object):
             'firmware_version': None
         }
 
-
-
     def list_devices(self, baudrate):
         ports = []
         if os.name == 'posix':
@@ -173,15 +179,13 @@ class SerialManagerClass(object):
                 try:
                     s = serial.Serial(port=i, baudrate=baudrate)
                     ports.append(s.portstr)
-                    available.append( (i, s.portstr))
+                    available.append((i, s.portstr))
                     s.close()
                 except serial.SerialException:
                     pass
             print "Found ports:"
-            for n,s in available: print "(%d) %s" % (n,s)
+            for n, s in available: print "(%d) %s" % (n,s)
         return ports
-
-
 
     def match_device(self, search_regex, baudrate):
         if os.name == 'posix':
@@ -206,7 +210,6 @@ class SerialManagerClass(object):
                     pass
             return None
 
-
     def connect(self, port, baudrate):
         self.rx_buffer = ""
         self.tx_buffer = ""
@@ -222,7 +225,6 @@ class SerialManagerClass(object):
         # many bytes were actually written if this is different from requested.
         # Work around: use a big enough timeout and a small enough chunk size.
         self.device = serial.Serial(port, baudrate, timeout=0, writeTimeout=1)
-
 
     def close(self):
         if self.device:
@@ -248,7 +250,6 @@ class SerialManagerClass(object):
             self.queue_gcode('?')
         return self.status
 
-
     def flush_input(self):
         if self.device:
             self.device.flushInput()
@@ -256,7 +257,6 @@ class SerialManagerClass(object):
     def flush_output(self):
         if self.device:
             self.device.flushOutput()
-
 
     def queue_gcode(self, gcode):
         lines = gcode.split('\n')
@@ -295,8 +295,8 @@ class SerialManagerClass(object):
         gcode_processed = '\n'.join(job_list) + '\n'
         self.tx_buffer += gcode_processed
         self.job_active = True
-        if (self.status['ready'] == False) and (len(lines) > 10) :
-            start_accounting(len(lines)) # as soon, as jobname ius vailable, can be passed as second param
+        if (self.status['ready'] == False) and (len(lines) > 10):
+            self.start_accounting(len(lines)) # as soon, as jobname is vailable, can be passed as second param
 
     def cancel_queue(self):
         self.tx_buffer = ""
@@ -322,15 +322,14 @@ class SerialManagerClass(object):
         else:
             if flag:  # pause
                 self.status['paused'] = True
-                self.job_accounting['start_pause']=datetime.now()
+                self.job_accounting['start_pause'] = datetime.now()
                 return True
             else:     # unpause
                 pause = datetime.now() - self.job_accounting['start_pause']
-                self.job_accounting['pause_time']+=int(pause.total_seconds())
-                self.job_accounting['start_pause']=None
+                self.job_accounting['pause_time'] += int(pause.total_seconds())
+                self.job_accounting['start_pause'] = None
                 self.status['paused'] = False
                 return False
-
 
     def send_queue_as_ready(self):
         """Continuously call this to keep processing queue."""
@@ -347,7 +346,7 @@ class SerialManagerClass(object):
                         chars = chars.replace(self.ready_char, "")
                     ## assemble lines
                     self.rx_buffer += chars
-                    while(1):  # process all lines in buffer
+                    while True:  # process all lines in buffer
                         posNewline = self.rx_buffer.find('\n')
                         if posNewline == -1:
                             break  # no more complete lines
@@ -419,7 +418,7 @@ class SerialManagerClass(object):
                         self.job_active = False
                         # ready whenever a job is done, including a status request via '?'
                         if (self.status['ready'] == False) and (self.job_accounting['running'] == True):
-                            stop_accounting()
+                            self.stop_accounting()
                         self.status['ready'] = True
             except OSError:
                 # Serial port appears closed => reset
@@ -430,8 +429,6 @@ class SerialManagerClass(object):
         else:
             # serial disconnected
             self.status['ready'] = False
-
-
 
     def process_status_line(self, line):
         if '#' in line[:3]:
@@ -509,9 +506,5 @@ class SerialManagerClass(object):
                 self.status['firmware_version'] = line[line.find('V')+1:]
 
 
-
-
-
 # singelton
 SerialManager = SerialManagerClass()
-
