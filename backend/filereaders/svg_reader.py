@@ -212,10 +212,12 @@ class SVGReader:
                     self.px2mm *= 10.0
                     log.info("px2mm by svg cm unit")
                 elif unit == 'px' or unit == '':
+                    pass
                     # no physical units in file
                     # we have to interpret user (px) units
+
         # 3. For some apps we can make a good guess.
-        if not self.px2mm
+        if not self.px2mm:
             svghead = svgstring[0:400]
             if 'Inkscape' in svghead:
                 self.px2mm *= 25.4/90.0
@@ -232,8 +234,6 @@ class SVGReader:
             elif 'Qt' in svghead:
                 self.px2mm *= 25.4/90.0
                 log.info("SVG exported with Qt lib -> 90dpi.")
-
-
 
         # 5. Fall back on px unit DPIs default value
         if not self.px2mm:
