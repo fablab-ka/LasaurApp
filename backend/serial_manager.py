@@ -78,21 +78,21 @@ class SerialManagerClass(object):
         self.logger = logging.getLogger('Lasaur-Accounting')
         if self.logger.handlers == []:
             #CHANGE_ME
-            filehandler=logging.FileHandler('/path/to/lasaur.log')
-            formatter=logging.Formatter('%(asctime)s - %(message)s')
+            filehandler = logging.FileHandler('logs/lasaur.log')
+            formatter = logging.Formatter('%(asctime)s - %(message)s')
             filehandler.setFormatter(formatter)
             self.logger.addHandler(filehandler)
             self.logger.setLevel(logging.INFO)
 
         self.job_accounting = {}
-        self.lastJobs=[]
+        self.lastJobs = []
         self.reset_status()
         self.reset_accounting()
 
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
         #CHANGE_ME
-        with open('/path/to/lasaur.json', 'r') as json_file:
+        with open('logs/lasaur.json', 'r') as json_file:
             self.lastJobs = json.load( json_file, cls=DateDecoder, list_type=list)
 
         self.logger.info("Init Accounting")
