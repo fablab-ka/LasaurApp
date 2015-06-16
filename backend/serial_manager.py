@@ -1,8 +1,9 @@
-import json
+from __future__ import print_function
 import os
 import sys
 import time
 import serial
+import json
 from remotelogger import RemoteLogger
 from datetime import datetime
 from serial.tools import list_ports
@@ -45,6 +46,11 @@ def date_to_json(obj):
 class SerialManagerClass(object):
 
     def __init__(self):
+        configfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.json")
+        print("loading config file", configfile)
+        with open(configfile) as configdata: 
+            self.config = json.load(configdata)
+
         self.device = None
 
         self.rx_buffer = ""
@@ -73,7 +79,7 @@ class SerialManagerClass(object):
         self.request_ready_char = '\x14'
         self.last_request_ready = 0
 
-        self.logger = RemoteLogger('Lasaur-Accounting')
+        self.logger = RemoteLogger('Lasaur-Accounting', self.config["influx"])
 
         self.job_accounting = {}
         self.lastJobs = []
@@ -82,9 +88,13 @@ class SerialManagerClass(object):
 
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
-        #CHANGE_ME
-        with open('logs/lasaur.json', 'r') as json_file:
-            self.lastJobs = json.load(json_file, cls=DateDecoder, list_type=list)
+        accountingoutput = self.config["accounting"]["outputfile"]
+        if os.path.isfile(accountingoutput):
+            with open(accountingoutput, 'r') as json_file:
+                self.lastJobs = json.load(json_file, cls=DateDecoder, list_type=list)
+        else:
+            with open(self.config["accounting"]["outputfile"], 'w+') as json_file:
+                json.dump(self.lastJobs, json_file, default=date_to_json)
 
         self.logger.info("Init Accounting")
 
@@ -114,7 +124,7 @@ class SerialManagerClass(object):
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
         #CHANGE_ME
-        with open('/path/to/lasaur.json', 'w') as json_file:
+        with open(self.config["accounting"]["outputfile"], 'w') as json_file:
             json.dump(self.lastJobs, json_file, default=date_to_json)
 
         self.reset_accounting()
@@ -156,12 +166,12 @@ class SerialManagerClass(object):
         ports = []
         if os.name == 'posix':
             iterator = sorted(list_ports.grep('tty'))
-            print "Found ports:"
+            print("Found ports:")
             for port, desc, hwid in iterator:
                 ports.append(port)
-                print "%-20s" % (port,)
-                print "    desc: %s" % (desc,)
-                print "    hwid: %s" % (hwid,)
+                print("%-20s" % (port,))
+                print("    desc: %s" % (desc,))
+                print("    hwid: %s" % (hwid,))
         else:
             # iterator = sorted(list_ports.grep(''))  # does not return USB-style
             # scan for available ports. return a list of tuples (num, name)
@@ -174,8 +184,8 @@ class SerialManagerClass(object):
                     s.close()
                 except serial.SerialException:
                     pass
-            print "Found ports:"
-            for n, s in available: print "(%d) %s" % (n,s)
+            print("Found ports:")
+            for n, s in available: print("(%d) %s" % (n,s))
         return ports
 
     def match_device(self, search_regex, baudrate):
@@ -185,11 +195,11 @@ class SerialManagerClass(object):
                 for match_tuple in matched_ports:
                     if match_tuple:
                         return match_tuple[0]
-            print "No serial port match for anything like: " + search_regex
+            print("No serial port match for anything like: " + search_regex)
             return None
         else:
             # windows hack because pyserial does not enumerate USB-style com ports
-            print "Trying to find Controller ..."
+            print("Trying to find Controller ...")
             for i in range(24):
                 try:
                     s = serial.Serial(port=i, baudrate=baudrate, timeout=2.0)
@@ -251,7 +261,7 @@ class SerialManagerClass(object):
 
     def queue_gcode(self, gcode):
         lines = gcode.split('\n')
-        print "Adding to queue %s lines" % len(lines)
+        print("Adding to queue %s lines" % len(lines))
         job_list = []
         for line in lines:
             line = line.strip()
@@ -331,7 +341,7 @@ class SerialManagerClass(object):
                 if len(chars) > 0:
                     ## check for data request
                     if self.ready_char in chars:
-                        # print "=========================== READY"
+                        # print("=========================== READY")
                         self.nRequested = self.TX_CHUNK_SIZE
                         #remove control chars
                         chars = chars.replace(self.ready_char, "")
@@ -385,7 +395,7 @@ class SerialManagerClass(object):
                             # ask to send a ready byte
                             # only ask for this when sending is on hold
                             # only ask once (and after a big time out)
-                            # print "=========================== REQUEST READY"
+                            # print("=========================== REQUEST READY")
                             try:
                                 t_prewrite = time.time()
                                 actuallySent = self.device.write(self.request_ready_char)
@@ -402,8 +412,8 @@ class SerialManagerClass(object):
 
                 else:
                     if self.job_active:
-                        # print "\nG-code stream finished!"
-                        # print "(LasaurGrbl may take some extra time to finalize)"
+                        # print("\nG-code stream finished!")
+                        # print("(LasaurGrbl may take some extra time to finalize)")
                         self.tx_buffer = ""
                         self.tx_index = 0
                         self.job_active = False
