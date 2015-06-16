@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import serial
-import logging
+from remotelogger import RemoteLogger
 from datetime import datetime
 from serial.tools import list_ports
 
@@ -73,16 +73,7 @@ class SerialManagerClass(object):
         self.request_ready_char = '\x14'
         self.last_request_ready = 0
 
-        # Added accounting related stuff
-        # Log all Accounting information, change to valid logserver in Fablab instead local file
-        self.logger = logging.getLogger('Lasaur-Accounting')
-        if self.logger.handlers == []:
-            #CHANGE_ME
-            filehandler = logging.FileHandler('logs/lasaur.log')
-            formatter = logging.Formatter('%(asctime)s - %(message)s')
-            filehandler.setFormatter(formatter)
-            self.logger.addHandler(filehandler)
-            self.logger.setLevel(logging.INFO)
+        self.logger = RemoteLogger('Lasaur-Accounting')
 
         self.job_accounting = {}
         self.lastJobs = []
@@ -93,7 +84,7 @@ class SerialManagerClass(object):
         # stop_accounting is limiting the array size to a constant value
         #CHANGE_ME
         with open('logs/lasaur.json', 'r') as json_file:
-            self.lastJobs = json.load( json_file, cls=DateDecoder, list_type=list)
+            self.lastJobs = json.load(json_file, cls=DateDecoder, list_type=list)
 
         self.logger.info("Init Accounting")
 
@@ -118,7 +109,7 @@ class SerialManagerClass(object):
         jobtime = int(runtime.total_seconds()) - self.job_accounting['pause_time']
         #    start time, end time, job name, job duration (sec), gcode elements, cumulated time (sec)
         job = [self.job_accounting['start_job'], datetime.now(), self.job_accounting['job_name'], jobtime,
-               self.job_accounting['gcode_lines'], int(self.lastJobs[0][5]+jobtime)]
+               self.job_accounting['gcode_lines'], int(self.lastJobs[0][5] + jobtime)]
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
