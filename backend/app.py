@@ -161,6 +161,11 @@ def static_img_handler(path):
     return static_file(path, root=os.path.join(resources_dir(), 'frontend/img'))
 
 
+@app.route('/fonts/:path#.+#')
+def static_img_handler(path):
+    return static_file(path, root=os.path.join(resources_dir(), 'frontend/fonts'))
+
+
 @app.route('/favicon.ico')
 def favicon_handler():
     return static_file('favicon.ico', root=os.path.join(resources_dir(), 'frontend/img'))

@@ -1,11 +1,11 @@
 
 body {
-  padding-top:50px; 
+  padding-top:50px;
 }
 
 
-a:focus { 
-    outline: none; 
+a:focus {
+    outline: none;
 }
 
 
@@ -25,7 +25,7 @@ div.log_success {
   border: 1px solid green;
 }
 div.log_warning {
-  border: 1px solid orange;  
+  border: 1px solid orange;
 }
 div.log_error {
   border: 1px solid red;
@@ -33,4 +33,21 @@ div.log_error {
 
 button.active-strong {
   border: 1px solid #aaaaaa;
+}
+
+#container {
+  margin-top: 40px;
+}
+
+.jog_btns .btn {
+  padding: 0;
+  margin: 0;
+}
+
+.jog_btns #jog_up_btn, .jog_btns #jog_down_btn {
+  width: 100%;
+}
+
+.jog_btns #jog_left_btn, .jog_btns #jog_right_btn {
+  width: 50%;
 }
