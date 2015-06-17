@@ -13,8 +13,8 @@ from .svg_tag_reader import SVGTagReader
 
 logging.basicConfig()
 log = logging.getLogger("svg_reader")
-# log.setLevel(logging.DEBUG)
-# log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 log.setLevel(logging.WARN)
 
 
@@ -155,16 +155,16 @@ class SVGReader:
             self.px2mm = 25.4/force_dpi
             log.info("SVG import forced to %s dpi." % (force_dpi))
 
+        width = None
+        height = None
+        vb_x = None
+        vb_y = None
+        vb_w = None
+        vb_h = None
+        unit = ''
+
         # Get width, height, viewBox for further processing
         if not self.px2mm:
-            width = None
-            height = None
-            vb_x = None
-            vb_y = None
-            vb_w = None
-            vb_h = None
-            unit = ''
-
             # get width, height, unit
             width_str = svgRootElement.attrib.get('width')
             height_str = svgRootElement.attrib.get('height')

@@ -117,7 +117,7 @@ class SerialManagerClass(object):
             'job_name'   : job_name
         }
         self.logger.info(
-            "Start Accounting: gcode-lines:", self.job_accounting['num_gcode_lines'],
+            "Start Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
             " jobname: ", self.job_accounting['job_name'])
 
     def stop_accounting(self):
@@ -126,8 +126,11 @@ class SerialManagerClass(object):
         # Job summary
         jobtime = int(runtime.total_seconds()) - self.job_accounting['pause_time']
         #    start time, end time, job name, job duration (sec), gcode elements, cumulated time (sec)
+        current_total = 0
+        if len(self.lastJobs) > 0 and len(self.lastJobs[0]) > 5:
+            current_total = self.lastJobs[0][5]
         job = [self.job_accounting['start_job'], datetime.now(), self.job_accounting['job_name'], jobtime,
-               self.job_accounting['gcode_lines'], int(self.lastJobs[0][5] + jobtime)]
+               self.job_accounting['gcode_lines'], int(current_total + jobtime)]
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
@@ -135,19 +138,21 @@ class SerialManagerClass(object):
         with open(self.config["accounting"]["outputfile"], 'w') as json_file:
             json.dump(self.lastJobs, json_file, default=date_to_json)
 
-        self.reset_accounting()
         self.logger.info(
-            "Stop Accounting: gcode-lines:", self.job_accounting['num_gcode_lines'],
+            "Stop Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
             " jobname: ", self.job_accounting['job_name'],
             " job time: ", jobtime,
             " total time: ", int(self.lastJobs[0][5] + jobtime))
+        self.reset_accounting()
 
     def reset_accounting(self):
         self.job_accounting = {
             'running'    : False,   # True, while accounting is running
             'start_pause': None,
             'pause_time' : 0,
-            'start_job'  : None
+            'start_job'  : None,
+            'gcode_lines': 0,
+            'job_name'   : '',
         }
         self.logger.info("Reset Accounting")
 

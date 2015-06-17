@@ -509,22 +509,27 @@ def file_reader():
     except:
         pass
 
-    if filename and filedata:
-        print("You uploaded %s (%d bytes)." % (filename, len(filedata)))
-        if filename[-4:] in ['.dxf', '.DXF']:
-            res = read_dxf(filedata, TOLERANCE, optimize)
-        elif filename[-4:] in ['.svg', '.SVG']:
-            res = read_svg(filedata, dimensions, TOLERANCE, dpi_forced, optimize)
-        elif filename[-4:] in ['.ngc', '.NGC']:
-            res = read_ngc(filedata, TOLERANCE, optimize)
-        else:
-            print("error: unsupported file format")
-            return None
+    try:
+        if filename and filedata:
+            print("You uploaded %s (%d bytes)." % (filename, len(filedata)))
+            if filename[-4:] in ['.dxf', '.DXF']:
+                res = read_dxf(filedata, TOLERANCE, optimize)
+            elif filename[-4:] in ['.svg', '.SVG']:
+                res = read_svg(filedata, dimensions, TOLERANCE, dpi_forced, optimize)
+            elif filename[-4:] in ['.ngc', '.NGC']:
+                res = read_ngc(filedata, TOLERANCE, optimize)
+            else:
+                print("error: unsupported file format")
+                return None
 
-        # print boundarys
-        jsondata = json.dumps(res)
-        # print "returning %d items as %d bytes." % (len(res['boundarys']), len(jsondata))
-        return jsondata
+            # print boundarys
+            jsondata = json.dumps(res)
+            # print "returning %d items as %d bytes." % (len(res['boundarys']), len(jsondata))
+            return jsondata
+    except Exception as e:
+        msg = "Failed to parse file" + e.message
+        print(msg)
+        return msg
     return "You missed a field."
 
 
