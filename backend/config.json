@@ -7,6 +7,6 @@
 	    "db": "LabNet"
     },
     "accounting": {
-    	"outputfile": "lasaur.json"
+    	"outputfile": "logs/accounting.json"
     }
 }

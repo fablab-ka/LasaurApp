@@ -7,7 +7,12 @@ import json
 from remotelogger import RemoteLogger
 from datetime import datetime
 from serial.tools import list_ports
+from serial import dummy_serial
 
+DEBUG = True
+
+dummy_serial.RESPONSES = {'\x14': '\x12'}
+dummy_serial.DEFAULT_RESPONSE = '\n'
 
 # Class and method needed fpr datetime<->json conversion later
 class DateDecoder(json.JSONDecoder):
@@ -93,7 +98,10 @@ class SerialManagerClass(object):
             with open(accountingoutput, 'r') as json_file:
                 self.lastJobs = json.load(json_file, cls=DateDecoder, list_type=list)
         else:
-            with open(self.config["accounting"]["outputfile"], 'w+') as json_file:
+            folder = os.path.dirname(accountingoutput)
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            with open(accountingoutput, 'w+') as json_file:
                 json.dump(self.lastJobs, json_file, default=date_to_json)
 
         self.logger.info("Init Accounting")
@@ -162,6 +170,12 @@ class SerialManagerClass(object):
             'firmware_version': None
         }
 
+    def open_serial(self, port, baudrate, timeout=0, writeTimeout=1):
+        if DEBUG:
+            return dummy_serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+        else:
+            return serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+
     def list_devices(self, baudrate):
         ports = []
         if os.name == 'posix':
@@ -178,7 +192,7 @@ class SerialManagerClass(object):
             available = []
             for i in range(24):
                 try:
-                    s = serial.Serial(port=i, baudrate=baudrate)
+                    s = self.open_serial(i, baudrate)
                     ports.append(s.portstr)
                     available.append((i, s.portstr))
                     s.close()
@@ -202,7 +216,7 @@ class SerialManagerClass(object):
             print("Trying to find Controller ...")
             for i in range(24):
                 try:
-                    s = serial.Serial(port=i, baudrate=baudrate, timeout=2.0)
+                    s = self.open_serial(i, baudrate, 2.0)
                     lasaur_hello = s.read(32)
                     if lasaur_hello.find(self.LASAURGRBL_FIRST_STRING) > -1:
                         return s.portstr
@@ -225,7 +239,7 @@ class SerialManagerClass(object):
         # BUG WARNING: the pyserial write function does not report how
         # many bytes were actually written if this is different from requested.
         # Work around: use a big enough timeout and a small enough chunk size.
-        self.device = serial.Serial(port, baudrate, timeout=0, writeTimeout=1)
+        self.device = self.open_serial(port, baudrate, 0, 1)
 
     def close(self):
         if self.device:
@@ -448,7 +462,8 @@ class SerialManagerClass(object):
                 sys.stdout.write(line + "\n")
                 sys.stdout.flush()
             else:
-                sys.stdout.write(".")
+                if not DEBUG:
+                    sys.stdout.write(".")
                 sys.stdout.flush()
 
             if 'N' in line:
