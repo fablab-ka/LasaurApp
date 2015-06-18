@@ -20,6 +20,7 @@ div.log_item {
 }
 div.log_notice {
   border: 1px solid #aaaaaa;
+  border-radius: 0;
 }
 div.log_success {
   border: 1px solid green;

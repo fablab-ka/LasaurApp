@@ -16,30 +16,30 @@ var progress_not_yet_done_flag = false;
     }
 
     text = text.replace(/\n/g,'<br>')
-    
+
     if (kind == 'notice') {
-      $('#log_content').prepend('<div class="log_item log_notice well" style="display:none">' + text + '</div>');
+      $('#log_content').prepend('<div class="log_item log_notice well-sm" style="display:none">' + text + '</div>');
       $('#log_content').children('div').first().show('blind');
       if ($("#log_content").is(':hidden')) {
         $().toastmessage('showNoticeToast', text);
       }
     } else if (kind == 'success') {
-      $('#log_content').prepend('<div class="log_item log_success well" style="display:none">' + text + '</div>');
+      $('#log_content').prepend('<div class="log_item log_success well-sm" style="display:none;">' + text + '</div>');
       $('#log_content').children('div').first().show('blind');
       if ($("#log_content").is(':hidden')) {
-        $().toastmessage('showSuccessToast', text);   
+        $().toastmessage('showSuccessToast', text);
       }
     } else if (kind == 'warning') {
-      $('#log_content').prepend('<div class="log_item log_warning well" style="display:none">' + text + '</div>');
+      $('#log_content').prepend('<div class="log_item log_warning well-sm" style="display:none">' + text + '</div>');
       $('#log_content').children('div').first().show('blind');
       if ($("#log_content").is(':hidden')) {
-        $().toastmessage('showWarningToast', text);   
+        $().toastmessage('showWarningToast', text);
       }
     } else if (kind == 'error') {
-      $('#log_content').prepend('<div class="log_item log_error well" style="display:none">' + text + '</div>');
+      $('#log_content').prepend('<div class="log_item log_error well-sm" style="display:none">' + text + '</div>');
       $('#log_content').children('div').first().show('blind');
       if ($("#log_content").is(':hidden')) {
-        $().toastmessage('showErrorToast', text);   
+        $().toastmessage('showErrorToast', text);
       }
     }
 
@@ -48,7 +48,7 @@ var progress_not_yet_done_flag = false;
     }
 
   };
-})(jQuery); 
+})(jQuery);
 
 
 function send_gcode(gcode, success_msg, progress) {
@@ -98,7 +98,7 @@ function update_progress() {
     if (data.length > 0) {
       var pct = parseInt(data);
       $("#progressbar").children().first().width(pct+'%');
-      setTimeout(update_progress, 2000);         
+      setTimeout(update_progress, 2000);
     } else {
       if (progress_not_yet_done_flag) {
         $("#progressbar").children().first().width('100%');
@@ -107,7 +107,7 @@ function update_progress() {
         setTimeout(update_progress, 2000);
       } else {
         $('#progressbar').hide();
-        $("#progressbar").children().first().width(0); 
+        $("#progressbar").children().first().width(0);
       }
     }
   });
@@ -178,9 +178,9 @@ function generate_download(filename, filedata) {
 
 
 $(document).ready(function(){
-  
+
   $().uxmessage('notice', "Frontend started.");
-  
+
   $('#feedrate_field').val(app_settings.max_seek_speed);
 
   $('#tab_logs_button').click(function(){
@@ -202,18 +202,18 @@ $(document).ready(function(){
       }
       $("#connect_btn").removeClass("btn-danger");
       $("#connect_btn").removeClass("btn-warning");
-      $("#connect_btn").addClass("btn-success");      
+      $("#connect_btn").addClass("btn-success");
     } else {
       connect_btn_state = false
       if (!connect_btn_in_hover) {
         $("#connect_btn").html("Disconnected");
-      }   
+      }
       $("#connect_btn").removeClass("btn-danger");
       $("#connect_btn").removeClass("btn-success");
-      $("#connect_btn").addClass("btn-warning");     
+      $("#connect_btn").addClass("btn-warning");
     }
   }
-    
+
   // get hardware status
   function poll_hardware_status() {
     $.getJSON('/status', function(data) {
@@ -250,23 +250,23 @@ $(document).ready(function(){
       if (data.serial_connected) {
         if (data.door_open) {
           $('#door_status_btn').removeClass('btn-success')
-          $('#door_status_btn').addClass('btn-warning') 
+          $('#door_status_btn').addClass('btn-warning')
           // $().uxmessage('warning', "Door is open!");
         } else {
           $('#door_status_btn').removeClass('btn-warning')
-          $('#door_status_btn').addClass('btn-success')         
+          $('#door_status_btn').addClass('btn-success')
         }
         if (data.chiller_off) {
           $('#chiller_status_btn').removeClass('btn-success')
-          $('#chiller_status_btn').addClass('btn-warning')           
-          // $().uxmessage('warning', "Chiller is off!"); 
+          $('#chiller_status_btn').addClass('btn-warning')
+          // $().uxmessage('warning', "Chiller is off!");
         } else {
           $('#chiller_status_btn').removeClass('btn-warning')
           $('#chiller_status_btn').addClass('btn-success')
         }
         if (data.power_off) {
-          $().uxmessage('error', "Power is off!"); 
-          $().uxmessage('notice', "Turn on Lasersaur power then run homing cycle to reset.");          
+          $().uxmessage('error', "Power is off!");
+          $().uxmessage('notice', "Turn on Lasersaur power then run homing cycle to reset.");
         }
         if (data.limit_hit) {
           $().uxmessage('error', "Limit hit!");
@@ -275,7 +275,7 @@ $(document).ready(function(){
         if (data.buffer_overflow) {
           $().uxmessage('error', "Rx Buffer Overflow!");
           $().uxmessage('notice', "Please report this to the author of this software.");
-        }        
+        }
         if (data.transmission_error) {
           $().uxmessage('error', "Transmission Error!");
           $().uxmessage('notice', "If this happens a lot tell the author of this software.");
@@ -332,11 +332,11 @@ $(document).ready(function(){
 
   connect_btn_width = $("#connect_btn").innerWidth();
   $("#connect_btn").width(connect_btn_width);
-  $("#connect_btn").click(function(e){  
+  $("#connect_btn").click(function(e){
     if (connect_btn_state == true) {
       $.get('/serial/0', function(data) {
         if (data != "") {
-          connect_btn_set_state(false);   
+          connect_btn_set_state(false);
         } else {
           // was already disconnected
           connect_btn_set_state(false);
@@ -348,17 +348,17 @@ $(document).ready(function(){
       $.get('/serial/1', function(data) {
         if (data != "") {
           connect_btn_set_state(true);
-          $("#connect_btn").html("Connected");      
+          $("#connect_btn").html("Connected");
         } else {
           // failed to connect
           connect_btn_set_state(false);
           $("#connect_btn").removeClass("btn-warning");
-          $("#connect_btn").addClass("btn-danger");  
-        }   
+          $("#connect_btn").addClass("btn-danger");
+        }
       });
-    } 
-    e.preventDefault();   
-  }); 
+    }
+    e.preventDefault();
+  });
   $("#connect_btn").hover(
     function () {
       connect_btn_in_hover = true;
@@ -368,7 +368,7 @@ $(document).ready(function(){
         $(this).html("Connect");
       }
       $(this).width(connect_btn_width);
-    }, 
+    },
     function () {
       connect_btn_in_hover = false;
       if (connect_btn_state) {
@@ -376,12 +376,12 @@ $(document).ready(function(){
       } else {
         $(this).html("Disconnected");
       }
-      $(this).width(connect_btn_width);      
+      $(this).width(connect_btn_width);
     }
   );
 
   $("#pause_btn").tooltip({placement:'bottom', delay: {show:500, hide:100}});
-  $("#pause_btn").click(function(e){  
+  $("#pause_btn").click(function(e){
     if (pause_btn_state == true) {  // unpause
       $.get('/pause/0', function(data) {
         if (data == '0') {
@@ -405,38 +405,38 @@ $(document).ready(function(){
           $("#pause_btn").removeClass("btn-warning");
           $("#pause_btn").removeClass("btn-primary");
           $().uxmessage('notice', "Not pausing...");
-        }   
+        }
       });
-    } 
-    e.preventDefault();   
-  }); 
+    }
+    e.preventDefault();
+  });
   //\\\\\\ serial connect and pause button \\\\\\\\
-  
-  
+
+
   $("#cancel_btn").tooltip({placement:'bottom', delay: {show:500, hide:100}});
   $("#cancel_btn").click(function(e){
     var gcode = '!\n'  // ! is enter stop state char
     // $().uxmessage('notice', gcode.replace(/\n/g, '<br>'));
-    send_gcode(gcode, "Stopping ...", false); 
+    send_gcode(gcode, "Stopping ...", false);
     var delayedresume = setTimeout(function() {
       var gcode = '~\nG90\nM81\nG0X0Y0F'+app_settings.max_seek_speed+'\n'  // ~ is resume char
       // $().uxmessage('notice', gcode.replace(/\n/g, '<br>'));
       send_gcode(gcode, "Resetting ...", false);
     }, 1000);
-    e.preventDefault();   
+    e.preventDefault();
   });
-  
+
   $("#homing_cycle").tooltip({placement:'bottom', delay: {show:500, hide:100}});
   $("#homing_cycle").click(function(e){
     var gcode = '!\n'  // ! is enter stop state char
     // $().uxmessage('notice', gcode.replace(/\n/g, '<br>'));
-    send_gcode(gcode, "Resetting ...", false); 
+    send_gcode(gcode, "Resetting ...", false);
     var delayedresume = setTimeout(function() {
       var gcode = '~\nG30\n'  // ~ is resume char
       // $().uxmessage('notice', gcode.replace(/\n/g, '<br>'));
       send_gcode(gcode, "Homing cycle ...", false);
     }, 1000);
-    e.preventDefault(); 
+    e.preventDefault();
 
   });
 
@@ -448,10 +448,10 @@ $(document).ready(function(){
       reset_offset();
     }
     gcode = 'G90\nG0X0Y0F'+app_settings.max_seek_speed+'\n'
-    // $().uxmessage('notice', gcode);  
+    // $().uxmessage('notice', gcode);
     send_gcode(gcode, "Going to origin ...", false);
-    e.preventDefault();   
-  });  
+    e.preventDefault();
+  });
 
   $("#reset_atmega").click(function(e){
     $.get('/reset_atmega', function(data) {
@@ -460,9 +460,9 @@ $(document).ready(function(){
         firmware_version_reported = false;
       } else {
         $().uxmessage('error', "Atmega restart failed!");
-      }   
+      }
     });
-    e.preventDefault();   
+    e.preventDefault();
   });
 
 
@@ -519,5 +519,5 @@ $(document).ready(function(){
     $('#tab_logs_button').trigger('click');
     return false;
   });
-  
+
 });  // ready
