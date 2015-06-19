@@ -51,7 +51,7 @@ var progress_not_yet_done_flag = false;
 })(jQuery);
 
 
-function send_gcode(gcode, success_msg, progress) {
+function send_gcode(gcode, success_msg, progress, name) {
   // if (hardware_ready_state || gcode[0] == '!' || gcode[0] == '~') {
   if (true) {
     if (typeof gcode === "string" && gcode != '') {
@@ -59,7 +59,7 @@ function send_gcode(gcode, success_msg, progress) {
       $.ajax({
         type: "POST",
         url: "/gcode",
-        data: {'job_data':gcode},
+        data: {'name': name, 'job_data':gcode},
         // dataType: "json",
         success: function (data) {
           if (data == "__ok__") {

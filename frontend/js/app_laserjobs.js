@@ -371,7 +371,7 @@ $(document).ready(function(){
           job_bbox[2] <= app_settings.work_area_dimensions[0] &&
           job_bbox[3] <= app_settings.work_area_dimensions[1])
       {
-        send_gcode(DataHandler.getGcode(), "G-Code sent to backend.", true);
+        send_gcode(DataHandler.getGcode(), "G-Code sent to backend.", true, $('#job_name').val());
       } else {
         $().uxmessage('warning', "rejecting, outside work area");
       }
@@ -392,7 +392,7 @@ $(document).ready(function(){
           job_bbox[2] <= app_settings.work_area_dimensions[0] &&
           job_bbox[3] <= app_settings.work_area_dimensions[1])
       {
-        send_gcode(DataHandler.getBboxGcode(), "BBox G-Code sent to backend", true);
+        send_gcode(DataHandler.getBboxGcode(), "BBox G-Code sent to backend", true, $('#job_name').val());
       } else {
         $().uxmessage('warning', "rejecting, outside work area");
       }

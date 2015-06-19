@@ -8,43 +8,12 @@ from remotelogger import RemoteLogger
 from datetime import datetime
 from serial.tools import list_ports
 from serial import dummy_serial
+import datedecoder
 
 DEBUG = True
 
 dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
-
-# Class and method needed fpr datetime<->json conversion later
-class DateDecoder(json.JSONDecoder):
-    # needed to convert json strings back to python datetime
-    def default(self):
-        return json.JSONDecoder.default(self.obj)
-    def __init__(self, list_type=list, **kwargs):
-        json.JSONDecoder.__init__(self, **kwargs)
-        self.parse_array = self.JSONArray
-        self.scan_once = json.scanner.py_make_scanner(self)
-        self.list_type = list_type
-
-    def JSONArray(self, s_and_end, scan_once, **kwargs):
-        values, end = json.decoder.JSONArray(s_and_end, scan_once, **kwargs)
-        if type(values) is list:
-            for (i, entry) in enumerate(values):
-                if type(entry) is unicode:
-                    try:
-                        values[i] = datetime.strptime(entry, "%Y-%m-%dT%H:%M:%S.%f")
-                    except:
-                        pass
-
-        return self.list_type(values), end
-
-
-def date_to_json(obj):
-    #used to convert a datetime object into a json string
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-
-    raise TypeError("Type not serializable")
-
 
 
 #extended Class of Lasersaur project
@@ -53,7 +22,7 @@ class SerialManagerClass(object):
     def __init__(self):
         configfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.json")
         print("loading config file", configfile)
-        with open(configfile) as configdata: 
+        with open(configfile) as configdata:
             self.config = json.load(configdata)
 
         self.device = None
@@ -96,17 +65,17 @@ class SerialManagerClass(object):
         accountingoutput = self.config["accounting"]["outputfile"]
         if os.path.isfile(accountingoutput):
             with open(accountingoutput, 'r') as json_file:
-                self.lastJobs = json.load(json_file, cls=DateDecoder, list_type=list)
+                self.lastJobs = json.load(json_file, object_hook=datedecoder.object_hook)
         else:
             folder = os.path.dirname(accountingoutput)
             if not os.path.exists(folder):
                 os.makedirs(folder)
             with open(accountingoutput, 'w+') as json_file:
-                json.dump(self.lastJobs, json_file, default=date_to_json)
+                json.dump(self.lastJobs, json_file, default=datedecoder.default)
 
         self.logger.info("Init Accounting")
 
-    def start_accounting(self, num_gcode_lines=0, job_name='no jobname available'):
+    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>'):
         # initialize all accounting data, get start time, write log information
         self.job_accounting = {
             'running'    : True,
@@ -128,21 +97,27 @@ class SerialManagerClass(object):
         #    start time, end time, job name, job duration (sec), gcode elements, cumulated time (sec)
         current_total = 0
         if len(self.lastJobs) > 0 and len(self.lastJobs[0]) > 5:
-            current_total = self.lastJobs[0][5]
-        job = [self.job_accounting['start_job'], datetime.now(), self.job_accounting['job_name'], jobtime,
-               self.job_accounting['gcode_lines'], int(current_total + jobtime)]
+            current_total = self.lastJobs[0]["total"]
+        job = {
+            'start': self.job_accounting['start_job'],
+            'end': datetime.now(),
+            'name': self.job_accounting['job_name'],
+            'duration': jobtime,
+            'lines': self.job_accounting['gcode_lines'],
+            'total': int(current_total + jobtime)
+        }
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
         #CHANGE_ME
         with open(self.config["accounting"]["outputfile"], 'w') as json_file:
-            json.dump(self.lastJobs, json_file, default=date_to_json)
+            json.dump(self.lastJobs, json_file, default=datedecoder.default)
 
         self.logger.info(
             "Stop Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
             " jobname: ", self.job_accounting['job_name'],
             " job time: ", jobtime,
-            " total time: ", int(self.lastJobs[0][5] + jobtime))
+            " total time: ", int(self.lastJobs[0]["total"] + jobtime))
         self.reset_accounting()
 
     def reset_accounting(self):
@@ -278,7 +253,7 @@ class SerialManagerClass(object):
         if self.device:
             self.device.flushOutput()
 
-    def queue_gcode(self, gcode):
+    def queue_gcode(self, gcode, name=None):
         lines = gcode.split('\n')
         print("Adding to queue %s lines" % len(lines))
         job_list = []
@@ -316,7 +291,7 @@ class SerialManagerClass(object):
         self.tx_buffer += gcode_processed
         self.job_active = True
         if (self.status['ready'] == False) and (len(lines) > 10):
-            self.start_accounting(len(lines)) # as soon, as jobname is vailable, can be passed as second param
+            self.start_accounting(len(lines), name) # as soon, as jobname is vailable, can be passed as second param
 
     def cancel_queue(self):
         self.tx_buffer = ""

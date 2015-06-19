@@ -11,6 +11,7 @@ from flash import flash_upload, reset_atmega
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
 from serial import SerialException
+import datedecoder
 
 
 APPNAME = "lasaurapp"
@@ -201,6 +202,15 @@ def decode_filename(name):
     index = name.find('-')
     return base64.urlsafe_b64decode(name[index + 1:])
 
+
+@app.route('/accounting')
+def accounting():
+    return json.dumps(SerialManager.job_accounting)
+
+
+@app.route('/jobs/history')
+def lastjobs():
+    return json.dumps(SerialManager.lastJobs, default=datedecoder.default)
 
 @app.route('/queue/get/:name#.+#')
 def static_queue_handler(name):
@@ -476,9 +486,10 @@ def reset_atmega_handler():
 
 @app.route('/gcode', method='POST')
 def job_submit_handler():
+    name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data)
+        SerialManager.queue_gcode(job_data, name)
         return "__ok__"
     else:
         return "serial disconnected"
