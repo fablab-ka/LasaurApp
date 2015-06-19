@@ -357,13 +357,17 @@ $(document).ready(function(){
     }
   );
 
+  function submit_job() {
+    var data = $('#job_data').val();
 
-  /// button events /////////////////////////////
+    if (data.length === 0) {
+        $().uxmessage('warning', "No data loaded. Please load a document first.");
+      $('#preview_canvas').shake(4,10,500);
+      return;
+    }
 
-  $("#progressbar").hide();
-  $("#job_submit").click(function(e) {
     // send gcode string to server via POST
-    DataHandler.setByJson($('#job_data').val());
+    DataHandler.setByJson(data);
     if (readPassesWidget()) {
       var job_bbox = DataHandler.getJobBbox();
       if (job_bbox[0] >= 0 &&
@@ -378,7 +382,24 @@ $(document).ready(function(){
     } else {
       $().uxmessage('warning', "nothing to cut -> please assign colors to passes");
     }
+  }
+
+
+  /// button events /////////////////////////////
+
+  $("#progressbar").hide();
+  $("#job_submit").click(function(e) {
+    if ($('#door_status_btn').hasClass('btn-warning')) {
+      $('#door_open_warning_modal').modal();
+    } else {
+      submit_job();
+    }
     return false;
+  });
+
+  $('#really_submit_job_btn').click(function() {
+      submit_job();
+      $('#door_open_warning_modal').modal('hide');
   });
 
 

@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!--<link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">-->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <link rel="stylesheet" href="/css/jquery.toastmessage.css" type="text/css">
         <link rel="stylesheet" href="/css/roboto.min.css" type="text/css">
         <link rel="stylesheet" href="/css/material-fullpalette.min.css" type="text/css">
@@ -84,12 +84,14 @@
         </nav>
 
         <!-- about modal -->
-        <div id="about_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="about_label" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="about_label">About LasaurApp</h3>
-            </div>
-            <div class="modal-body">
+        <div id="about_modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">About LasersaurApp</h4>
+              </div>
+              <div class="modal-body">
                 <p><img src="/img/lasersaur-black_w530.jpg"></p>
                 <div style="width:60px;margin-left:auto;margin-right:auto;margin-top:20px;margin-bottom:20px"><img src="/img/lasersaur-dino.png" style="width:60px"></div>
                 <p>LasaurApp is the offical control app for the Lasersaur laser cutter and part of the <a href="http://www.lasersaur.com/">Lasersaur project</a>. This software is made available under the <a href="https://gnu.org/licenses/gpl.html">GPLv3 (version 3 or later)</a> software license. Copyright (c) 2013 <a href="http://labs.nortd.com/">Nortd Labs</a></p>
@@ -97,26 +99,51 @@
                     <li>LasaurApp version <span id="lasaurapp_version"></span></li>
                     <li>Firmware version <span id="firmware_version">&lt;not connected&gt;</span></li>
                 </ul>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
-            </div>
-        </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
         <!-- cancel modal -->
-        <div id="cancel_modal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="cancel_modal_label" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="cancel_modal_label">Stop Job</h3>
-            </div>
-            <div class="modal-body">
+        <div id="cancel_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cancel_modal_label" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 id="cancel_modal_label" class="modal-title">Stop Job</h4>
+              </div>
+              <div class="modal-body">
                 <p>Press ENTER to confirm stopping the current job.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default " data-dismiss="modal" aria-hidden="true">Close</button>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button id="really_cancel_btn" class="btn btn-danger">Stop Job!</button>
-            </div>
-        </div>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <!-- door open warning modal -->
+        <div id="door_open_warning_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="door_open_warning_modal_label" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 id="door_open_warning_modal_label" class="modal-title">Door is open</h4>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to start the job with an open Door?</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                <button id="really_submit_job_btn" class="btn btn-danger">Sure I know what I'm doing</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
         <div id="container" class="container">
             <div class="row">
@@ -155,8 +182,8 @@
                         <div class="col-md-10">
                             <div class="tab-content" style="overflow:visible; padding-bottom:30px">
                                 <!--content start-->
-                                <div id="tab_jobs" class="tab-pane active">
-                                    <div style="width:650px;">
+                                <div id="tab_jobs" class="tab-pane active row">
+                                    <div class="col-md-9">
                                         <div class="well clearfix" style="margin-bottom:40px">
                                             <input type="text" id="job_name" style="width:296px;padding-left: 5px;" placeholder="Load or import a job.">
                                             <button id="file_import_quick_btn" class="btn btn-default pull-right" title="file import" data-delay="500" style="margin-top:0;">
@@ -218,6 +245,32 @@
                                                 </ul>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <div class="col-md-3 well well-sm">
+                                        <h3>
+                                            History
+                                            <small>
+                                                <a href="#" data-toggle="modal" data-target="#history_modal" data-backdrop="true">
+                                                    show all
+                                                </a>
+                                            </small>
+                                        </h3>
+                                        <table id="job_history" class="table table-hover table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Duration</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr class="active">
+                                                    <th>Total</th>
+                                                    <th id="total_job_duration">...</th>
+                                                </tr>
+                                            </tfoot>
+                                            <tbody></tbody>
+                                        </table>
                                     </div>
                                 </div>
                                 <div id="tab_import" class="tab-pane">
@@ -362,9 +415,47 @@
             </div>
         </div>
 
+        <!-- Modal -->
+        <div class="modal fade" id="history_modal" tabindex="-1" role="dialog" aria-labelledby="history_modal_title">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="history_modal_title">Job History</h4>
+              </div>
+              <div class="modal-body" style="overflow:auto; max-height:500px;">
+                <table id="job_history_big" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Duration</th>
+                            <th>Lines of GCode</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr class="active">
+                            <th></th>
+                            <th></th>
+                            <th>Total Duration</th>
+                            <th id="total_job_duration_big">...</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody></tbody>
+                </table>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <script src="/js/jquery-1.7.2.min.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
+
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <script src="/js/jquery.toastmessage.js"></script>
         <script src="/js/jquery.hotkeys.js"></script>
         <script src="/js/settings.js"></script>
@@ -377,6 +468,7 @@
         <script src="/js/app_import.js"></script>
         <script src="/js/ripples.min.js"></script>
         <script src="/js/material.min.js"></script>
+        <script src="/js/dateformat.js"></script>
         <script>
             $(document).ready(function() {
                 $.material.init();

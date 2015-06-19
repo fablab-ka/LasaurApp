@@ -209,8 +209,12 @@ def accounting():
 
 
 @app.route('/jobs/history')
-def lastjobs():
-    return json.dumps(SerialManager.lastJobs, default=datedecoder.default)
+def jobs_history():
+    jobs = SerialManager.lastJobs
+    if "limit" in request.params.keys():
+        limit = int(request.params["limit"])
+        jobs = jobs[:limit]
+    return json.dumps(jobs, default=datedecoder.default)
 
 @app.route('/queue/get/:name#.+#')
 def static_queue_handler(name):

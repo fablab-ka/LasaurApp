@@ -64,7 +64,7 @@ function send_gcode(gcode, success_msg, progress, name) {
         success: function (data) {
           if (data == "__ok__") {
             $().uxmessage('success', success_msg);
-            if (progress = true) {
+            if (progress) {
               // show progress bar, register live updates
               if ($("#progressbar").children().first().width() == 0) {
                 $("#progressbar").children().first().width('5%');
@@ -108,6 +108,8 @@ function update_progress() {
       } else {
         $('#progressbar').hide();
         $("#progressbar").children().first().width(0);
+
+        poll_job_history();
       }
     }
   });
@@ -168,6 +170,30 @@ function generate_download(filename, filedata) {
     complete: function (data) {
       // future use
     }
+  });
+}
+
+function poll_job_history() {
+  console.log("poll_job_history");
+
+  $.getJSON('/jobs/history?limit=10', function(history) {
+    $('#job_history tbody').empty();
+
+    for (var i in history) {
+      var job = history[i];
+      var date = new Date(job.start.$date).format('dd.MM.yyyy hh:mm:ss');
+
+      var row = $('<tr title="'+date+'" data-toggle="tooltip" data-placement="right"/>');
+      row.append($('<td/>').text(job.name));
+      row.append($('<td/>').text(job.duration + "s"));
+      $('#job_history tbody').append(row);
+    }
+
+    if (history.length > 0) {
+      $('#total_job_duration').text(history[0].total + "s");
+    }
+
+    $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
   });
 }
 
@@ -249,20 +275,20 @@ $(document).ready(function(){
       // door, chiller, power, limit, buffer
       if (data.serial_connected) {
         if (data.door_open) {
-          $('#door_status_btn').removeClass('btn-success')
-          $('#door_status_btn').addClass('btn-warning')
+          $('#door_status_btn').removeClass('btn-success');
+          $('#door_status_btn').addClass('btn-warning');
           // $().uxmessage('warning', "Door is open!");
         } else {
-          $('#door_status_btn').removeClass('btn-warning')
-          $('#door_status_btn').addClass('btn-success')
+          $('#door_status_btn').removeClass('btn-warning');
+          $('#door_status_btn').addClass('btn-success');
         }
         if (data.chiller_off) {
-          $('#chiller_status_btn').removeClass('btn-success')
-          $('#chiller_status_btn').addClass('btn-warning')
+          $('#chiller_status_btn').removeClass('btn-success');
+          $('#chiller_status_btn').addClass('btn-warning');
           // $().uxmessage('warning', "Chiller is off!");
         } else {
-          $('#chiller_status_btn').removeClass('btn-warning')
-          $('#chiller_status_btn').addClass('btn-success')
+          $('#chiller_status_btn').removeClass('btn-warning');
+          $('#chiller_status_btn').addClass('btn-success');
         }
         if (data.power_off) {
           $().uxmessage('error', "Power is off!");
@@ -330,7 +356,9 @@ $(document).ready(function(){
   // kick off hardware polling
   poll_hardware_status();
 
-  connect_btn_width = $("#connect_btn").innerWidth();
+  poll_job_history();
+
+  connect_btn_width = $("#connect_btn").width();
   $("#connect_btn").width(connect_btn_width);
   $("#connect_btn").click(function(e){
     if (connect_btn_state == true) {
@@ -414,8 +442,8 @@ $(document).ready(function(){
 
 
   $("#cancel_btn").tooltip({placement:'bottom', delay: {show:500, hide:100}});
-  $("#cancel_btn").click(function(e){
-    var gcode = '!\n'  // ! is enter stop state char
+  $("#cancel_btn").click(function(e) {
+    var gcode = '!\n';  // ! is enter stop state char
     // $().uxmessage('notice', gcode.replace(/\n/g, '<br>'));
     send_gcode(gcode, "Stopping ...", false);
     var delayedresume = setTimeout(function() {
@@ -520,4 +548,39 @@ $(document).ready(function(){
     return false;
   });
 
+  $('#history_modal').on('show.bs.modal', function (e) {
+
+    $.getJSON('/jobs/history', function(history) {
+      $('#history_modal tbody').empty();
+      for (var i in history) {
+        var job = history[i];
+        var start_date = new Date(job.start.$date).format('dd.MM.yyyy hh:mm:ss');
+        var end_date = new Date(job.end.$date).format('dd.MM.yyyy hh:mm:ss');
+
+        var row = $('<tr/>');
+        row.append($('<td/>').text(job.name));
+        row.append($('<td/>').text(start_date));
+        row.append($('<td/>').text(end_date));
+        row.append($('<td/>').text(job.duration + "s"));
+        row.append($('<td/>').text(job.lines));
+        $('#history_modal tbody').append(row);
+      }
+
+      if (history.length > 0) {
+        $('#total_job_duration_big').text(history[0].total + "s");
+      }
+    });
+  });
 });  // ready
+
+jQuery.fn.shake = function(intShakes, intDistance, intDuration) {
+    this.each(function() {
+        $(this).css("position","relative");
+        for (var x=1; x<=intShakes; x++) {
+        $(this).animate({left:(intDistance*-1)}, (((intDuration/intShakes)/4)))
+    .animate({left:intDistance}, ((intDuration/intShakes)/2))
+    .animate({left:0}, (((intDuration/intShakes)/4)));
+    }
+  });
+  return this;
+};
