@@ -24,7 +24,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">{{ToggleNavigation}}</span>
+                        <span class="sr-only">{{Toggle navigation}}</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -65,17 +65,17 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manual<b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="http://www.lasersaur.com/manual/">{{ManualTOC}}</a></li>
-                                <li><a href="http://www.lasersaur.com/manual/operation">{{OperatingALasersaur}}</a></li>
-                                <li><a href="http://www.lasersaur.com/manual/lasertags">{{LaserTags}}</a></li>
+                                <li><a href="http://www.lasersaur.com/manual/">Manual TOC</a></li>
+                                <li><a href="http://www.lasersaur.com/manual/operation">Operating a Lasersaur</a></li>
+                                <li><a href="http://www.lasersaur.com/manual/lasertags">LaserTags</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Admin}}<b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="flash_firmware">{{FlashFirmwareLatest}}</a></li>
-                                <li><a href="build_firmware">{{BuildAndFlashFromSource}}</a></li>
-                                <li><a id="reset_atmega" href="reset_atmega">{{ResetAtmegaRestartsFirmware}}</a></li>
+                                <li><a href="flash_firmware">Flash Firmware (latest)</a></li>
+                                <li><a href="build_firmware">Build and Flash from Source</a></li>
+                                <li><a id="reset_atmega" href="reset_atmega">Reset Atmega (restarts firmware)</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -89,19 +89,19 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">{{AboutLasersaurApp}}</h4>
+                <h4 class="modal-title">About LasersaurApp</h4>
               </div>
               <div class="modal-body">
                 <p><img src="/img/lasersaur-black_w530.jpg"></p>
                 <div style="width:60px;margin-left:auto;margin-right:auto;margin-top:20px;margin-bottom:20px"><img src="/img/lasersaur-dino.png" style="width:60px"></div>
-                <p>{{AboutDialogText_00}} <a href="http://www.lasersaur.com/">{{LasersaurProject}}</a>. {{AboutDialogText_01}} <a href="https://gnu.org/licenses/gpl.html">GPLv3 (version 3 or later)</a> {{AboutDialogText_02}} <a href="http://labs.nortd.com/">Nortd Labs</a></p>
+                <p>LasaurApp is the offical control app for the Lasersaur laser cutter and part of the <a href="http://www.lasersaur.com/">Lasersaur project</a>. This software is made available under the <a href="https://gnu.org/licenses/gpl.html">GPLv3 (version 3 or later)</a> software license. Copyright (c) 2013 <a href="http://labs.nortd.com/">Nortd Labs</a></p>
                 <ul>
-                    <li>{{LasaurAppVersion}} <span id="lasaurapp_version"></span></li>
-                    <li>{{FirmwareVersion}} <span id="firmware_version">&lt;{{NotConnected}}&gt;</span></li>
+                    <li>LasaurApp version <span id="lasaurapp_version"></span></li>
+                    <li>Firmware version <span id="firmware_version">&lt;not connected&gt;</span></li>
                 </ul>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{Close}}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->
@@ -112,15 +112,15 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="{{Close}}"><span aria-hidden="true">&times;</span></button>
-                <h4 id="cancel_modal_label" class="modal-title">{{StopJob}}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 id="cancel_modal_label" class="modal-title">Stop Job</h4>
               </div>
               <div class="modal-body">
-                <p>{{PressEnterToStopJob}}</p>
+                <p>Press ENTER to confirm stopping the current job.</p>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{Close}}</button>
-                <button id="really_cancel_btn" class="btn btn-danger">{{StopJob}}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="really_cancel_btn" class="btn btn-danger">Stop Job!</button>
               </div>
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->
@@ -132,14 +132,14 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 id="door_open_warning_modal_label" class="modal-title">{{DoorIsOpen}}</h4>
+                <h4 id="door_open_warning_modal_label" class="modal-title">Door is open</h4>
               </div>
               <div class="modal-body">
-                <p>{{ReallyStartJobWithOpenDoor}}</p>
+                <p>Are you sure you want to start the job with an open Door?</p>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{No}}</button>
-                <button id="really_submit_job_btn" class="btn btn-danger">{{IKnowWhatImDoing}}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                <button id="really_submit_job_btn" class="btn btn-danger">Sure I know what I'm doing</button>
               </div>
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->
@@ -155,25 +155,25 @@
                                 <li class="active">
                                     <a class="btn btn-link" href="#tab_jobs" id="tab_jobs_button" data-toggle="tab" style="text-align: left;">
                                         <i class="glyphicon glyphicon-th-list" style="margin-right:2px"></i>
-                                        {{LaserJobs}}
+                                        Laser Jobs
                                     </a>
                                 </li>
                                 <li>
                                     <a class="btn btn-link " href="#tab_import" id="tab_import_button" data-toggle="tab" style="text-align: left;">
                                         <i class="glyphicon glyphicon-folder-open" style="margin-right:2px"></i>
-                                        {{FileImport}}
+                                        File Import
                                     </a>
                                 </li>
                                 <li>
                                     <a class="btn btn-link " href="#tab_mover" id="tab_mover_button" data-toggle="tab" style="text-align: left;">
                                         <i class="glyphicon glyphicon-move" style="margin-right:2px"></i>
-                                        {{MoveJog}}
+                                        Move/Jog
                                     </a>
                                 </li>
                                 <li>
                                     <a class="btn btn-link " href="#tab_logs" id="tab_logs_button" data-toggle="tab" style="text-align: left;">
                                         <i class="glyphicon glyphicon-exclamation-sign" style="margin-right:2px"></i>
-                                        {{Logs}}
+                                        Logs
                                     </a>
                                 </li>
                             </ul>
@@ -185,8 +185,8 @@
                                 <div id="tab_jobs" class="tab-pane active row">
                                     <div class="col-md-9">
                                         <div class="well clearfix" style="margin-bottom:40px">
-                                            <input type="text" id="job_name" style="width:296px;padding-left: 5px;" placeholder="{{LoadOrImportaJob}}">
-                                            <button id="file_import_quick_btn" class="btn btn-default pull-right" title="{{FileImport}}" data-delay="500" style="margin-top:0;">
+                                            <input type="text" id="job_name" style="width:296px;padding-left: 5px;" placeholder="Load or import a job.">
+                                            <button id="file_import_quick_btn" class="btn btn-default pull-right" title="file import" data-delay="500" style="margin-top:0;">
                                                 <span class="glyphicon glyphicon-folder-open"></span>
                                             </button>
                                             <textarea id="job_data" style="display:none"></textarea>
@@ -194,8 +194,8 @@
                                             <!-- passes -->
                                             <div id="passes_container" class="clearfix" style="width:594px; margin:0px; margin-top:10px; padding:15px; background-color:#dddddd; display:none">
                                                 <div id="passes_info" class="pull-right" style="width:180px; color:#888888; display:none">
-                                                    <p>{{VectorCutInstructions}}</p>
-                                                    <p>{{NeedMorePasses_1}} <a id="add_pass_btn" href="">{{NeedMorePasses_2}}</a></p>
+                                                    <p>Vector cuts: Use one or more passes with different cut parameters (feedrate, intensity). Assign path colors to passes as needed.</p>
+                                                    <p>Need <a id="add_pass_btn" href="">more passes?</a></p>
                                                 </div>
                                                 <div id="passes" class="pull-left" style="width:350px">
                                                     <!-- passes go here -->
@@ -203,8 +203,8 @@
                                             </div>
                                             <div style="padding-top:20px">
                                                 <div class="btn-group pull-left">
-                                                    <button id="job_submit" class="btn btn-lg btn-primary">{{SendToLasersaur}}</button>
-                                                    <button id="job_bbox_submit" class="btn btn-lg btn-primary" title="{{SendBoundingBoxToLasersaur}}" data-delay="500">
+                                                    <button id="job_submit" class="btn btn-lg btn-primary">Send to Lasersaur</button>
+                                                    <button id="job_bbox_submit" class="btn btn-lg btn-primary" title="send bounding box to lasersaur" data-delay="500">
                                                     <span class="glyphicon glyphicon-resize-full glyphicon glyphicon-white"></span>
                                                     </button>
                                                 </div>
@@ -215,11 +215,11 @@
                                                         <span class="caret"></span>
                                                     </a>
                                                     <ul class="dropdown-menu">
-                                                        <li><a id="export_json_btn" href="#">{{ExportJobAsJSON}}</a></li>
-                                                        <li><a id="export_gcode_btn" href="#">{{ExportJobAsGCode}}</a></li>
+                                                        <li><a id="export_json_btn" href="#">Export Job as JSON</a></li>
+                                                        <li><a id="export_gcode_btn" href="#">Export Job as G-Code</a></li>
                                                     </ul>
                                                 </div>
-                                                <button id="job_save_to_queue" class="btn btn-default btn-lg pull-right" title="{{AddToQueue}}" data-delay="500" style="margin-right:10px">
+                                                <button id="job_save_to_queue" class="btn btn-default btn-lg pull-right" title="add to queue" data-delay="500" style="margin-right:10px">
                                                 <span class="glyphicon glyphicon-th-list"></span>
                                                 </button>
                                             </div>
@@ -227,17 +227,17 @@
                                                 <div class="progress-bar" style="width:0%;"></div>
                                             </div>
                                         </div>
-                                        <button id="clear_queue" class="btn btn-default btn-xs pull-right" title="{{DeleteNonStarredJobs}}" data-delay="500">
-                                            {{Clear}}
+                                        <button id="clear_queue" class="btn btn-default btn-xs pull-right" title="delete non-starred jobs" data-delay="500">
+                                            clear
                                         </button>
-                                        <h3>{{RecentJobs}}</h3>
+                                        <h3>Recent Jobs</h3>
                                         <div>
                                             <ul id="job_queue" class="nav nav-pills nav-stacked">
                                                 <!-- job queue -->
                                             </ul>
                                             <div class="btn-group dropup">
                                                 <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
-                                                    {{LibraryJobs}}
+                                                    Library Jobs
                                                     <span class="caret"></span>
                                                 </a>
                                                 <ul id="job_library" class="dropdown-menu">
@@ -249,23 +249,23 @@
 
                                     <div class="col-md-3 well well-sm">
                                         <h3>
-                                            {{History}}
+                                            History
                                             <small>
                                                 <a href="#" data-toggle="modal" data-target="#history_modal" data-backdrop="true">
-                                                    {{ShowAll}}
+                                                    show all
                                                 </a>
                                             </small>
                                         </h3>
                                         <table id="job_history" class="table table-hover table-condensed">
                                             <thead>
                                                 <tr>
-                                                    <th>{{Name}}</th>
-                                                    <th>{{Duration}}</th>
+                                                    <th>Name</th>
+                                                    <th>Duration</th>
                                                 </tr>
                                             </thead>
                                             <tfoot>
                                                 <tr class="active">
-                                                    <th>{{Total}}</th>
+                                                    <th>Total</th>
                                                     <th id="total_job_duration">...</th>
                                                 </tr>
                                             </tfoot>
@@ -277,17 +277,17 @@
                                     <div class="well clearfix" style="width:650px">
                                         <div class="row" style="margin-left:0px">
                                             <div class="btn-group pull-left">
-                                                <button id="file_import_btn" class="btn btn-info btn-lg" data-loading-text="{{Loading}}" autocomplete="off">
+                                                <button id="file_import_btn" class="btn btn-info btn-lg" data-loading-text="loading..." autocomplete="off">
                                                     <i class="glyphicon glyphicon-folder-open" style="margin-right:5px;"></i>
-                                                    {{Import}}
+                                                    Import
                                                 </button>
                                                 <button class="btn btn-info btn-lg dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                                 <ul class="dropdown-menu">
-                                                    <li><a id="svg_import_72_btn" href="#">{{Import72dpiSVG}}</a></li>
-                                                    <li><a id="svg_import_90_btn" href="#">{{Import90dpiSVG}}</a></li>
-                                                    <li><a id="svg_import_96_btn" href="#">{{Import96dpiSVG}}</a></li>
+                                                    <li><a id="svg_import_72_btn" href="#">Import 72dpi SVG</a></li>
+                                                    <li><a id="svg_import_90_btn" href="#">Import 90dpi SVG</a></li>
+                                                    <li><a id="svg_import_96_btn" href="#">Import 96dpi SVG</a></li>
                                                     <li class="divider"></li>
-                                                    <li><a id="svg_import_nop_btn" href="#">{{ImportWithoutOptimizing}}</a></li>
+                                                    <li><a id="svg_import_nop_btn" href="#">Import without Optimizing</a></li>
                                                 </ul>
                                             </div>
                                             <div id="dpi_import_info" class="pull-left" style="margin-top: 23px; margin-left: 15px;"></div>
@@ -303,23 +303,23 @@
                                         </div>
                                         <div class="pull-left">
                                             <button id="import_to_queue" class="btn btn-primary btn-lg" style="margin-top:16px">
-                                            <i class="glyphicon glyphicon-th-list"></i> {{AddToQueue}}
+                                            <i class="glyphicon glyphicon-th-list"></i> Add to Queue
                                             </button>
                                         </div>
                                         <div class="pull-left" style="margin-top:27px; margin-left:20px">
-                                            {{UnderName}}
+                                            under name
                                         </div>
                                         <div class="pull-left" style="margin-top:22px; margin-left:10px">
-                                            <input type="text" id="import_name" style="width:240px; padding-left:5px;" placeholder="{{NameDots}}">
+                                            <input type="text" id="import_name" style="width:240px; padding-left:5px;" placeholder="Name...">
                                         </div>
                                         </div> <!--end of well-->
                                         <div class="alert alert-warning" style="width:400px">
                                             <a class="close" data-dismiss="alert">×</a>
-                                            <strong>{{NoteExclamation}}</strong> {{SetPageSizeTo}} <b id="bed_size_note"></b>.
+                                            <strong>Note!</strong> Set page size in your SVG vector app to <b id="bed_size_note"></b>.
                                         </div>
                                         <div class="alert alert-warning" style="width:400px">
                                             <a class="close" data-dismiss="alert">×</a>
-                                            <strong>{{NoteExclamation}}</strong> {{SetCuttingParametersWith}} <a href="http://www.lasersaur.com/manual/lasertags">{{LaserTags}}</a>.
+                                            <strong>Note!</strong> Set cutting parameters in the SVG file with <a href="http://www.lasersaur.com/manual/lasertags">LaserTags</a>.
                                         </div>
                                 </div> <!-- end of import tab -->
                                 <div id="tab_mover" class="tab-pane" style="margin-left:0px">
@@ -334,8 +334,8 @@
                                         </div>
                                         <div class="row" style="width:475px; margin-left:auto; margin-right:auto; margin-top:20px">
                                             <div id="seek_feed_btns" class="btn-group pull-left" data-toggle="buttons-radio">
-                                                <button id="seek_btn" class="btn btn-primary active">{{Move}}</button>
-                                                <button id="feed_btn" class="btn btn-primary">{{Cut}}</button>
+                                                <button id="seek_btn" class="btn btn-primary active">Move</button>
+                                                <button id="feed_btn" class="btn btn-primary">Cut</button>
                                             </div>
                                             <div id="intensity_input_div" class="input-group pull-left" style="margin-left:8px; margin-top:16px; display: inline;">
                                                 <span class="input-group-addon" style="margin-right:-5px; display: inline;">%</span>
@@ -343,13 +343,13 @@
                                                 <input id="intensity_field_disabled" type="textfield" class="disabled" disabled="" value="0" style="width:26px;">
                                             </div>
                                             <div id="feedrate_btns" class="btn-group pull-right" data-toggle="buttons-radio">
-                                                <button id="feedrate_btn_slow" class="btn btn-primary ">{{Slow}}</button>
-                                                <button id="feedrate_btn_medium" class="btn btn-primary ">{{Medium}}</button>
-                                                <button id="feedrate_btn_fast" class="btn btn-primary active">{{Fast}}</button>
+                                                <button id="feedrate_btn_slow" class="btn btn-primary ">slow</button>
+                                                <button id="feedrate_btn_medium" class="btn btn-primary ">medium</button>
+                                                <button id="feedrate_btn_fast" class="btn btn-primary active">fast</button>
                                             </div>
                                             <div class="input-group pull-right" style="margin-right:8px; margin-top:16px; display: inline;">
                                                 <input id="feedrate_field" type="textfield" value="8000" style="width:40px;">
-                                                <span class="input-group-addon" style="margin-left:-5px; display: inline;">{{MMPerMin}}</span>
+                                                <span class="input-group-addon" style="margin-left:-5px; display: inline;">mm/min</span>
                                             </div>
                                         </div>
                                         <div class="row clearfix jog_btns" style="width:400px; margin-left:auto; margin-right:auto; margin-top:16px">
@@ -370,9 +370,9 @@
                                             <div class="pull-right" style="width:168px; height:130px; background-color:#dddddd; padding-top: 15px;">
                                                 <div class="btn-group" style="margin-bottom:20px; margin-left: 15px;">
                                                     <button id="location_set_btn" class="btn btn-primary btn-sm" style="padding:5px;">
-                                                        <span id="loc_move_cut_word">{{Move_To_1}}</span> {{Move_To_2}}
+                                                        <span id="loc_move_cut_word">Move</span> To
                                                     </button>
-                                                    <button id="origin_set_btn" class="btn btn-primary btn-sm" style="padding:5px;">{{OffsetTo}}</button>
+                                                    <button id="origin_set_btn" class="btn btn-primary btn-sm" style="padding:5px;">Offset To</button>
                                                 </div>
                                                 <div class="input-group pull-left" style="display: inline;">
                                                     <span class="input-group-addon" style="margin-right:-5px;display: inline;">x</span>
@@ -385,23 +385,23 @@
                                             </div>
                                         </div>
                                         <div class="row" style="width:210px; margin-left:auto; margin-right:auto;">
-                                            <button id="air_on_btn" class="btn btn-primary">{{AirAssistOn}}</button>
-                                            <button id="air_off_btn" class="btn btn-primary">{{AirAssistOff}}</button>
+                                            <button id="air_on_btn" class="btn btn-primary">Air Assist On</button>
+                                            <button id="air_off_btn" class="btn btn-primary">Air Assist Off</button>
                                         </div>
                                     </div>
                                     <div class="alert alert-warning" style="width:400px">
                                         <a class="close" data-dismiss="alert">×</a>
-                                        <strong>{{NoteExclamation}}</strong> {{SetOffsetByShifClick}}
+                                        <strong>Note!</strong> Set an offset by shift-clicking in the work area.
                                     </div>
                                     <div class="alert alert-warning" style="width:400px">
                                         <a class="close" data-dismiss="alert">×</a>
-                                        <strong>{{NoteExclamation}}</strong> {{UseArrowKeysToJog}}
+                                        <strong>Note!</strong> User arrow keys to jog. De/increase step with alt and shift.
                                     </div>
                                 </div> <!-- end of mover tab -->
                                 <div id="tab_logs" class="tab-pane active">
                                     <div class="alert alert-warning" style="margin:5px; display:none">
                                         <a class="close" data-dismiss="alert">×</a>
-                                        {{LogMostRecentMessagesFirst}}
+                                        Log, most recent messages first:
                                     </div>
                                     <div id="log_content" style="clear:both; overflow:auto; display:none">
                                         <!-- log -->
@@ -427,18 +427,18 @@
                 <table id="job_history_big" class="table table-striped">
                     <thead>
                         <tr>
-                            <th>{{History_Name}}</th>
-                            <th>{{History_Start}}</th>
-                            <th>{{History_End}}</th>
-                            <th>{{History_Duration}}</th>
-                            <th>{{History_LinesOfGCode}}</th>
+                            <th>Name</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Duration</th>
+                            <th>Lines of GCode</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr class="active">
                             <th></th>
                             <th></th>
-                            <th>{{History_TotalDuration}}</th>
+                            <th>Total Duration</th>
                             <th id="total_job_duration_big">...</th>
                             <th></th>
                         </tr>
@@ -447,7 +447,7 @@
                 </table>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{Close}}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
           </div>

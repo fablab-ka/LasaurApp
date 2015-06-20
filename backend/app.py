@@ -5,12 +5,13 @@ import glob, json, argparse, copy
 import tempfile
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
-from bottle import Bottle, static_file, request, debug, default_app
+from bottle import Bottle, static_file, request, debug, default_app, template
 from serial_manager import SerialManager
 from flash import flash_upload, reset_atmega
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
 from serial import SerialException
+import i18n
 import datedecoder
 
 
@@ -25,6 +26,7 @@ CONFIG_FILE = "lasaurapp.conf"
 COOKIE_KEY = 'secret_key_jkn23489hsdf'
 FIRMWARE = "LasaurGrbl.hex"
 TOLERANCE = 0.08
+I18N = i18n.Translations("de")
 
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
@@ -327,7 +329,8 @@ def queue_unstar_handler(name):
 @app.route('/index.html')
 @app.route('/app.html')
 def default_handler():
-    return static_file('app.html', root=os.path.join(resources_dir(), 'frontend'))
+    filename = os.path.join(os.path.join(resources_dir(), 'frontend', 'app.html'))
+    return template(filename, list(I18N))
 
 
 @app.route('/stash_download', method='POST')
