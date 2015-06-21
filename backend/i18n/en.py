@@ -1,6 +1,6 @@
 dictionary = {
-    "About": "Info",
-    "ToggleNavigation": "Navigation umschalten",
+    "About": "About",
+    "ToggleNavigation": "Toggle Navigation",
     "ManualTOC": "Manual TOC",
     "OperatingALasersaur": "Operating a Lasersaur",
     "LaserTags": "LaserTags",
