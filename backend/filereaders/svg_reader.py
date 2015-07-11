@@ -1,4 +1,3 @@
-
 __author__ = 'Stefan Hechenberger <stefan@nortd.com>'
 
 import re
@@ -13,8 +12,8 @@ from .svg_tag_reader import SVGTagReader
 
 logging.basicConfig()
 log = logging.getLogger("svg_reader")
-log.setLevel(logging.DEBUG)
-log.setLevel(logging.INFO)
+# log.setLevel(logging.DEBUG)
+# log.setLevel(logging.INFO)
 log.setLevel(logging.WARN)
 
 
@@ -154,17 +153,15 @@ class SVGReader:
         if force_dpi is not None:
             self.px2mm = 25.4/force_dpi
             log.info("SVG import forced to %s dpi." % (force_dpi))
-
-        width = None
-        height = None
-        vb_x = None
-        vb_y = None
-        vb_w = None
-        vb_h = None
-        unit = ''
-
-        # Get width, height, viewBox for further processing
-        if not self.px2mm:
+        else:
+            # Get width, height, viewBox for further processing
+            width = None
+            height = None
+            vb_x = None        #needed for later translate ( xformToWorld)
+            vb_y = None        #needed for later translate ( xformToWorld)
+            vb_w = None
+            vb_h = None
+            unit = ''
             # get width, height, unit
             width_str = svgRootElement.attrib.get('width')
             height_str = svgRootElement.attrib.get('height')
@@ -184,56 +181,60 @@ class SVGReader:
                 log.info("SVG viewBox (%s,%s,%s,%s)." % (vb_x, vb_y, vb_w, vb_h))
 
         # 2. Get px2mm from width, height, viewBox
-        if not self.px2mm:
-            if (width and height) or vb:
-                if not (width and height):
-                    # default to viewBox
-                    width = vb_w
-                    height = vb_h
-                if not vb:
-                    # default to width, height, and no offset
-                    vb_x = 0.0
-                    vb_y = 0.0
-                    vb_w = width
-                    vb_h = height
+        if (not self.px2mm) and vb:
+            if not (width and height):
+                log.info("SVG with viewbox but no width and height: Assuming relation 1:1")
+                # default to viewBox
+                width = vb_w
+                height = vb_h
 
+            if unit == 'mm':
+                # great, the svg file already uses mm
                 self.px2mm = width/vb_w
-
-                if unit == 'mm':
-                    # great, the svg file already uses mm
-                    pass
-                    log.info("px2mm by svg mm unit")
-                elif unit == 'in':
-                    # prime for inch to mm conversion
-                    self.px2mm *= 25.4
-                    log.info("px2mm by svg inch unit")
-                elif unit == 'cm':
-                    # prime for cm to mm conversion
-                    self.px2mm *= 10.0
-                    log.info("px2mm by svg cm unit")
-                elif unit == 'px' or unit == '':
-                    pass
-                    # no physical units in file
-                    # we have to interpret user (px) units
+                log.info("px2mm by svg mm unit")
+            elif unit == 'in':
+                # prime for inch to mm conversion
+                self.px2mm = width/vb_w * 25.4
+                log.info("px2mm by svg inch unit")
+            elif unit == 'cm':
+                # prime for cm to mm conversion
+                self.px2mm = width/vb_w * 10
+                log.info("px2mm by svg cm unit")
+            elif unit == 'px' or unit == '':
+                log.info("SVG with viewbox and width and height, but no real world units in width and height")
+            else:
+                pass
+                log.error("SVG with unsupported unit.")
 
         # 3. For some apps we can make a good guess.
-        if not self.px2mm:
+        # no physical units in file
+        # we have to interpret user (px) units
+        if (not self.px2mm):
             svghead = svgstring[0:400]
-            if 'Inkscape' in svghead:
-                self.px2mm *= 25.4/90.0
+            if 'Inkscape' in svghead:   #Incscape 0.48 and before. 0.91 writes viewbox an newly created files
+                self.px2mm = 25.4/90.0
                 log.info("SVG exported with Inkscape -> 90dpi.")
             elif 'Illustrator' in svghead:
-                self.px2mm *= 25.4/72.0
+                self.px2mm = 25.4/72.0
                 log.info("SVG exported with Illustrator -> 72dpi.")
             elif 'Intaglio' in svghead:
-                self.px2mm *= 25.4/72.0
+                self.px2mm = 25.4/72.0
                 log.info("SVG exported with Intaglio -> 72dpi.")
-            elif 'CorelDraw' in svghead:
-                self.px2mm *= 25.4/96.0
+            elif 'CorelDraw' in svghead:   # must be a very old Corel-Draw, as Corel Draw supports viewbox since at least X3.
+                self.px2mm = 25.4/96.0
                 log.info("SVG exported with CorelDraw -> 96dpi.")
             elif 'Qt' in svghead:
-                self.px2mm *= 25.4/90.0
+                self.px2mm = 25.4/90.0
                 log.info("SVG exported with Qt lib -> 90dpi.")
+            else:
+                log.info("no known application found in header")
+                pass
+
+        # 4. Get px2mm by the ratio of svg size to target size
+        if not self.px2mm and (width and height):
+            self.px2mm = self._target_size[0]/width
+            log.info("px2mm by target_size/page_size ratio")
+
 
         # 5. Fall back on px unit DPIs default value
         if not self.px2mm:
@@ -245,11 +246,11 @@ class SVGReader:
 
         # translation from viewbox
         if vb_x:
-            tx = -1 * vb_x
+            tx = vb_x * -1.0
         else:
             tx = 0.0
         if vb_y:
-            ty = -1 * vb_y
+            ty = vb_y * -1.0
         else:
             ty = 0.0
 
@@ -327,9 +328,3 @@ class SVGReader:
 
 
 
-
-if __name__ == "__main__":
-    with open(os.path.join(svgpath, "rocket_full.svg")) as f:
-        svgstring = f.read()
-    svgReader = SVGReader(0.08, [1220,610])
-    svgReader.parse(svg_string, forced_dpi)
