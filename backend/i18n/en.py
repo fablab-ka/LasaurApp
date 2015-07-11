@@ -77,6 +77,7 @@ dictionary = {
     "History_Start": "Start",
     "History_End": "End",
     "History_Duration": "Duration",
-    "History_LinesOfGCode": "Lines of GCode",
+    "History_LinesOfGCode": "# GCode",
     "History_TotalDuration": "Total Duration",
+    "History_Selected": "Selected",
 }

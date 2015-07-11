@@ -173,6 +173,25 @@ function generate_download(filename, filedata) {
   });
 }
 
+function getDurationString(durationSeconds) {
+    var hours   = Math.floor(durationSeconds / 3600);
+    var minutes = Math.floor((durationSeconds - (hours * 3600)) / 60);
+    var seconds = durationSeconds - (hours * 3600) - (minutes * 60);
+
+    var duration = '';
+    if (seconds > 0) {
+      duration = seconds + 's ' + duration;
+    }
+    if (minutes > 0) {
+      duration = minutes + 'min ' + duration;
+    }
+    if (hours > 0) {
+      duration = hours + 'h ' + duration;
+    }
+
+    return duration;
+}
+
 function poll_job_history() {
   console.log("poll_job_history");
 
@@ -181,11 +200,12 @@ function poll_job_history() {
 
     for (var i in history) {
       var job = history[i];
-      var date = new Date(job.start.$date).format('dd.MM.yyyy hh:mm:ss');
+      var date = new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss');
+      var duration = getDurationString(job.duration);
 
       var row = $('<tr title="'+date+'" data-toggle="tooltip" data-placement="right"/>');
-      row.append($('<td/>').text(job.name));
-      row.append($('<td/>').text(job.duration + "s"));
+      row.append($('<td class="name" />').append($('<span/>').text(job.name)));
+      row.append($('<td/>').append($('<span/>').text(duration)));
       $('#job_history tbody').append(row);
     }
 
@@ -210,9 +230,9 @@ $(document).ready(function(){
   $('#feedrate_field').val(app_settings.max_seek_speed);
 
   $('#tab_logs_button').click(function(){
-    $('#log_content').show()
-    $('#tab_logs div.alert').show()
-  })
+    $('#log_content').show();
+    $('#tab_logs div.alert').show();
+  });
 
 
   //////// serial connect and pause button ////////
@@ -554,22 +574,47 @@ $(document).ready(function(){
       $('#history_modal tbody').empty();
       for (var i in history) {
         var job = history[i];
-        var start_date = new Date(job.start.$date).format('dd.MM.yyyy hh:mm:ss');
-        var end_date = new Date(job.end.$date).format('dd.MM.yyyy hh:mm:ss');
+        var start_date = new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss');
+        var end_date = new Date(job.end.$date).format('dd.mm.yyyy hh:MM:ss');
+        var duration = getDurationString(job.duration);
 
         var row = $('<tr/>');
-        row.append($('<td/>').text(job.name));
-        row.append($('<td/>').text(start_date));
-        row.append($('<td/>').text(end_date));
-        row.append($('<td/>').text(job.duration + "s"));
-        row.append($('<td/>').text(job.lines));
+        row.append($('<td />').append($('<span class="cell row-1" />').text(job.name).attr('data-original-title', job.name)));
+        row.append($('<td />').append($('<span class="cell row-2" />').text(start_date)));
+        row.append($('<td />').append($('<span class="cell row-3" />').text(end_date)));
+        row.append($('<td />').append($('<span class="cell row-4" />').text(job.lines)));
+        row.append($('<td />').append($('<span class="cell row-5" />').text(duration)));
+        row.data('duration', job.duration);
         $('#history_modal tbody').append(row);
       }
 
       if (history.length > 0) {
         $('#total_job_duration_big').text(history[0].total + "s");
       }
+
+      $('#selected_history_label').hide();
+
+      $('#history_modal tbody span.cell').tooltip({ container: 'body' });
     });
+  });
+
+  $('#job_history_big tbody').on('click', 'tr', function() {
+    $(this).toggleClass('selected');
+
+    var selected = $('#job_history_big tbody tr.selected');
+    if (selected.length <= 0) {
+      $('#selected_history_label').hide();
+    } else {
+      $('#selected_history_label').show();
+
+      var duration = 0;
+      selected.each(function(i, row) {
+        duration += $(row).data('duration');
+      });
+
+      var durationString = getDurationString(duration);
+      $('#selected_history_label .badge').text(durationString);
+    }
   });
 });  // ready
 

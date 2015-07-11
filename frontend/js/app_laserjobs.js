@@ -231,7 +231,7 @@ function addPasses(num) {
                     '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
                     '<input class="intensity" type="textfield" value="'+
                       app_settings.default_intensity+
-                      '" title="intensity 0-100%" style="width:26px;" data-delay="500">' +
+                      '" title="intensity 0-100%" style="width:30px;" data-delay="500">' +
                   '</div>' +
                   '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
                 '</div>' +
