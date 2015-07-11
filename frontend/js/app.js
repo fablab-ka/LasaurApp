@@ -174,9 +174,10 @@ function generate_download(filename, filedata) {
 }
 
 function getDurationString(durationSeconds) {
-    var hours   = Math.floor(durationSeconds / 3600);
-    var minutes = Math.floor((durationSeconds - (hours * 3600)) / 60);
-    var seconds = durationSeconds - (hours * 3600) - (minutes * 60);
+    var days   = Math.floor(durationSeconds / 86400);
+    var hours   = Math.floor((durationSeconds - (days * 86400)) / 3600);
+    var minutes = Math.floor((durationSeconds - (days * 86400) - (hours * 3600)) / 60);
+    var seconds = durationSeconds - (days * 86400) - (hours * 3600) - (minutes * 60);
 
     var duration = '';
     if (seconds > 0) {
@@ -187,6 +188,9 @@ function getDurationString(durationSeconds) {
     }
     if (hours > 0) {
       duration = hours + 'h ' + duration;
+    }
+    if (days > 0) {
+      duration = days + 'd ' + duration;
     }
 
     return duration;
