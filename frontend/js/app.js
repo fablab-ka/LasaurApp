@@ -271,12 +271,12 @@ $(document).ready(function(){
       if (data.paused) {
         pause_btn_state = true;
         $("#pause_btn").addClass("btn-primary");
-        $("#pause_btn").html('<i class="icon-play"></i>');
+        $("#pause_btn").html('<i class="glyphicon glyphicon-play"></i>');
       } else {
         pause_btn_state = false;
         $("#pause_btn").removeClass("btn-warning");
         $("#pause_btn").removeClass("btn-primary");
-        $("#pause_btn").html('<i class="icon-pause"></i>');
+        $("#pause_btn").html('<i class="glyphicon glyphicon-pause"></i>');
       }
       // serial connected
       if (data.serial_connected) {
@@ -440,7 +440,7 @@ $(document).ready(function(){
           pause_btn_state = false;
           $("#pause_btn").removeClass('btn-primary');
           $("#pause_btn").removeClass('btn-warning');
-          $("#pause_btn").html('<i class="icon-pause"></i>');
+          $("#pause_btn").html('<i class="glyphicon glyphicon-pause"></i>');
           $().uxmessage('notice', "Continuing...");
         }
       });
@@ -451,7 +451,7 @@ $(document).ready(function(){
           pause_btn_state = true;
           $("#pause_btn").removeClass("btn-warning");
           $("#pause_btn").addClass('btn-primary');
-          $("#pause_btn").html('<i class="icon-play"></i>');
+          $("#pause_btn").html('<i class="glyphicon glyphicon-play"></i>');
           $().uxmessage('notice', "Pausing in a bit...");
         } else if (data == '0') {
           $("#pause_btn").removeClass("btn-warning");
