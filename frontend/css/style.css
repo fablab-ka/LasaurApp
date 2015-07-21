@@ -102,3 +102,8 @@ button.active-strong {
   overflow: hidden;
   white-space: nowrap;
 }
+
+.btn-primary.active:not(.btn-link):not(.btn-flat) {
+  background-color: #00C320;
+  text-decoration: underline;
+}
