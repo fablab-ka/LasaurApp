@@ -185,7 +185,7 @@
                                 <div id="tab_jobs" class="tab-pane active row">
                                     <div class="col-md-9">
                                         <div class="well clearfix" style="margin-bottom:40px">
-                                            <input type="text" id="job_name" style="width:296px;padding-left: 5px;" placeholder="{{LoadOrImportaJob}}">
+                                            <input type="text" id="job_name" style="width:296px;padding-left: 5px;" placeholder="{{LoadOrImportaJob}}" class="form-control">
                                             <button id="file_import_quick_btn" class="btn btn-default pull-right" title="{{FileImport}}" data-delay="500" style="margin-top:0;">
                                                 <span class="glyphicon glyphicon-folder-open"></span>
                                             </button>
@@ -293,7 +293,7 @@
                                             <div id="dpi_import_info" class="pull-left" style="margin-top: 23px; margin-left: 15px;"></div>
                                             <div class="pull-left">
                                                 <form id="svg_upload_form" action="#" onsubmit="return false;">
-                                                    <input type="file" id="svg_upload_file" name="data" style="visibility:hidden; position:fixed">
+                                                    <input type="file" id="svg_upload_file" name="data" style="visibility:hidden; position:fixed" class="form-control">
                                                 </form>
                                             </div>
                                         </div>
@@ -310,7 +310,7 @@
                                             {{UnderName}}
                                         </div>
                                         <div class="pull-left" style="margin-top:22px; margin-left:10px">
-                                            <input type="text" id="import_name" style="width:240px; padding-left:5px;" placeholder="{{NameDots}}">
+                                            <input type="text" id="import_name" style="width:240px; padding-left:5px;" placeholder="{{NameDots}}" class="form-control">
                                         </div>
                                         </div> <!--end of well-->
                                         <div class="alert alert-warning" style="width:400px">
@@ -335,36 +335,36 @@
                                         <div class="row" style="width:475px; margin-left:auto; margin-right:auto; margin-top:20px">
                                             <div id="seek_feed_btns" class="btn-group pull-left" data-toggle="buttons">
                                               <label class="btn btn-primary active">
-                                                <input id="seek_btn" type="radio" name="seek_feed" autocomplete="off" checked/>
+                                                <input id="seek_btn" type="radio" name="seek_feed" autocomplete="off" checked class="form-control"/>
                                                 {{Move}}
                                               </label>
                                               <label class="btn btn-primary">
-                                                <input id="feed_btn" type="radio" name="seek_feed" autocomplete="off"/>
+                                                <input id="feed_btn" type="radio" name="seek_feed" autocomplete="off"  class="form-control"/>
                                                 {{Cut}}
                                               </label>
                                             </div>
-                                            <div id="intensity_input_div" class="input-group pull-left" style="margin-left:8px; margin-top:16px; display: inline;">
-                                                <span class="input-group-addon" style="margin-right:-5px; display: inline;">%</span>
-                                                <input id="intensity_field" type="textfield" value="0" style="width:30px; display:none">
-                                                <input id="intensity_field_disabled" type="textfield" class="disabled" disabled="" value="0" style="width:26px;">
+                                            <div id="intensity_input_div" class="input-group pull-left" style="margin-left:25px; margin-top:10px; display: inline; width: 100px;">
+                                                <input id="intensity_field" type="textfield" value="0" style="width:40px; display:none; text-align: right;"  class="form-control">
+                                                <input id="intensity_field_disabled" type="textfield" class="disabled form-control" disabled="" value="0" style="width:40px; text-align: right;" title="{{NoIntensityForMove}}">
+                                                <span class="input-group-addon" style="line-height:32px; display: inline;">%</span>
                                             </div>
                                             <div id="feedrate_btns" class="btn-group pull-right" data-toggle="buttons">
                                               <label class="btn btn-primary active">
-                                                <input id="feedrate_btn_slow" type="radio" name="feedrate" autocomplete="off" checked/>
+                                                <input id="feedrate_btn_slow" type="radio" name="feedrate" autocomplete="off" checked class="form-control"/>
                                                 {{Slow}}
                                               </label>
                                               <label class="btn btn-primary">
-                                                <input id="feedrate_btn_medium" type="radio" name="feedrate" autocomplete="off"/>
+                                                <input id="feedrate_btn_medium" type="radio" name="feedrate" autocomplete="off"class="form-control"/>
                                                 {{Medium}}
                                               </label>
                                               <label class="btn btn-primary">
-                                                <input id="feedrate_btn_fast" type="radio" name="feedrate" autocomplete="off"/>
+                                                <input id="feedrate_btn_fast" type="radio" name="feedrate" autocomplete="off"class="form-control"/>
                                                 {{Fast}}
                                               </label>
                                             </div>
                                             <div class="input-group pull-right" style="margin-right:8px; margin-top:16px; display: inline;">
-                                                <input id="feedrate_field" type="textfield" value="8000" style="width:40px;">
-                                                <span class="input-group-addon" style="margin-left:-5px; display: inline;">{{MMPerMin}}</span>
+                                                <input id="feedrate_field" type="textfield" value="8000" style="width:40px; text-align: right;"class="form-control">
+                                                <span class="input-group-addon" style="line-height:32px; display: inline;">{{MMPerMin}}</span>
                                             </div>
                                         </div>
                                         <div class="row clearfix jog_btns" style="width:400px; margin-left:auto; margin-right:auto; margin-top:16px">
@@ -486,7 +486,6 @@
         <script src="/js/jquery.toastmessage.js"></script>
         <script src="/js/jquery.hotkeys.js"></script>
         <script src="/js/settings.js"></script>
-        <script src="/js/app_svgreader.js"></script>
         <script src="/js/app_datahandler.js"></script>
         <script src="/js/app_canvas.js"></script>
         <script src="/js/app.js"></script>

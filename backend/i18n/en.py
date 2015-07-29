@@ -80,4 +80,5 @@ dictionary = {
     "History_LinesOfGCode": "# GCode",
     "History_TotalDuration": "Total Duration",
     "History_Selected": "Selected",
+    "NoIntensityForMove": "no laser intensity for move required",
 }
