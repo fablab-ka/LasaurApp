@@ -42,10 +42,13 @@ void control_init() {
     // For SYNRAD 48-5 RFF lasertube we need to use PD5 (OC0B) as only this can be
     // configured with 5kHz
     DDRD |= (1 << DDD5);      // set PD5 as an output
-    TCCR0A = _BV(COM0B1) | _BV(COM0A0) | _BV(WGM00);
-    TCCR0B = _BV(WGM02) | _BV(CS01);
-    OCR0A = 200;
-    OCR0B = 1;
+    //Use CTC-Mode with phase-correct PWM
+    //This means the pwm counts from 0 to OCR0A and back.
+    //Since we can't use PD6 in this mode, we have to usw PD5.
+    TCCR0A = _BV(COM0B1) | _BV(COM0A0) | _BV(WGM00); //CTC phase-correct mode
+    TCCR0B = _BV(WGM02) | _BV(CS01); //3,9kHz
+    OCR0A = 200; //set upper pwm border so that 3,9kHz * 255 / 200 = 4,97kHz
+    OCR0B = 1; //Set Tickle signal (1µs)
   #else  // This is the standard RECI setting
     // Setup Timer0 for a 488.28125Hz "phase correct PWM" wave (assuming a 16Mhz clock)
     // Timer0 can pwm either PD5 (OC0B) or PD6 (OC0A), we use PD6
@@ -85,9 +88,9 @@ void control_init() {
 void control_laser_intensity(uint8_t intensity) {
   #ifndef SYNRAD
     uint16_t temp = intensity;
-    temp = temp * 200;
-    temp = temp >> 8;
-    OCR0B = (temp < 1 ? 1 : temp);
+    temp = temp * 200; //Adjust the maximum value to be 200, since we
+    temp = temp >> 8;  //  only count to 200.
+    OCR0B = (temp < 1 ? 1 : temp); //Always let the Tickle Signal remain (1µs)
   #else
     OCR0A = intensity;
   #endif  
