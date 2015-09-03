@@ -339,7 +339,12 @@ ISR(TIMER1_COMPA_vect) {
         // decelerating
         } else if (step_events_completed >= current_block->decelerate_after) {
           if ( acceleration_tick() ) {  // scheduled speed change
-            adjusted_rate -= current_block->rate_delta;
+            // Fix from martinxyz@github fix high power burts during deceleration!
+            if (adjusted_rate > current_block->rate_delta) {
+              adjusted_rate -= current_block->rate_delta;
+            } else {
+              adjusted_rate = 0; // unsigned
+            }
             if (adjusted_rate < current_block->final_rate) {  // overshot
               adjusted_rate = current_block->final_rate;
             }
@@ -471,18 +476,20 @@ static void adjust_speed( uint32_t steps_per_minute ) {
   uint8_t constrained_intensity = max(adjusted_intensity, 0);
   control_laser_intensity(constrained_intensity);
 
-  // depending on intensity adapt PWM freq
-  // assuming: TCCR0A = _BV(COM0A1) | _BV(WGM00);  // phase correct PWM mode
-  if (constrained_intensity > 40) {
-    // set PWM freq to 3.9kHz
-    TCCR0B = _BV(CS01);
-  } else if (constrained_intensity > 10) {
-    // set PWM freq to 489Hz
-    TCCR0B = _BV(CS01) | _BV(CS00);
-  } else {
-    // set PWM freq to 122Hz
-    TCCR0B = _BV(CS02); 
-  }
+  #ifndef SYNRAD // don't change PWM for SYNRAD to avoid problems with tickle
+    // depending on intensity adapt PWM freq
+    // assuming: TCCR0A = _BV(COM0A1) | _BV(WGM00);  // phase correct PWM mode
+    if (constrained_intensity > 40) {
+      // set PWM freq to 3.9kHz
+      TCCR0B = _BV(CS01);
+    } else if (constrained_intensity > 10) {
+      // set PWM freq to 489Hz
+      TCCR0B = _BV(CS01) | _BV(CS00);
+    } else {
+      // set PWM freq to 122Hz
+      TCCR0B = _BV(CS02); 
+    }
+  #endif
 }
 
 
