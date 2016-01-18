@@ -10,7 +10,7 @@ from serial.tools import list_ports
 from serial import dummy_serial
 import datedecoder
 
-DEBUG = True
+DEBUG = False
 
 dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
