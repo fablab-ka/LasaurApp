@@ -154,7 +154,7 @@ class SerialManagerClass(object):
         if DEBUG:
             return dummy_serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
         else:
-            return serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+            return serial.Serial(port, baudrate, timeout=timeout, writeTimeout=writeTimeout)
 
     def list_devices(self, baudrate):
         ports = []
