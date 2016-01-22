@@ -117,9 +117,10 @@ $(document).ready(function(){
         opacity: 1.0,
         left: x,
         top: y,
-        width: 609-x,
-        height: 304-y
+        width: 664-x,
+        height: 332-y
       }, 200 );
+
       gcode_coordinate_offset = [x,y];
       var x_phy = x*app_settings.to_physical_scale + app_settings.table_offset[0];
       var y_phy = y*app_settings.to_physical_scale + app_settings.table_offset[1];
