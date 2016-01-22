@@ -18,9 +18,9 @@ import datedecoder
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
 COMPANY_NAME = "com.nortd.labs"
-SERIAL_PORT = None
+SERIAL_PORT = "/dev/tty.usbserial-AI03U5V7"
 BITSPERSECOND = 57600
-NETWORK_PORT = 4444
+NETWORK_PORT = 4445
 HARDWARE = 'x86'  # also: 'beaglebone', 'raspberrypi'
 CONFIG_FILE = "lasaurapp.conf"
 COOKIE_KEY = 'secret_key_jkn23489hsdf'
