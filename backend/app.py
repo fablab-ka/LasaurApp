@@ -13,14 +13,14 @@ from filereaders import read_svg, read_dxf, read_ngc
 from serial import SerialException
 import i18n
 import datedecoder
-
+import readid
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
 COMPANY_NAME = "com.nortd.labs"
 SERIAL_PORT = None
 BITSPERSECOND = 57600
-NETWORK_PORT = 4444
+NETWORK_PORT = 4445
 HARDWARE = 'x86'  # also: 'beaglebone', 'raspberrypi'
 CONFIG_FILE = "lasaurapp.conf"
 COOKIE_KEY = 'secret_key_jkn23489hsdf'
@@ -140,6 +140,13 @@ def run_with_callback(host, port):
     SerialManager.close()
 
 
+def has_valid_id():
+    id = readid.getId()
+    print("ID:", id)
+
+    return True
+
+
 # @app.route('/longtest')
 # def longtest_handler():
 # fp = open("longtest.ngc")
@@ -148,6 +155,7 @@ def run_with_callback(host, port):
 #     return "Longtest queued."
 
 app = Bottle()
+
 
 @app.route('/css/:path#.+#')
 def static_css_handler(path):
@@ -217,6 +225,7 @@ def jobs_history():
         limit = int(request.params["limit"])
         jobs = jobs[:limit]
     return json.dumps(jobs, default=datedecoder.default)
+
 
 @app.route('/queue/get/:name#.+#')
 def static_queue_handler(name):
@@ -458,7 +467,7 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
         ret.append('<h2>Flashing Failed!</h2> Check terminal window for possible errors. ')
         ret.append('Most likely LasaurApp could not find the right serial port.')
         ret.append(
-            '<br><a href="/flash_firmware/' + firmware_file + '">try again</a> or <a href="/">return</a><br><br>')
+                '<br><a href="/flash_firmware/' + firmware_file + '">try again</a> or <a href="/">return</a><br><br>')
         if os.name != 'posix':
             ret.append('If you know the COM ports the Arduino is connected to you can specifically select it here:')
             for i in range(1, 13):
@@ -493,6 +502,10 @@ def reset_atmega_handler():
 
 @app.route('/gcode', method='POST')
 def job_submit_handler():
+    if not has_valid_id():
+        print("cancel gcode post request because no valid ID is inserted")
+        return "no_id"
+
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
@@ -632,7 +645,6 @@ if args.beaglebone:
     for pin26 in pin26list:
         os.system("echo uart > %s" % (pin26))
 
-
     ### Set up atmega328 reset control
     # The reset pin is connected to GPIO2_7 (2*32+7 = 71).
     # Setting it to low triggers a reset.
@@ -662,7 +674,6 @@ if args.beaglebone:
     fw.flush()
     fw.close()
 
-
     ### Set up atmega328 reset control - BeagleBone Black
     # The reset pin is connected to GPIO2_9 (2*32+9 = 73).
     # Setting it to low triggers a reset.
@@ -691,7 +702,6 @@ if args.beaglebone:
     fw.write("1")
     fw.flush()
     fw.close()
-
 
     ### read stepper driver configure pin GPIO2_12 (2*32+12 = 76).
     # Low means Geckos, high means SMC11s
@@ -723,6 +733,7 @@ elif args.raspberrypi:
     NETWORK_PORT = 80
     SERIAL_PORT = "/dev/ttyAMA0"
     import RPi.GPIO as GPIO
+
     # GPIO.setwarnings(False) # surpress warnings
     GPIO.setmode(GPIO.BCM)  # use chip pin number
     pinSense = 7
