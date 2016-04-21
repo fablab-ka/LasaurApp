@@ -261,15 +261,15 @@ $(document).ready(function(){
     $("#feedrate_field" ).val(app_settings.max_seek_speed);
   });
   $("#feedrate_field").focus(function(e) {
-    $("#feedrate_btn_slow").removeClass('active');
-    $("#feedrate_btn_medium").removeClass('active');
-    $("#feedrate_btn_fast").removeClass('active');
+    $("#feedrate_btn_slow input").removeClass('active');
+    $("#feedrate_btn_medium input").removeClass('active');
+    $("#feedrate_btn_fast input").removeClass('active');
   });
 
   if ($("#feedrate_field" ).val() != app_settings.max_seek_speed) {
-    $("#feedrate_btn_slow").removeClass('active');
-    $("#feedrate_btn_medium").removeClass('active');
-    $("#feedrate_btn_fast").removeClass('active');
+    $("#feedrate_btn_slow input").removeClass('active');
+    $("#feedrate_btn_medium input").removeClass('active');
+    $("#feedrate_btn_fast input").removeClass('active');
   }
 
 
