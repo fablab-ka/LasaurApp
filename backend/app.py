@@ -27,6 +27,7 @@ COOKIE_KEY = 'secret_key_jkn23489hsdf'
 FIRMWARE = "LasaurGrbl.hex"
 TOLERANCE = 0.08
 I18N = i18n.Translations("de")
+USE_ID_CARD_ACCESS_RESTRICTION = True
 
 SerialManager = SerialManagerClass(False)
 
@@ -145,10 +146,22 @@ def run_with_callback(host, port):
 
 
 def has_valid_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return True
+
     id = readid.getId()
     print("ID:", id)
 
-    return True
+    return not id is None
+
+def has_valid_admin_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return True
+
+    id = readid.getId()
+    print("ID:", id)
+
+    return not id is None
 
 
 # @app.route('/longtest')
@@ -204,6 +217,13 @@ def library_list_handler():
     finally:
         os.chdir(cwd_temp)
     return json.dumps(file_list)
+
+
+### ID
+
+@app.route('/has_valid_id')
+def has_valid_id_handler():
+    return json.dumps(has_valid_id())
 
 
 ### QUEUE
@@ -408,11 +428,15 @@ def get_status():
     status = copy.deepcopy(SerialManager.get_hardware_status())
     status['serial_connected'] = SerialManager.is_connected()
     status['lasaurapp_version'] = VERSION
+    status['has_valid_id'] = has_valid_id()
     return json.dumps(status)
 
 
 @app.route('/pause/:flag')
 def set_pause(flag):
+    if not has_valid_id():
+        return '0'
+
     # returns pause status
     if flag == '1':
         if SerialManager.set_pause(True):
@@ -432,6 +456,11 @@ def set_pause(flag):
 @app.route('/flash_firmware/:firmware_file')
 def flash_firmware_handler(firmware_file=FIRMWARE):
     global SERIAL_PORT, GUESS_PREFIX
+
+    if not has_valid_admin_id():
+        print("ERROR: Failed to flash Arduino. No Admin ID entered.")
+        return '<br/><h2>Failed to flash Arduino. No Admin ID entered.</h2>'
+
     return_code = 1
     if SerialManager.is_connected():
         SerialManager.close()
@@ -481,6 +510,11 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
 
 @app.route('/build_firmware')
 def build_firmware_handler():
+
+    if not has_valid_admin_id():
+        print("ERROR: Failed to build firmware. No Admin ID entered.")
+        return '<br/><h2>Failed to build firmware. No Admin ID entered.</h2>'
+
     ret = []
     buildname = "LasaurGrbl_from_src"
     firmware_dir = os.path.join(resources_dir(), 'firmware')
@@ -500,6 +534,10 @@ def build_firmware_handler():
 
 @app.route('/reset_atmega')
 def reset_atmega_handler():
+    if not has_valid_id():
+        print("ERROR: Failed to reset Chip. No Valid ID entered.")
+        return '0'
+
     reset_atmega(HARDWARE)
     return '1'
 
