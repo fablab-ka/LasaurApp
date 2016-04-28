@@ -6,7 +6,7 @@ import tempfile
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
 from bottle import Bottle, static_file, request, debug, default_app, template
-from serial_manager import SerialManager
+from serial_manager import SerialManagerClass
 from flash import flash_upload, reset_atmega
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
@@ -28,6 +28,8 @@ FIRMWARE = "LasaurGrbl.hex"
 TOLERANCE = 0.08
 I18N = i18n.Translations("de")
 
+SerialManager = SerialManagerClass(False)
+
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
 elif os.name == 'posix':
@@ -38,6 +40,8 @@ elif os.name == 'posix':
 else:
     GUESS_PREFIX = "no prefix"
 
+def setDummyMode():
+    SerialManager = SerialManagerClass(True)
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -613,13 +617,19 @@ argparser.add_argument('--beaglebone', dest='beaglebone', action='store_true',
                        default=False, help='use this for running on beaglebone')
 argparser.add_argument('--raspberrypi', dest='raspberrypi', action='store_true',
                        default=False, help='use this for running on Raspberry Pi')
+argparser.add_argument('--dummy', dest='dummy', action='store_true',
+                       default=False, help='use this for developing without hardware')
 argparser.add_argument('-m', '--match', dest='match',
                        default=GUESS_PREFIX, help='match serial device with this string')
 args = argparser.parse_args()
 
 print("LasaurApp " + VERSION)
 
-if args.beaglebone:
+print(args.dummy)
+if args.dummy:
+    print("starting in Dummy Mode")
+    setDummyMode()
+elif args.beaglebone:
     HARDWARE = 'beaglebone'
     NETWORK_PORT = 80
     SERIAL_PORT = "/dev/ttyO1"
