@@ -46,6 +46,8 @@
                         <button id="door_status_btn" class="btn btn-default disabled btn-warning" type="submit">Door</button>
                         <button id="chiller_status_btn" class="btn btn-default disabled btn-warning" type="submit">Chiller</button>
                     </div>
+                    <div id="button_container" class="btn-group pull-right">
+                    </div>
                     <div class="btn-group pull-right">
                         <button id="go_to_origin" class="btn btn-default " type="submit" title="move to origin">(0,0)</button>
                         <button id="homing_cycle" class="btn btn-default " type="submit" title="run homing cycle, find table origin">
@@ -60,16 +62,18 @@
                     </div>
 
                     <ul class="nav navbar-nav">
-                        <li><a href="#about_modal" data-toggle="modal">{{About}}</a></li>
 
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manual<b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
                             <ul class="dropdown-menu">
+                                <li><a href="#about_modal" data-toggle="modal">{{About}}</a></li>
+
                                 <li><a href="http://www.lasersaur.com/manual/">{{ManualTOC}}</a></li>
                                 <li><a href="http://www.lasersaur.com/manual/operation">{{OperatingALasersaur}}</a></li>
                                 <li><a href="http://www.lasersaur.com/manual/lasertags">{{LaserTags}}</a></li>
                             </ul>
                         </li>
+
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Admin}}<b class="caret"></b></a>
                             <ul class="dropdown-menu">
@@ -184,15 +188,15 @@
                                 <!--content start-->
                                 <div id="tab_jobs" class="tab-pane active row">
                                     <div class="col-md-9">
-                                        <div class="well clearfix" style="margin-bottom:40px">
-                                            <input type="text" id="job_name" style="width:296px;padding-left: 5px;" placeholder="{{LoadOrImportaJob}}" class="form-control">
+                                        <div class="well clearfix" style="margin-bottom:40px; padding-top: 30px;">
+                                            <input type="text" id="job_name" style="width:296px;padding-left: 5px; display: inline-block;" placeholder="{{LoadOrImportaJob}}" class="form-control">
                                             <button id="file_import_quick_btn" class="btn btn-default pull-right" title="{{FileImport}}" data-delay="500" style="margin-top:0;">
                                                 <span class="glyphicon glyphicon-folder-open"></span>
                                             </button>
                                             <textarea id="job_data" style="display:none"></textarea>
-                                            <div id="preview_canvas_container"></div>
+                                            <div id="preview_canvas_container" style="margin-top: 31px;"></div>
                                             <!-- passes -->
-                                            <div id="passes_container" class="clearfix" style="width:594px; margin:0px; margin-top:10px; padding:15px; background-color:#dddddd; display:none">
+                                            <div id="passes_container" class="clearfix" style="width:665px; margin:0px; margin-top:10px; padding:15px; background-color:#dddddd; display:none">
                                                 <div id="passes_info" class="pull-right" style="width:180px; color:#888888; display:none">
                                                     <p>{{VectorCutInstructions}}</p>
                                                     <p>{{NeedMorePasses_1}} <a id="add_pass_btn" href="">{{NeedMorePasses_2}}</a></p>
@@ -274,7 +278,7 @@
                                     </div>
                                 </div>
                                 <div id="tab_import" class="tab-pane">
-                                    <div class="well clearfix" style="width:650px">
+                                    <div class="well clearfix" style="width:700px">
                                         <div class="row" style="margin-left:0px">
                                             <div class="btn-group pull-left">
                                                 <button id="file_import_btn" class="btn btn-info btn-lg" data-loading-text="{{Loading}}" autocomplete="off">
@@ -323,48 +327,54 @@
                                         </div>
                                 </div> <!-- end of import tab -->
                                 <div id="tab_mover" class="tab-pane" style="margin-left:0px">
-                                    <div class="well" style="width:650px">
-                                        <div class="row" style="margin-left:0px">
-                                            <div id="cutting_area" style="position:relative; width:610px; height:305px; border:1px dashed #aaaaaa;">
+                                    <div class="well" style="width:700px">
+                                        <div class="row" style="width:475px; margin-left:0; margin-right:auto; margin-top:5px">
+                                            <div id="seek_feed_btns" class="btn-group pull-left" data-toggle="buttons">
+                                                <label id="seek_btn" class="btn btn-primary active">
+                                                    <input type="radio" name="seek_feed" autocomplete="off" checked class="form-control"/>
+                                                    {{Move}}
+                                                </label>
+                                                <label id="feed_btn" class="btn btn-primary">
+                                                    <input type="radio" name="seek_feed" autocomplete="off"  class="form-control"/>
+                                                    {{Cut}}
+                                                </label>
+                                            </div>
+
+                                            <div id="intensity_input_div" class="input-group pull-left" style="margin-left:25px; margin-top:10px; display: inline; width: 100px;">
+                                                <input id="intensity_field" type="textfield" value="0" style="width:40px; display:none; text-align: right;"  class="form-control">
+                                                <input id="intensity_field_disabled" type="textfield" class="disabled form-control" disabled="" value="0" style="width:40px; text-align: right;" title="{{NoIntensityForMove}}">
+                                                <span class="input-group-addon" style="line-height:32px; display: inline;">%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" style="margin-left:0px; margin-top: 15px;">
+                                            <div id="cutting_area" style="position:relative; width:665px; height:333px; border:1px dashed #aaaaaa;">
                                                 <div id="coordinates_info" style="margin:4px"></div>
                                                 <div id="offset_area" style="display:none; position:absolute; top:100px; left:100px; width:100px; height:100px; border-top:1px dashed #aaaaaa; border-left:1px dashed #aaaaaa">
                                                     <div id="offset_info" style="margin:4px"></div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row" style="width:475px; margin-left:auto; margin-right:auto; margin-top:20px">
-                                            <div id="seek_feed_btns" class="btn-group pull-left" data-toggle="buttons">
-                                              <label class="btn btn-primary active">
-                                                <input id="seek_btn" type="radio" name="seek_feed" autocomplete="off" checked class="form-control"/>
-                                                {{Move}}
-                                              </label>
-                                              <label class="btn btn-primary">
-                                                <input id="feed_btn" type="radio" name="seek_feed" autocomplete="off"  class="form-control"/>
-                                                {{Cut}}
-                                              </label>
+
+                                        <div class="row" style="width:475px; margin-left:0; margin-right:auto; margin-top:20px">
+                                            <div class="input-group" style="display: inline-block; margin-right:8px; margin-top:16px; display: inline;">
+                                                <input id="feedrate_field" type="textfield" value="8000" style="margin-top:12px; width:40px; text-align: right;" class="form-control">
+                                                <span class="input-group-addon" style="line-height:32px; display: inline;">{{MMPerMin}}</span>
                                             </div>
-                                            <div id="intensity_input_div" class="input-group pull-left" style="margin-left:25px; margin-top:10px; display: inline; width: 100px;">
-                                                <input id="intensity_field" type="textfield" value="0" style="width:40px; display:none; text-align: right;"  class="form-control">
-                                                <input id="intensity_field_disabled" type="textfield" class="disabled form-control" disabled="" value="0" style="width:40px; text-align: right;" title="{{NoIntensityForMove}}">
-                                                <span class="input-group-addon" style="line-height:32px; display: inline;">%</span>
-                                            </div>
-                                            <div id="feedrate_btns" class="btn-group pull-right" data-toggle="buttons">
-                                              <label class="btn btn-primary active">
-                                                <input id="feedrate_btn_slow" type="radio" name="feedrate" autocomplete="off" checked class="form-control"/>
+
+                                            <div id="feedrate_btns" class="btn-group" data-toggle="buttons" style="display: inline-block; ">
+                                              <label id="feedrate_btn_slow" class="btn btn-primary active">
+                                                <input type="radio" name="feedrate" autocomplete="off" checked class="form-control"/>
                                                 {{Slow}}
                                               </label>
-                                              <label class="btn btn-primary">
-                                                <input id="feedrate_btn_medium" type="radio" name="feedrate" autocomplete="off"class="form-control"/>
+                                              <label id="feedrate_btn_medium" class="btn btn-primary">
+                                                <input type="radio" name="feedrate" autocomplete="off"class="form-control"/>
                                                 {{Medium}}
                                               </label>
-                                              <label class="btn btn-primary">
-                                                <input id="feedrate_btn_fast" type="radio" name="feedrate" autocomplete="off"class="form-control"/>
+                                              <label id="feedrate_btn_fast" class="btn btn-primary">
+                                                <input type="radio" name="feedrate" autocomplete="off"class="form-control"/>
                                                 {{Fast}}
                                               </label>
-                                            </div>
-                                            <div class="input-group pull-right" style="margin-right:8px; margin-top:16px; display: inline;">
-                                                <input id="feedrate_field" type="textfield" value="8000" style="width:40px; text-align: right;"class="form-control">
-                                                <span class="input-group-addon" style="line-height:32px; display: inline;">{{MMPerMin}}</span>
                                             </div>
                                         </div>
                                         <div class="row clearfix jog_btns" style="width:400px; margin-left:auto; margin-right:auto; margin-top:16px">
@@ -399,7 +409,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row" style="width:210px; margin-left:auto; margin-right:auto;">
+                                        <div id="air_assist_group" class="row" style="width:210px; margin-left:auto; margin-right:auto;">
                                             <button id="air_on_btn" class="btn btn-primary">{{AirAssistOn}}</button>
                                             <button id="air_off_btn" class="btn btn-primary">{{AirAssistOff}}</button>
                                         </div>

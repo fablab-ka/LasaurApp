@@ -232,11 +232,45 @@ $(document).ready(function(){
   $().uxmessage('notice', "Frontend started.");
 
   $('#feedrate_field').val(app_settings.max_seek_speed);
+  if (!app_settings.air_assist_enabled) {
+    $('#air_assist_group').hide();
+  }
 
   $('#tab_logs_button').click(function(){
     $('#log_content').show();
     $('#tab_logs div.alert').show();
   });
+
+  if (app_settings.custom_buttons) {
+    for (var i = 0; i < app_settings.custom_buttons.length; i++) {
+      var btn = app_settings.custom_buttons[i];
+      var btnObj = $('<button id="custom_button_' + i + '" class="btn btn-default custom_button" type="submit" title="' + btn.title + '"></button>');
+      btnObj.html('<i class="glyphicon glyphicon-' + btn.icon + '"></i>');
+
+      if (btn.default_on) {
+        btnObj.addClass('btn-success');
+      }
+      btnObj.data('def', btn);
+
+      btnObj.click(function() {
+        var def = $(this).data('def');
+        if (def.toggle) {
+          if ($(this).hasClass('btn-success')) {
+            $(this).removeClass('btn-success');
+
+            send_gcode(def.gcode_disable, def.disable_message);
+          } else {
+            $(this).addClass('btn-success');
+
+            send_gcode(def.gcode_enable, def.enable_message);
+          }
+        } else {
+          send_gcode(def.gcode_enable);
+        }
+      });
+      $('#button_container').append(btnObj);
+    }
+  }
 
 
   //////// serial connect and pause button ////////

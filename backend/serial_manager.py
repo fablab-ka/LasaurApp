@@ -10,8 +10,6 @@ from serial.tools import list_ports
 from serial import dummy_serial
 import datedecoder
 
-DEBUG = False
-
 dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
 
@@ -19,13 +17,15 @@ dummy_serial.DEFAULT_RESPONSE = '\n'
 #extended Class of Lasersaur project
 class SerialManagerClass(object):
 
-    def __init__(self):
+    def __init__(self, dummyMode=False):
         configfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.json")
         print("loading config file", configfile)
         with open(configfile) as configdata:
             self.config = json.load(configdata)
 
         self.device = None
+
+        self.dummyMode = dummyMode
 
         self.rx_buffer = ""
         self.tx_buffer = ""
@@ -151,7 +151,7 @@ class SerialManagerClass(object):
         }
 
     def open_serial(self, port, baudrate, timeout=0, writeTimeout=1):
-        if DEBUG:
+        if self.dummyMode:
             return dummy_serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
         else:
             return serial.Serial(port, baudrate, timeout=timeout, writeTimeout=writeTimeout)
@@ -442,7 +442,7 @@ class SerialManagerClass(object):
                 sys.stdout.write(line + "\n")
                 sys.stdout.flush()
             else:
-                if not DEBUG:
+                if not self.dummyMode:
                     sys.stdout.write(".")
                 sys.stdout.flush()
 
@@ -500,7 +500,3 @@ class SerialManagerClass(object):
 
             if 'V' in line:
                 self.status['firmware_version'] = line[line.find('V')+1:]
-
-
-# singelton
-SerialManager = SerialManagerClass()
