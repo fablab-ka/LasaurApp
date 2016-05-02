@@ -155,7 +155,10 @@ def get_id_list():
         return result
 
     with open(ID_CARD_LIST_PATH) as f:
-        result = f.readlines()
+        for line in f.readlines():
+            result.append(line.strip())
+
+    print("Number of Ids registerd: " + str(len(result)))
 
     return result
 
@@ -167,7 +170,10 @@ def get_admin_id_list():
         return result
 
     with open(ID_CARD_ADMIN_LIST_PATH) as f:
-        result = f.readlines()
+        for line in f.readlines():
+            result.append(line.strip())
+
+    print("Number of Admin Ids registerd: " + str(len(result)))
 
     return result
 
@@ -189,7 +195,7 @@ def has_valid_id():
 
     id_list = get_id_list()
 
-    return id is in id_list
+    return id in id_list
 
 def has_valid_admin_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
@@ -203,7 +209,7 @@ def has_valid_admin_id():
 
     admin_id_list = get_admin_id_list()
 
-    return id is in admin_id_list
+    return id in admin_id_list
 
 
 # @app.route('/longtest')
