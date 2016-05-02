@@ -14,6 +14,7 @@ from serial import SerialException
 import i18n
 import datedecoder
 import readid
+import os.path
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
@@ -149,6 +150,10 @@ def run_with_callback(host, port):
 def get_id_list():
     result = []
 
+    if not os.path.isfile(ID_CARD_LIST_PATH):
+        print("File '" + ID_CARD_LIST_PATH + "' is missing")
+        return result
+
     with open(ID_CARD_LIST_PATH) as f:
         result = f.readlines()
 
@@ -156,6 +161,10 @@ def get_id_list():
 
 def get_admin_id_list():
     result = []
+
+    if not os.path.isfile(ID_CARD_ADMIN_LIST_PATH):
+        print("File '" + ID_CARD_ADMIN_LIST_PATH + "' is missing")
+        return result
 
     with open(ID_CARD_ADMIN_LIST_PATH) as f:
         result = f.readlines()
