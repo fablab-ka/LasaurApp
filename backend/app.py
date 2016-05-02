@@ -18,14 +18,14 @@ import datedecoder
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
 COMPANY_NAME = "com.nortd.labs"
-SERIAL_PORT = None
+SERIAL_PORT = "/dev/ttyACM0"
 BITSPERSECOND = 57600
-NETWORK_PORT = 4444
+NETWORK_PORT = 80
 HARDWARE = 'x86'  # also: 'beaglebone', 'raspberrypi'
 CONFIG_FILE = "lasaurapp.conf"
 COOKIE_KEY = 'secret_key_jkn23489hsdf'
 FIRMWARE = "LasaurGrbl.hex"
-TOLERANCE = 0.08
+TOLERANCE = 0.01
 I18N = i18n.Translations("de")
 
 SerialManager = SerialManagerClass(False)
@@ -127,7 +127,7 @@ def run_with_callback(host, port):
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
     # open web-browser
     try:
-        webbrowser.open_new_tab('http://127.0.0.1:' + str(port))
+        #webbrowser.open_new_tab('http://127.0.0.1:' + str(port))
         pass
     except webbrowser.Error:
         print("Cannot open Webbrowser, please do so manually.")
