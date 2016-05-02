@@ -28,6 +28,8 @@ FIRMWARE = "LasaurGrbl.hex"
 TOLERANCE = 0.08
 I18N = i18n.Translations("de")
 USE_ID_CARD_ACCESS_RESTRICTION = True
+ID_CARD_LIST_PATH = '/etc/lasersaur/idlist.txt'
+ID_CARD_ADMIN_LIST_PATH = '/etc/lasersaur/adminidlist.txt'
 
 SerialManager = SerialManagerClass(False)
 
@@ -144,6 +146,21 @@ def run_with_callback(host, port):
     print("\nShutting down...")
     SerialManager.close()
 
+def get_id_list():
+    result = []
+
+    with open(ID_CARD_LIST_PATH) as f:
+        result = f.readlines()
+
+    return result
+
+def get_admin_id_list():
+    result = []
+
+    with open(ID_CARD_ADMIN_LIST_PATH) as f:
+        result = f.readlines()
+
+    return result
 
 def get_user_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
@@ -158,7 +175,12 @@ def has_valid_id():
     id = readid.getId()
     print("ID:", id)
 
-    return not id is None
+    if id is None:
+        return False
+
+    id_list = get_id_list()
+
+    return id is in id_list
 
 def has_valid_admin_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
@@ -167,7 +189,12 @@ def has_valid_admin_id():
     id = readid.getId()
     print("ID:", id)
 
-    return not id is None
+    if id is None:
+        return False
+
+    admin_id_list = get_admin_id_list()
+
+    return id is in admin_id_list
 
 
 # @app.route('/longtest')
