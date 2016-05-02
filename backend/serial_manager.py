@@ -75,7 +75,7 @@ class SerialManagerClass(object):
 
         self.logger.info("Init Accounting")
 
-    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>'):
+    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>', user_id='<unknown>'):
         # initialize all accounting data, get start time, write log information
         self.job_accounting = {
             'running'    : True,
@@ -83,7 +83,8 @@ class SerialManagerClass(object):
             'pause_time' : 0,
             'start_job'  : datetime.now(),
             'gcode_lines': num_gcode_lines,
-            'job_name'   : job_name
+            'job_name'   : job_name,
+            'user_id'    : user_id
         }
         self.logger.info(
             "Start Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
@@ -253,7 +254,7 @@ class SerialManagerClass(object):
         if self.device:
             self.device.flushOutput()
 
-    def queue_gcode(self, gcode, name=None):
+    def queue_gcode(self, gcode, name=None, user_id=None):
         lines = gcode.split('\n')
         print("Adding to queue %s lines" % len(lines))
         job_list = []
@@ -291,7 +292,7 @@ class SerialManagerClass(object):
         self.tx_buffer += gcode_processed
         self.job_active = True
         if (self.status['ready'] == False) and (len(lines) > 10):
-            self.start_accounting(len(lines), name) # as soon, as jobname is vailable, can be passed as second param
+            self.start_accounting(len(lines), name, user_id) # as soon, as jobname is vailable, can be passed as second param
 
     def cancel_queue(self):
         self.tx_buffer = ""

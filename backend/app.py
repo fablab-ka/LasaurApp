@@ -145,6 +145,12 @@ def run_with_callback(host, port):
     SerialManager.close()
 
 
+def get_user_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return None
+
+    return readid.getId()
+
 def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
@@ -551,7 +557,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name)
+        SerialManager.queue_gcode(job_data, name, get_user_id())
         return "__ok__"
     else:
         return "serial disconnected"
