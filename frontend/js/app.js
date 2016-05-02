@@ -62,7 +62,7 @@ function send_gcode(gcode, success_msg, progress, name) {
         data: {'name': name, 'job_data':gcode},
         // dataType: "json",
         success: function (data) {
-          if (data == "__ok__") {
+          if (data === "__ok__") {
             $().uxmessage('success', success_msg);
             if (progress) {
               // show progress bar, register live updates
@@ -73,6 +73,8 @@ function send_gcode(gcode, success_msg, progress, name) {
                 setTimeout(update_progress, 2000);
               }
             }
+          } else if (data === "no_id") {
+            $().uxmessage('error', "No ID entered. Please insert your ID card.");
           } else {
             $().uxmessage('error', "Backend error: " + data);
           }

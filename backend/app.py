@@ -13,7 +13,8 @@ from filereaders import read_svg, read_dxf, read_ngc
 from serial import SerialException
 import i18n
 import datedecoder
-
+import readid
+import os.path
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
@@ -27,6 +28,9 @@ COOKIE_KEY = 'secret_key_jkn23489hsdf'
 FIRMWARE = "LasaurGrbl.hex"
 TOLERANCE = 0.01
 I18N = i18n.Translations("de")
+USE_ID_CARD_ACCESS_RESTRICTION = True
+ID_CARD_LIST_PATH = '/etc/lasersaur/idlist.txt'
+ID_CARD_ADMIN_LIST_PATH = '/etc/lasersaur/adminidlist.txt'
 
 SerialManager = SerialManagerClass(False)
 
@@ -143,6 +147,64 @@ def run_with_callback(host, port):
     print("\nShutting down...")
     SerialManager.close()
 
+def get_id_list():
+    result = []
+
+    if not os.path.isfile(ID_CARD_LIST_PATH):
+        print("File '" + ID_CARD_LIST_PATH + "' is missing")
+        return result
+
+    with open(ID_CARD_LIST_PATH) as f:
+        result = f.readlines()
+
+    return result
+
+def get_admin_id_list():
+    result = []
+
+    if not os.path.isfile(ID_CARD_ADMIN_LIST_PATH):
+        print("File '" + ID_CARD_ADMIN_LIST_PATH + "' is missing")
+        return result
+
+    with open(ID_CARD_ADMIN_LIST_PATH) as f:
+        result = f.readlines()
+
+    return result
+
+def get_user_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return None
+
+    return readid.getId()
+
+def has_valid_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return True
+
+    id = readid.getId()
+    print("ID:", id)
+
+    if id is None:
+        return False
+
+    id_list = get_id_list()
+
+    return id is in id_list
+
+def has_valid_admin_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return True
+
+    id = readid.getId()
+    print("ID:", id)
+
+    if id is None:
+        return False
+
+    admin_id_list = get_admin_id_list()
+
+    return id is in admin_id_list
+
 
 # @app.route('/longtest')
 # def longtest_handler():
@@ -152,6 +214,7 @@ def run_with_callback(host, port):
 #     return "Longtest queued."
 
 app = Bottle()
+
 
 @app.route('/css/:path#.+#')
 def static_css_handler(path):
@@ -198,6 +261,13 @@ def library_list_handler():
     return json.dumps(file_list)
 
 
+### ID
+
+@app.route('/has_valid_id')
+def has_valid_id_handler():
+    return json.dumps(has_valid_id())
+
+
 ### QUEUE
 
 def encode_filename(name):
@@ -221,6 +291,7 @@ def jobs_history():
         limit = int(request.params["limit"])
         jobs = jobs[:limit]
     return json.dumps(jobs, default=datedecoder.default)
+
 
 @app.route('/queue/get/:name#.+#')
 def static_queue_handler(name):
@@ -399,11 +470,15 @@ def get_status():
     status = copy.deepcopy(SerialManager.get_hardware_status())
     status['serial_connected'] = SerialManager.is_connected()
     status['lasaurapp_version'] = VERSION
+    status['has_valid_id'] = has_valid_id()
     return json.dumps(status)
 
 
 @app.route('/pause/:flag')
 def set_pause(flag):
+    if not has_valid_id():
+        return '0'
+
     # returns pause status
     if flag == '1':
         if SerialManager.set_pause(True):
@@ -423,6 +498,11 @@ def set_pause(flag):
 @app.route('/flash_firmware/:firmware_file')
 def flash_firmware_handler(firmware_file=FIRMWARE):
     global SERIAL_PORT, GUESS_PREFIX
+
+    if not has_valid_admin_id():
+        print("ERROR: Failed to flash Arduino. No Admin ID entered.")
+        return '<br/><h2>Failed to flash Arduino. No Admin ID entered.</h2>'
+
     return_code = 1
     if SerialManager.is_connected():
         SerialManager.close()
@@ -462,7 +542,7 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
         ret.append('<h2>Flashing Failed!</h2> Check terminal window for possible errors. ')
         ret.append('Most likely LasaurApp could not find the right serial port.')
         ret.append(
-            '<br><a href="/flash_firmware/' + firmware_file + '">try again</a> or <a href="/">return</a><br><br>')
+                '<br><a href="/flash_firmware/' + firmware_file + '">try again</a> or <a href="/">return</a><br><br>')
         if os.name != 'posix':
             ret.append('If you know the COM ports the Arduino is connected to you can specifically select it here:')
             for i in range(1, 13):
@@ -472,6 +552,11 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
 
 @app.route('/build_firmware')
 def build_firmware_handler():
+
+    if not has_valid_admin_id():
+        print("ERROR: Failed to build firmware. No Admin ID entered.")
+        return '<br/><h2>Failed to build firmware. No Admin ID entered.</h2>'
+
     ret = []
     buildname = "LasaurGrbl_from_src"
     firmware_dir = os.path.join(resources_dir(), 'firmware')
@@ -491,16 +576,24 @@ def build_firmware_handler():
 
 @app.route('/reset_atmega')
 def reset_atmega_handler():
+    if not has_valid_id():
+        print("ERROR: Failed to reset Chip. No Valid ID entered.")
+        return '0'
+
     reset_atmega(HARDWARE)
     return '1'
 
 
 @app.route('/gcode', method='POST')
 def job_submit_handler():
+    if not has_valid_id():
+        print("cancel gcode post request because no valid ID is inserted")
+        return "no_id"
+
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name)
+        SerialManager.queue_gcode(job_data, name, get_user_id())
         return "__ok__"
     else:
         return "serial disconnected"
@@ -642,7 +735,6 @@ elif args.beaglebone:
     for pin26 in pin26list:
         os.system("echo uart > %s" % (pin26))
 
-
     ### Set up atmega328 reset control
     # The reset pin is connected to GPIO2_7 (2*32+7 = 71).
     # Setting it to low triggers a reset.
@@ -672,7 +764,6 @@ elif args.beaglebone:
     fw.flush()
     fw.close()
 
-
     ### Set up atmega328 reset control - BeagleBone Black
     # The reset pin is connected to GPIO2_9 (2*32+9 = 73).
     # Setting it to low triggers a reset.
@@ -701,7 +792,6 @@ elif args.beaglebone:
     fw.write("1")
     fw.flush()
     fw.close()
-
 
     ### read stepper driver configure pin GPIO2_12 (2*32+12 = 76).
     # Low means Geckos, high means SMC11s
@@ -733,6 +823,7 @@ elif args.raspberrypi:
     NETWORK_PORT = 80
     SERIAL_PORT = "/dev/ttyAMA0"
     import RPi.GPIO as GPIO
+
     # GPIO.setwarnings(False) # surpress warnings
     GPIO.setmode(GPIO.BCM)  # use chip pin number
     pinSense = 7
