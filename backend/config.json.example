@@ -1,0 +1,13 @@
+{
+    "target_size": [1220,610],
+    "tolerance": 0.01,
+    "company_name": "com.nortd.labs",
+    "cookie_key": "secret_key_jkn23489hsdf",
+    "language": "de",
+    "influx": false,
+    "open_browser": true,
+    "dummy_mode": false,
+    "accounting": {
+        "outputfile": "logs/accounting.json"
+    }
+}
