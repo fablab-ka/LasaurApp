@@ -825,7 +825,7 @@ else:
             else:
                 print("ERROR: Failed to flash Arduino.")
     else:
-        if args.host_on_all_interfaces:
+        if args.host_on_all_interfaces or config.get("public", False):
             run_with_callback('', NETWORK_PORT)
         else:
             run_with_callback('127.0.0.1', NETWORK_PORT)
