@@ -51,6 +51,7 @@ else:
     GUESS_PREFIX = "no prefix"
 
 def pauseIfCardNotAvailable():
+    global lastCardCheck
     if config["use_id_card_access_restriction"]:
         if (time.time() - lastCardCheck) > cardCheckInterval:
             lastCardCheck = time.time()
