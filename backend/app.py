@@ -18,21 +18,27 @@ import os.path
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
-COMPANY_NAME = "com.nortd.labs"
-SERIAL_PORT = "/dev/ttyACM0"
-BITSPERSECOND = 57600
-NETWORK_PORT = 80
-HARDWARE = 'x86'  # also: 'beaglebone', 'raspberrypi'
-CONFIG_FILE = "lasaurapp.conf"
-COOKIE_KEY = 'secret_key_jkn23489hsdf'
-FIRMWARE = "LasaurGrbl.hex"
-TOLERANCE = 0.01
-I18N = i18n.Translations("de")
-USE_ID_CARD_ACCESS_RESTRICTION = True
-ID_CARD_LIST_PATH = '/etc/lasersaur/idlist.txt'
-ID_CARD_ADMIN_LIST_PATH = '/etc/lasersaur/adminidlist.txt'
+CONFIG_FILE = "config.json"
 
-SerialManager = SerialManagerClass(False)
+configfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), CONFIG_FILE)
+print("loading config file", configfile)
+with open(configfile) as configdata:
+    config = json.load(configdata)
+
+COMPANY_NAME = config.get("company_name", "com.nortd.labs")
+SERIAL_PORT = config.get("serial_port", None)
+BITSPERSECOND = config.get("bitspersecond", 57600)
+NETWORK_PORT = config.get("network_port", 4444)
+HARDWARE = config.get("hardware", 'beaglebone')  # also: 'x86', 'raspberrypi'
+COOKIE_KEY = config.get("cookie_key", os.urandom(10))
+FIRMWARE = config.get("firmware", "LasaurGrbl.hex")
+TOLERANCE = config.get("tolerance", 0.08)
+I18N = i18n.Translations(config.get("language", "de"))
+
+SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], False)
+
+lastCardCheck = 0
+cardCheckInterval = 2
 
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
@@ -44,8 +50,14 @@ elif os.name == 'posix':
 else:
     GUESS_PREFIX = "no prefix"
 
+def pauseIfCardNotAvailable():
+    if config["use_id_card_access_restriction"]:
+        if time.time - lastCardCheck > cardCheckInterval:
+            if not has_valid_id():
+                SerialManager.set_pause(True)
+
 def setDummyMode():
-    SerialManager = SerialManagerClass(True)
+    SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], True)
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -129,18 +141,24 @@ def run_with_callback(host, port):
     if not SERIAL_PORT:
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
+
     # open web-browser
-    try:
-        #webbrowser.open_new_tab('http://127.0.0.1:' + str(port))
-        pass
-    except webbrowser.Error:
-        print("Cannot open Webbrowser, please do so manually.")
+    if config.get("open_browser", True):
+        try:
+        webbrowser.open_new_tab('http://127.0.0.1:' + str(port))
+            pass
+        except:
+            print("Cannot open Webbrowser, please do so manually at http://127.0.0.1:" + str(port))
+
     sys.stdout.flush()  # make sure everything gets flushed
     server.timeout = 0
     while 1:
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
+
+            pauseIfCardNotAvailable()
+
             time.sleep(0.0004)
         except KeyboardInterrupt:
             break
@@ -150,40 +168,48 @@ def run_with_callback(host, port):
 def get_id_list():
     result = []
 
-    if not os.path.isfile(ID_CARD_LIST_PATH):
-        print("File '" + ID_CARD_LIST_PATH + "' is missing")
+    path = config["id_card_list_path"]
+
+    if not os.path.isfile(path):
+        print("id card list file '" + path + "' is missing")
         return result
 
-    with open(ID_CARD_LIST_PATH) as f:
+    with open(path) as f:
         for line in f.readlines():
             result.append(line.strip())
 
     print("Number of Ids registerd: " + str(len(result)))
-    print("result" + str(result))
 
     return result
 
 def get_admin_id_list():
     result = []
 
-    if not os.path.isfile(ID_CARD_ADMIN_LIST_PATH):
-        print("File '" + ID_CARD_ADMIN_LIST_PATH + "' is missing")
+    path = config["id_card_admin_list_path"]
+
+    if not os.path.isfile(path):
+        print("admin id card list file '" + path + "' is missing")
         return result
 
-    with open(ID_CARD_ADMIN_LIST_PATH) as f:
+    with open(path) as f:
         for line in f.readlines():
             result.append(line.strip())
+
+    print("Number of Admin Ids registerd: " + str(len(result)))
 
     return result
 
 def get_user_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
+    if not config["use_id_card_access_restriction"]:
         return None
 
     return readid.getId()
 
 def has_valid_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
+    if not config["use_id_card_access_restriction"]:
+        return True
+
+    if has_valid_admin_id():
         return True
 
     id = readid.getId()
@@ -197,7 +223,7 @@ def has_valid_id():
     return id in id_list
 
 def has_valid_admin_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
+    if not config["use_id_card_access_restriction"]:
         return True
 
     id = readid.getId()
@@ -710,8 +736,7 @@ args = argparser.parse_args()
 
 print("LasaurApp " + VERSION)
 
-print(args.dummy)
-if args.dummy:
+if args.dummy or config.get("dummy_mode", False):
     print("starting in Dummy Mode")
     setDummyMode()
 elif args.beaglebone:
@@ -857,17 +882,13 @@ else:
             # (1) get the serial device from the argument list
             SERIAL_PORT = args.port
             print("Using serial device '" + SERIAL_PORT + "' from command line.")
-        else:
-            # (2) get the serial device from the config file
-            if os.path.isfile(CONFIG_FILE):
-                fp = open(CONFIG_FILE)
-                line = fp.readline().strip()
-                if len(line) > 3:
-                    SERIAL_PORT = line
-                    print("Using serial device '" + SERIAL_PORT + "' from '" + CONFIG_FILE + "'.")
 
-    if not SERIAL_PORT:
-        if args.match:
+        elif config.get("serial_port", False):
+            # (2) get the serial device from the config file
+            SERIAL_PORT = config.get("serial_port", False)
+            print("Using serial device '" + SERIAL_PORT + "' from '" + CONFIG_FILE + "'.")
+
+        elif args.match:
             GUESS_PREFIX = args.match
             SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
             if SERIAL_PORT:
@@ -875,19 +896,19 @@ else:
                 if os.name == 'posix':
                     # not for windows for now
                     print("(first device to match: " + args.match + ")")
+
         else:
             SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
             if SERIAL_PORT:
                 print("Using serial device '" + str(SERIAL_PORT) + "' by best guess.")
-
-    if not SERIAL_PORT:
-        print("-----------------------------------------------------------------------------")
-        print("WARNING: LasaurApp doesn't know what serial device to connect to!")
-        print("Make sure the Lasersaur hardware is connectd to the USB interface.")
-        if os.name == 'nt':
-            print("ON WINDOWS: You will also need to setup the virtual com port.")
-            print("See 'Installing Drivers': http://arduino.cc/en/Guide/Windows")
-        print("-----------------------------------------------------------------------------")
+            else:
+                print("-----------------------------------------------------------------------------")
+                print("WARNING: LasaurApp doesn't know what serial device to connect to!")
+                print("Make sure the Lasersaur hardware is connectd to the USB interface.")
+                if os.name == 'nt':
+                    print("ON WINDOWS: You will also need to setup the virtual com port.")
+                    print("See 'Installing Drivers': http://arduino.cc/en/Guide/Windows")
+                print("-----------------------------------------------------------------------------")
 
     # run
     if args.debug:
@@ -917,7 +938,7 @@ else:
             else:
                 print("ERROR: Failed to flash Arduino.")
     else:
-        if args.host_on_all_interfaces:
+        if args.host_on_all_interfaces or config.get("public", False):
             run_with_callback('', NETWORK_PORT)
         else:
             run_with_callback('127.0.0.1', NETWORK_PORT)

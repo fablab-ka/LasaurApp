@@ -8,6 +8,7 @@ from __future__ import print_function
 from datetime import datetime
 
 INFLUXDB_ENABLED = False
+INFLUXDB_LOG_ENABLED = False
 try:
     from influxdb import InfluxDBClient
     INFLUXDB_ENABLED = True
@@ -16,7 +17,7 @@ except ImportError:
         "if you want remote logging, please install 'pip install influxdb'")
 
 class RemoteLogger(object):
-    """ The RemoteLogger is able to log to influxdb or stdout. 
+    """ The RemoteLogger is able to log to influxdb or stdout.
     Args:
         channel - the name of the channel to log into
         config - a dict containing values for: host, port, user, pw, db
@@ -25,7 +26,9 @@ class RemoteLogger(object):
     def __init__(self, channel, config):
         self.channel = channel
 
-        if INFLUXDB_ENABLED:
+        INFLUXDB_LOG_ENABLED = (config != False and INFLUXDB_ENABLED)
+
+        if INFLUXDB_LOG_ENABLED:
             self.client = InfluxDBClient(
                 config["host"],
                 config["port"],
@@ -38,7 +41,7 @@ class RemoteLogger(object):
 
         message = str.join(" ", [str(elem) for elem in args])
 
-        if INFLUXDB_ENABLED:
+        if INFLUXDB_LOG_ENABLED:
             self.client.write_points([{
                 "name": "lasersaur",
                 "level": "LOG",
@@ -54,7 +57,7 @@ class RemoteLogger(object):
 
         message = str.join(" ", [str(elem) for elem in args])
 
-        if INFLUXDB_ENABLED:
+        if INFLUXDB_LOG_ENABLED:
             self.client.write_points([{
                 "name": "lasersaur",
                 "level": "INFO",

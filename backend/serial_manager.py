@@ -17,11 +17,7 @@ dummy_serial.DEFAULT_RESPONSE = '\n'
 #extended Class of Lasersaur project
 class SerialManagerClass(object):
 
-    def __init__(self, dummyMode=False):
-        configfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.json")
-        print("loading config file", configfile)
-        with open(configfile) as configdata:
-            self.config = json.load(configdata)
+    def __init__(self, accountingFile, influxConfig, dummyMode=False):
 
         self.device = None
 
@@ -53,24 +49,24 @@ class SerialManagerClass(object):
         self.request_ready_char = '\x14'
         self.last_request_ready = 0
 
-        self.logger = RemoteLogger('Lasaur-Accounting', self.config["influx"])
+        self.logger = RemoteLogger('Lasaur-Accounting', influxConfig)
 
         self.job_accounting = {}
         self.lastJobs = []
         self.reset_status()
+        self.accountingFile = accountingFile
         self.reset_accounting()
 
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
-        accountingoutput = self.config["accounting"]["outputfile"]
-        if os.path.isfile(accountingoutput):
-            with open(accountingoutput, 'r') as json_file:
+        if os.path.isfile(self.accountingFile):
+            with open(self.accountingFile, 'r') as json_file:
                 self.lastJobs = json.load(json_file, object_hook=datedecoder.object_hook)
         else:
-            folder = os.path.dirname(accountingoutput)
+            folder = os.path.dirname(self.accountingFile)
             if not os.path.exists(folder):
                 os.makedirs(folder)
-            with open(accountingoutput, 'w+') as json_file:
+            with open(self.accountingFile, 'w+') as json_file:
                 json.dump(self.lastJobs, json_file, default=datedecoder.default)
 
         self.logger.info("Init Accounting")
@@ -111,7 +107,7 @@ class SerialManagerClass(object):
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
         #CHANGE_ME
-        with open(self.config["accounting"]["outputfile"], 'w') as json_file:
+        with open(self.accountingFile, 'w') as json_file:
             json.dump(self.lastJobs, json_file, default=datedecoder.default)
 
         self.logger.info(
