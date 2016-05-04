@@ -15,7 +15,6 @@ import i18n
 import datedecoder
 import readid
 import os.path
-import sched
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
@@ -38,8 +37,8 @@ I18N = i18n.Translations(config.get("language", "de"))
 
 SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], False)
 
-cardTimer = None
-wasPausedByMissingCard = False
+lastCardCheck = 0
+cardCheckInterval = 2
 
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
@@ -52,20 +51,10 @@ else:
     GUESS_PREFIX = "no prefix"
 
 def pauseIfCardNotAvailable():
-    if not has_valid_id():
-        SerialManager.set_pause(True)
-        wasPausedByMissingCard = True
-    elif wasPausedByMissingCard:
-        SerialManager.set_pause(False)
-        wasPausedByMissingCard = False
-
-def startCardTimer():
-    cardTimer = sched.scheduler(time.time, time.sleep)
-    cardTimer.enter(5, 1, pauseIfCardNotAvailable, ())
-    cardTimer.run()
-
-def stopCardTimer():
-    sched.scheduler.cancel(cardTimer)
+    if config["use_id_card_access_restriction"]:
+        if time.time - lastCardCheck > cardCheckInterval:
+            if not has_valid_id():
+                SerialManager.set_pause(True)
 
 def setDummyMode():
     SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], True)
@@ -167,6 +156,9 @@ def run_with_callback(host, port):
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
+
+            pauseIfCardNotAvailable()
+
             time.sleep(0.0004)
         except KeyboardInterrupt:
             break
