@@ -10,19 +10,15 @@ try:
 except ImportError:
     print("[readid] no smartcard library installed")
 
-hcontext = None
 
 def getId():
     result = None
 
     if SMARTCARD_INSTALLED:
 
-        if hcontext is None:
-            hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
-            if hresult != SCARD_S_SUCCESS:
-                hcontext = None
+        hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
 
-        if hcontext is None:
+        if hresult == SCARD_S_SUCCESS:
 
             hresult, readers = SCardListReaders(hcontext, [])
 
@@ -46,6 +42,11 @@ def getId():
                     print("NO_CARD")
             else:
                 print("NO_READER")
+
+
+            hresult = SCardReleaseContext(hcontext)
+            if hresult != SCARD_S_SUCCESS:
+                raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
         else:
             print("FAILED")
 
