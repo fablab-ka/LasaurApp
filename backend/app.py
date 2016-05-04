@@ -145,7 +145,7 @@ def run_with_callback(host, port):
     # open web-browser
     if config.get("open_browser", True):
         try:
-        webbrowser.open_new_tab('http://127.0.0.1:' + str(port))
+            webbrowser.open_new_tab('http://127.0.0.1:' + str(port))
             pass
         except:
             print("Cannot open Webbrowser, please do so manually at http://127.0.0.1:" + str(port))
