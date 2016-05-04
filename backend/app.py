@@ -52,7 +52,8 @@ else:
 
 def pauseIfCardNotAvailable():
     if config["use_id_card_access_restriction"]:
-        if time.time() - lastCardCheck > cardCheckInterval:
+        if (time.time() - lastCardCheck) > cardCheckInterval:
+            lastCardCheck = time.time()
             if not has_valid_id():
                 SerialManager.set_pause(True)
 
