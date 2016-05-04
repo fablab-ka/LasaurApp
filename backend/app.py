@@ -15,6 +15,7 @@ import i18n
 import datedecoder
 import readid
 import os.path
+import sched
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
@@ -37,6 +38,9 @@ I18N = i18n.Translations(config.get("language", "de"))
 
 SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], False)
 
+cardTimer = None
+wasPausedByMissingCard = False
+
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
 elif os.name == 'posix':
@@ -46,6 +50,22 @@ elif os.name == 'posix':
         GUESS_PREFIX = "tty.usbmodem"
 else:
     GUESS_PREFIX = "no prefix"
+
+def pauseIfCardNotAvailable():
+    if not has_valid_id():
+        SerialManager.set_pause(True)
+        wasPausedByMissingCard = True
+    elif wasPausedByMissingCard:
+        SerialManager.set_pause(False)
+        wasPausedByMissingCard = False
+
+def startCardTimer():
+    cardTimer = sched.scheduler(time.time, time.sleep)
+    cardTimer.enter(5, 1, pauseIfCardNotAvailable, ())
+    cardTimer.run()
+
+def stopCardTimer():
+    sched.scheduler.cancel(cardTimer)
 
 def setDummyMode():
     SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], True)
@@ -195,6 +215,9 @@ def get_user_id():
 
 def has_valid_id():
     if not config["use_id_card_access_restriction"]:
+        return True
+
+    if has_valid_admin_id():
         return True
 
     id = readid.getId()
