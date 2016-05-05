@@ -1,7 +1,8 @@
 {
     "target_size": [1220,610],
     "tolerance": 0.01,
-    "company_name": "/dev/ttyACM0",
+    "company_name": "de.fablab",
+    "serial_port": "/dev/ttyACM0",
     "cookie_key": "secret_key_jkn23489hsdf",
     "language": "de",
     "influx": false,
