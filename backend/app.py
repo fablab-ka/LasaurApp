@@ -233,7 +233,7 @@ def has_valid_id():
     if has_valid_admin_id():
         return True
 
-    id = readid.getId()
+    id = get_user_id()
     print("ID:", id)
 
     if id is None:
@@ -247,7 +247,7 @@ def has_valid_admin_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
 
-    id = readid.getId()
+    id = get_user_id()
     print("ID:", id)
 
     if id is None:
