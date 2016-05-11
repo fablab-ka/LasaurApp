@@ -34,8 +34,11 @@ COOKIE_KEY = config.get("cookie_key", os.urandom(10))
 FIRMWARE = config.get("firmware", "LasaurGrbl.hex")
 TOLERANCE = config.get("tolerance", 0.08)
 I18N = i18n.Translations(config.get("language", "de"))
+ACCOUNTING_FILE = config.get("accounting", {}).get("outputfile", "logs/accounting.json")
+INFLUX_CONFIG = config.get("influx", False)
+USE_ID_CARD_ACCESS_RESTRICTION = config.get("use_id_card_access_restriction", False)
 
-SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], False)
+SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
 
 lastCardCheck = 0
 cardCheckInterval = 2
@@ -52,14 +55,14 @@ else:
 
 def pauseIfCardNotAvailable():
     global lastCardCheck
-    if config["use_id_card_access_restriction"]:
+    if USE_ID_CARD_ACCESS_RESTRICTION:
         if (time.time() - lastCardCheck) > cardCheckInterval:
             lastCardCheck = time.time()
             if not has_valid_id():
                 SerialManager.set_pause(True)
 
 def setDummyMode():
-    SerialManager = SerialManagerClass(config["accounting"]["outputfile"], config["influx"], True)
+    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -184,7 +187,7 @@ def clean_id(id):
 def get_id_list():
     result = []
 
-    path = config["id_card_list_path"]
+    path = config.get("id_card_list_path", "/etc/lasersaur/idlist.txt")
 
     if not os.path.isfile(path):
         print("id card list file '" + path + "' is missing")
@@ -202,7 +205,7 @@ def get_id_list():
 def get_admin_id_list():
     result = []
 
-    path = config["id_card_admin_list_path"]
+    path = config.get("id_card_admin_list_path", "/etc/lasersaur/adminidlist.txt")
 
     if not os.path.isfile(path):
         print("admin id card list file '" + path + "' is missing")
@@ -218,13 +221,13 @@ def get_admin_id_list():
     return result
 
 def get_user_id():
-    if not config["use_id_card_access_restriction"]:
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
         return None
 
     return clean_id(readid.getId())
 
 def has_valid_id():
-    if not config["use_id_card_access_restriction"]:
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
 
     if has_valid_admin_id():
@@ -241,7 +244,7 @@ def has_valid_id():
     return id in id_list
 
 def has_valid_admin_id():
-    if not config["use_id_card_access_restriction"]:
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
 
     id = readid.getId()
