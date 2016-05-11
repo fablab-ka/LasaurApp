@@ -167,6 +167,20 @@ def run_with_callback(host, port):
     print("\nShutting down...")
     SerialManager.close()
 
+def clean_id(id):
+    # remove comment
+    id = id.split('#', 1)[0]
+
+    # remove separators
+    id = id.replace('-','')
+    id = id.replace(':','')
+    id = id.replace(' ','')
+
+    # remove any left over whitespace
+    id = id.strip()
+
+    return id.lower()
+
 def get_id_list():
     result = []
 
@@ -178,7 +192,8 @@ def get_id_list():
 
     with open(path) as f:
         for line in f.readlines():
-            result.append(line.strip())
+            if clean_id(line) != "":
+                result.append(clean_id(line))
 
     print("Number of Ids registerd: " + str(len(result)))
 
@@ -195,7 +210,8 @@ def get_admin_id_list():
 
     with open(path) as f:
         for line in f.readlines():
-            result.append(line.strip())
+            if clean_id(line) != "":
+                result.append(clean_id(line))
 
     print("Number of Admin Ids registerd: " + str(len(result)))
 
@@ -205,7 +221,7 @@ def get_user_id():
     if not config["use_id_card_access_restriction"]:
         return None
 
-    return readid.getId()
+    return clean_id(readid.getId())
 
 def has_valid_id():
     if not config["use_id_card_access_restriction"]:
