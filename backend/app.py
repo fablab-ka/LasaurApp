@@ -171,6 +171,8 @@ def run_with_callback(host, port):
     SerialManager.close()
 
 def clean_id(id):
+    if not isinstance(id, basestring):
+        return None
     # remove comment
     id = id.split('#', 1)[0]
 
@@ -184,10 +186,8 @@ def clean_id(id):
 
     return id.lower()
 
-def get_id_list():
+def read_id_list(path):
     result = []
-
-    path = config.get("id_card_list_path", "/etc/lasersaur/idlist.txt")
 
     if not os.path.isfile(path):
         print("id card list file '" + path + "' is missing")
@@ -198,24 +198,16 @@ def get_id_list():
             if clean_id(line) != "":
                 result.append(clean_id(line))
 
+    return result
+
+def get_id_list():
+    result = read_id_list(config.get("id_card_list_path", "/etc/lasersaur/idlist.txt"))
     print("Number of Ids registerd: " + str(len(result)))
 
     return result
 
 def get_admin_id_list():
-    result = []
-
-    path = config.get("id_card_admin_list_path", "/etc/lasersaur/adminidlist.txt")
-
-    if not os.path.isfile(path):
-        print("admin id card list file '" + path + "' is missing")
-        return result
-
-    with open(path) as f:
-        for line in f.readlines():
-            if clean_id(line) != "":
-                result.append(clean_id(line))
-
+    result = read_id_list(config.get("id_card_admin_list_path", "/etc/lasersaur/adminidlist.txt"))
     print("Number of Admin Ids registerd: " + str(len(result)))
 
     return result
@@ -234,7 +226,6 @@ def has_valid_id():
         return True
 
     id = get_user_id()
-    print("ID:", id)
 
     if id is None:
         return False
@@ -248,7 +239,6 @@ def has_valid_admin_id():
         return True
 
     id = get_user_id()
-    print("ID:", id)
 
     if id is None:
         return False
