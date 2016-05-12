@@ -216,7 +216,7 @@ function poll_job_history() {
     }
 
     if (history.length > 0) {
-      $('#total_job_duration').text(history[0].total + "s");
+      $('#total_job_duration').text(getDurationString(history[0].total));
     }
 
     $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
@@ -629,7 +629,7 @@ $(document).ready(function(){
       }
 
       if (history.length > 0) {
-        $('#total_job_duration_big').text(history[0].total + "s");
+        $('#total_job_duration_big').text(getDurationString(history[0].total));
       }
 
       $('#selected_history_label').hide();
