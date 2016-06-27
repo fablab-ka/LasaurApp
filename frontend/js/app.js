@@ -1,5 +1,6 @@
 
 var hardware_ready_state = false;
+var has_valid_id = false;
 var firmware_version_reported = false;
 var lasaurapp_version_reported = false;
 var progress_not_yet_done_flag = false;
@@ -267,13 +268,19 @@ $(document).ready(function(){
 
   function connect_btn_set_state(is_connected) {
     if (is_connected) {
-      connect_btn_state = true
-      if (!connect_btn_in_hover) {
-        $("#connect_btn").html("Connected");
-      }
+      connect_btn_state = true;
       $("#connect_btn").removeClass("btn-danger");
       $("#connect_btn").removeClass("btn-warning");
       $("#connect_btn").addClass("btn-success");
+
+      if (!connect_btn_in_hover) {
+        if (has_valid_id) {
+          $("#connect_btn").html("Connected");
+        } else {
+          $("#connect_btn").html("Card Missing");
+          $("#connect_btn").addClass("btn-warning");
+        }
+      }
     } else {
       connect_btn_state = false
       if (!connect_btn_in_hover) {
@@ -307,9 +314,13 @@ $(document).ready(function(){
       }
 
       // ready state
-      if (data.ready) {
+      has_valid_id = data.has_valid_id;
+      if (!data.has_valid_id) {
+        $("#connect_btn").html("Card Missing").addClass("btn-warning");
+        hardware_ready_state = false;
+      } else if (data.ready) {
         hardware_ready_state = true;
-        $("#connect_btn").html("Ready");
+        $("#connect_btn").html("Ready").removeClass("btn-warning");
       } else {
         if (data.serial_connected) {
           $("#connect_btn").html("Busy");
@@ -320,20 +331,16 @@ $(document).ready(function(){
       // door, chiller, power, limit, buffer
       if (data.serial_connected) {
         if (data.door_open) {
-          $('#door_status_btn').removeClass('btn-success');
-          $('#door_status_btn').addClass('btn-warning');
+          $('#door_status_btn').removeClass('btn-success').addClass('btn-warning');
           // $().uxmessage('warning', "Door is open!");
         } else {
-          $('#door_status_btn').removeClass('btn-warning');
-          $('#door_status_btn').addClass('btn-success');
+          $('#door_status_btn').removeClass('btn-warning').addClass('btn-success');
         }
         if (data.chiller_off) {
-          $('#chiller_status_btn').removeClass('btn-success');
-          $('#chiller_status_btn').addClass('btn-warning');
+          $('#chiller_status_btn').removeClass('btn-success').addClass('btn-warning');
           // $().uxmessage('warning', "Chiller is off!");
         } else {
-          $('#chiller_status_btn').removeClass('btn-warning');
-          $('#chiller_status_btn').addClass('btn-success');
+          $('#chiller_status_btn').removeClass('btn-warning').addClass('btn-success');
         }
         if (data.power_off) {
           $().uxmessage('error', "Power is off!");
@@ -444,7 +451,10 @@ $(document).ready(function(){
     },
     function () {
       connect_btn_in_hover = false;
-      if (connect_btn_state) {
+      if (!has_valid_id) {
+        $(this).html("Card Missing");
+        $("#connect_btn").addClass("btn-warning");
+      } else if (connect_btn_state) {
         $(this).html("Connected");
       } else {
         $(this).html("Disconnected");

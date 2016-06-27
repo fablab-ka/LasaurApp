@@ -62,6 +62,7 @@ def pauseIfCardNotAvailable():
                 SerialManager.set_pause(True)
 
 def setDummyMode():
+    global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
 
 def resources_dir():
