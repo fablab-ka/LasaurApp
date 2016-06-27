@@ -176,26 +176,11 @@ function generate_download(filename, filedata) {
 }
 
 function getDurationString(durationSeconds) {
-    var days   = Math.floor(durationSeconds / 86400);
-    var hours   = Math.floor((durationSeconds - (days * 86400)) / 3600);
-    var minutes = Math.floor((durationSeconds - (days * 86400) - (hours * 3600)) / 60);
-    var seconds = durationSeconds - (days * 86400) - (hours * 3600) - (minutes * 60);
+    var hours   = Math.floor(durationSeconds / 3600);
+    var minutes = Math.floor((durationSeconds - (hours * 3600)) / 60);
+    var seconds = durationSeconds - (hours * 3600) - (minutes * 60);
 
-    var duration = '';
-    if (seconds > 0) {
-      duration = seconds + 's ' + duration;
-    }
-    if (minutes > 0) {
-      duration = minutes + 'min ' + duration;
-    }
-    if (hours > 0) {
-      duration = hours + 'h ' + duration;
-    }
-    if (days > 0) {
-      duration = days + 'd ' + duration;
-    }
-
-    return duration;
+    return hours + 'h ' + minutes + 'min ' + seconds + 's ';
 }
 
 function poll_job_history() {
