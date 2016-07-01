@@ -5,6 +5,7 @@ import glob, json, argparse, copy
 import tempfile
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
+import bottle
 from bottle import Bottle, static_file, request, debug, default_app, template
 from serial_manager import SerialManagerClass
 from flash import flash_upload, reset_atmega
@@ -15,6 +16,8 @@ import i18n
 import datedecoder
 import readid
 import os.path
+
+bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024 # 20MB max upload
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
@@ -62,6 +65,7 @@ def pauseIfCardNotAvailable():
                 SerialManager.set_pause(True)
 
 def setDummyMode():
+    global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
 
 def resources_dir():
