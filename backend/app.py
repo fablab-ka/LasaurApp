@@ -16,6 +16,7 @@ import i18n
 import datedecoder
 import readid
 import os.path
+from odoo_remote import OdooRemote
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024 # 20MB max upload
 
@@ -42,6 +43,7 @@ INFLUX_CONFIG = config.get("influx", False)
 USE_ID_CARD_ACCESS_RESTRICTION = config.get("use_id_card_access_restriction", False)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
+odooremote = OdooRemote()
 
 lastCardCheck = 0
 cardCheckInterval = 2
@@ -150,7 +152,7 @@ def run_with_callback(host, port):
     if not SERIAL_PORT:
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
-
+    odooremote.init(); #TODO: Check if correct location
     # open web-browser
     if config.get("open_browser", True):
         try:
@@ -190,67 +192,13 @@ def clean_id(id):
 
     return id.lower()
 
-def read_id_list(path):
-    result = []
-
-    if not os.path.isfile(path):
-        print("id card list file '" + path + "' is missing")
-        return result
-
-    with open(path) as f:
-        for line in f.readlines():
-            if clean_id(line) != "":
-                result.append(clean_id(line))
-
-    return result
-
-def get_id_list():
-    result = read_id_list(config.get("id_card_list_path", "/etc/lasersaur/idlist.txt"))
-    print("Number of Ids registerd: " + str(len(result)))
-
-    return result
-
-def get_admin_id_list():
-    result = read_id_list(config.get("id_card_admin_list_path", "/etc/lasersaur/adminidlist.txt"))
-    print("Number of Admin Ids registerd: " + str(len(result)))
-
-    return result
-
-def get_user_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
-        return None
-
-    return clean_id(readid.getId())
 
 def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
 
-    if has_valid_admin_id():
-        return True
-
-    id = get_user_id()
-
-    if id is None:
-        return False
-
-    id_list = get_id_list()
-
-    return id in id_list
-
-def has_valid_admin_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
-        return True
-
-    id = get_user_id()
-
-    if id is None:
-        return False
-
-    admin_id_list = get_admin_id_list()
-
-    return id in admin_id_list
-
+    id = clean_id(readid.getId())
+    return odooremote.check_access(id)
 
 # @app.route('/longtest')
 # def longtest_handler():
@@ -545,10 +493,6 @@ def set_pause(flag):
 def flash_firmware_handler(firmware_file=FIRMWARE):
     global SERIAL_PORT, GUESS_PREFIX
 
-    if not has_valid_admin_id():
-        print("ERROR: Failed to flash Arduino. No Admin ID entered.")
-        return '<br/><h2>Failed to flash Arduino. No Admin ID entered.</h2>'
-
     return_code = 1
     if SerialManager.is_connected():
         SerialManager.close()
@@ -598,11 +542,6 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
 
 @app.route('/build_firmware')
 def build_firmware_handler():
-
-    if not has_valid_admin_id():
-        print("ERROR: Failed to build firmware. No Admin ID entered.")
-        return '<br/><h2>Failed to build firmware. No Admin ID entered.</h2>'
-
     ret = []
     buildname = "LasaurGrbl_from_src"
     firmware_dir = os.path.join(resources_dir(), 'firmware')

@@ -35,7 +35,7 @@ def getId():
                 if hresult == 0:
                     hresult, response = SCardTransmit(hcard, dwActiveProtocol, [0xFF, 0xCA, 0x00, 0x00, 0x00])
 
-                    print(smartcard.util.toHexString(response))
+                    #print(smartcard.util.toHexString(response))
 
                     result = smartcard.util.toHexString(response)
                 else:
