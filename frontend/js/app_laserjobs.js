@@ -225,13 +225,13 @@ function addPasses(num) {
                     '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
                     '<input type="text" class="feedrate" value="'+app_settings.default_feedrate+
                       '" title="feedrate 1-'+app_settings.max_seek_speed+
-                      'mm/min" style="width:40px" data-delay="500">' +
+                      'mm/min" style="width:60px" data-delay="500">' +
                   '</div>' +
                   '<div class="input-group" style="margin-left:6px">' +
                     '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
                     '<input class="intensity" type="textfield" value="'+
                       app_settings.default_intensity+
-                      '" title="intensity 0-100%" style="width:30px;" data-delay="500">' +
+                      '" title="intensity 0-100%" style="width:40px;" data-delay="500">' +
                   '</div>' +
                   '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
                 '</div>' +
