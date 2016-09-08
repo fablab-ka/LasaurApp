@@ -93,8 +93,9 @@ button.active-strong {
 #history_modal .row-1 { width: 265px; }
 #history_modal .row-2 { width: 115px; }
 #history_modal .row-3 { width: 115px; }
-#history_modal .row-4 { width: 80px; }
-#history_modal .row-5 { width: 100px; }
+#history_modal .row-4 { width: 115px; }
+#history_modal .row-5 { width: 80px; }
+#history_modal .row-6 { width: 100px; }
 
 #history_modal .cell {
   display: inline-block;

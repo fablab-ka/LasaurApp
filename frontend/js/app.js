@@ -615,10 +615,11 @@ $(document).ready(function(){
 
         var row = $('<tr/>');
         row.append($('<td />').append($('<span class="cell row-1" />').text(job.name).attr('data-original-title', job.name)));
-        row.append($('<td />').append($('<span class="cell row-2" />').text(start_date)));
-        row.append($('<td />').append($('<span class="cell row-3" />').text(end_date)));
-        row.append($('<td />').append($('<span class="cell row-4" />').text(job.lines)));
-        row.append($('<td />').append($('<span class="cell row-5" />').text(duration)));
+        row.append($('<td />').append($('<span class="cell row-2" />').text(job.user_id)));
+        row.append($('<td />').append($('<span class="cell row-3" />').text(start_date)));
+        row.append($('<td />').append($('<span class="cell row-4" />').text(end_date)));
+        row.append($('<td />').append($('<span class="cell row-5" />').text(job.lines)));
+        row.append($('<td />').append($('<span class="cell row-6" />').text(duration)));
         row.data('duration', job.duration);
         $('#history_modal tbody').append(row);
       }

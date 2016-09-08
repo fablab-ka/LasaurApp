@@ -74,6 +74,7 @@ dictionary = {
     "UseArrowKeysToJog": "Use arrow keys to jog. De/increase step with alt and shift.",
     "LogMostRecentMessagesFirst": "Log, most recent messages first:",
     "History_Name": "Name",
+    "History_User": "User",
     "History_Start": "Start",
     "History_End": "End",
     "History_Duration": "Duration",

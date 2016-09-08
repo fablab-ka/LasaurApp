@@ -20,6 +20,8 @@ class OdooRemote():
     machine_name = 'LaserSaur'
     user_level = None
     unlock_time = 5 #how long is the machine unlocked?
+    dummy_mode = False
+    last_user = ''
 
     _common = None
     _uid = None
@@ -40,6 +42,9 @@ class OdooRemote():
     #        time.sleep(1)
 
     def init(self):
+        if self.dummy_mode:
+            self.last_user = 'Max Mustermann'
+            return
         try:
             self._common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.url))
             self._uid = self._common.authenticate(self.db, self.username, self.password, {})
@@ -88,6 +93,8 @@ class OdooRemote():
             return False
 
     def check_access(self, card_number):
+        if self.dummy_mode:
+            return "Max Mustermann"
         print("card: " + card_number + " ", end="")
         if card_number == None:
             return False
@@ -141,15 +148,19 @@ class OdooRemote():
         if client['id'] in self._machine[0]['owner_ids']:
             print("CLIENT_IS_OWNER")
             self.user_level = 'owner'
-            return True #Owners get full acces no matter the circumstances
+            self.last_user = client['name']
+            return client['name'] #Owners get full acces no matter the circumstances
         elif self._machine[0]['status'] == 'r':
             if client['id'] in self._machine[0]['user_ids'] and self._machine[0]['rules'] == 'r':
                 print("CLIENT_IS_USER")
                 self.user_level = 'user'
-                return True
+                self.last_user = client['name']
+                return client['name']
             elif self._machine[0]['rules'] == 'f':
                 print("FREE_ACCESS")
                 self.user_level = 'free'
+                self.last_user = client['name']
+                return client['name']
         print("NO_ACCESS")
         return False
 
@@ -188,6 +199,5 @@ class OdooRemote():
         else:
             print("FAILED")
 
-if __name__ == "__main__":
-    Access().main()
+
 

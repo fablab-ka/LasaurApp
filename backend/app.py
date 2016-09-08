@@ -67,6 +67,7 @@ def pauseIfCardNotAvailable():
                 SerialManager.set_pause(True)
 
 def setDummyMode():
+    odooremote.dummy_mode = True
     global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
 
@@ -196,7 +197,6 @@ def clean_id(id):
 def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
-
     id = clean_id(readid.getId())
     return odooremote.check_access(id)
 
@@ -578,7 +578,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name, get_user_id())
+        SerialManager.queue_gcode(job_data, name, odooremote.last_user)
         return "__ok__"
     else:
         return "serial disconnected"

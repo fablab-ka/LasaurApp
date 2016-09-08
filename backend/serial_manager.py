@@ -101,7 +101,8 @@ class SerialManagerClass(object):
             'name': self.job_accounting['job_name'],
             'duration': jobtime,
             'lines': self.job_accounting['gcode_lines'],
-            'total': int(current_total + jobtime)
+            'total': int(current_total + jobtime),
+            'user_id': self.job_accounting['user_id']
         }
 
         self.lastJobs.insert(0, job)
