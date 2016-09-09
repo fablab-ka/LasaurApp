@@ -618,7 +618,7 @@ $(document).ready(function(){
         row.append($('<td />').append($('<span class="cell row-2" />').text(job.user_id)));
         row.append($('<td />').append($('<span class="cell row-3" />').text(start_date)));
         row.append($('<td />').append($('<span class="cell row-4" />').text(end_date)));
-        row.append($('<td />').append($('<span class="cell row-5" />').text(job.lines)));
+        //row.append($('<td />').append($('<span class="cell row-5" />').text(job.lines)));
         row.append($('<td />').append($('<span class="cell row-6" />').text(duration)));
         row.data('duration', job.duration);
         $('#history_modal tbody').append(row);
