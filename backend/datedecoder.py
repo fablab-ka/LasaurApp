@@ -14,7 +14,7 @@ def default(obj):
     # We preserve key order when rendering SON, DBRef, etc. as JSON by
     # returning a SON for those types instead of a dict.
     if isinstance(obj, datetime.datetime):
-        timestamp = obj.isoformat()
+        timestamp = obj.strftime('%Y-%m-%dT%H:%M:%S.%f')
         return {"$date": timestamp}
     if isinstance(obj, (RE_TYPE, Regex)):
         flags = ""
