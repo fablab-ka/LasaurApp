@@ -14,7 +14,7 @@ def default(obj):
     # We preserve key order when rendering SON, DBRef, etc. as JSON by
     # returning a SON for those types instead of a dict.
     if isinstance(obj, datetime.datetime):
-        timestamp = obj.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        timestamp = obj.strftime('%Y-%m-%dT%H:%M:%S')
         return {"$date": timestamp}
     if isinstance(obj, (RE_TYPE, Regex)):
         flags = ""
@@ -52,7 +52,7 @@ def object_hook(dct):
     if "$date" in dct:
         dtm = dct["$date"]
         if isinstance(dtm, basestring):
-            aware = datetime.datetime.strptime(dtm[:23], "%Y-%m-%dT%H:%M:%S.%f")
+            aware = datetime.datetime.strptime(dtm[:19], "%Y-%m-%dT%H:%M:%S")
             return aware
         else:
             secs = float(dtm) / 1000.0
