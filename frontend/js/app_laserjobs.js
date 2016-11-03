@@ -1,5 +1,3 @@
-
-
 var minNumPassWidgets = 3;
 var maxNumPassWidgets = 32;
 var preview_canvas_obj = null;
@@ -388,13 +386,47 @@ $(document).ready(function(){
   /// button events /////////////////////////////
 
   $("#progressbar").hide();
-  $("#job_submit").click(function(e) {
+
+  var use_sell_mode = true;
+  $('#job_submit').click(function(e) {
+    $.get("/material/get_sell_mode", function(value) {use_sell_mode = value;});
+     //alert(use_sell_mode ? "true" : "false"); //TODO: Fix it please :(
+    if(use_sell_mode) {
+      $('#material_modal').modal();
+    } else {
+      if ($('#door_status_btn').hasClass('btn-warning')) {
+        $('#door_open_warning_modal').modal();
+      } else {
+        submit_job();
+      }
+    }
+    return false;
+  });
+
+  $("#material_selected").click(function(e) {
+  //$('#job_submit').click(function(e) {
+  odoo_product = document.querySelector('input[name = "job_material"]:checked');
+  odoo_service = document.querySelector('input[name = "job_cost_mode"]:checked');
+  if(odoo_product == null)
+    odoo_product_id = 0;
+  else
+    odoo_product_id = odoo_product.value;
+
+  if(odoo_service == null)
+    odoo_service_id = 0;
+  else
+    odoo_service_id = odoo_service.value;
+
+  job_comment = document.querySelector('input[name = "job_comment_input"]').value;
+  $.get("/material/set_product/" + odoo_product_id, function(e){ });
+  $.get("/material/set_service/" + odoo_service_id, function(e){ });//TODO: finish
+  $.get("/material/set_comment/" + job_comment, function(e){ });
     if ($('#door_status_btn').hasClass('btn-warning')) {
       $('#door_open_warning_modal').modal();
     } else {
       submit_job();
     }
-    return false;
+    $("#material_modal").modal('hide')
   });
 
   $('#really_submit_job_btn').click(function() {

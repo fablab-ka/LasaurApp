@@ -20,7 +20,6 @@ class SerialManagerClass(object):
     def __init__(self, accountingFile, influxConfig, dummyMode=False):
 
         self.device = None
-
         self.dummyMode = dummyMode
 
         self.rx_buffer = ""
@@ -57,6 +56,10 @@ class SerialManagerClass(object):
         self.accountingFile = accountingFile
         self.reset_accounting()
 
+        self.odoo_service = None
+        self.odoo_product = None
+        self.job_comment = ""
+
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
         if os.path.isfile(self.accountingFile):
@@ -80,7 +83,10 @@ class SerialManagerClass(object):
             'start_job'  : datetime.now(),
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name,
-            'user_id'    : user_id
+            'user_id'    : user_id,
+            'odoo_service': self.odoo_service,
+            'odoo_product': self.odoo_product,
+            'comment'     : self.job_comment
         }
         self.logger.info(
             "Start Accounting: gcode-lines:", self.job_accounting['gcode_lines'],

@@ -21,6 +21,7 @@ class OdooRemote():
     user_level = None
     unlock_time = 5 #how long is the machine unlocked?
     dummy_mode = False
+    sell_mode = False
     last_user = ''
 
     _common = None
@@ -30,6 +31,9 @@ class OdooRemote():
     _id_cards = None
     _users = None
     _last_acces = 0
+    products_product = None
+    products_service = None
+    _product_category = None
 
     #def main(self):
     #    self.init()
@@ -41,10 +45,14 @@ class OdooRemote():
     #            #TODO: Try to go live again
     #        time.sleep(1)
 
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.init()
+
     def init(self):
         if self.dummy_mode:
             self.last_user = 'Max Mustermann'
-            return
         try:
             self._common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.url))
             self._uid = self._common.authenticate(self.db, self.username, self.password, {})
@@ -54,23 +62,54 @@ class OdooRemote():
                                     'lab.machine', 'search_read',
                                     [[['name', '=', self.machine_name]]],
                                     {})
+            print("Machine:")
             print(self._machine)
+
             self._id_cards = self._models.execute_kw(self.db, self._uid, self.password,
                                     'lab.id_cards', 'search_read',
                                     [],
                                     {'fields':['card_id', 'status', 'assigned_client']})
+            print("ID Cards: ")
             print(self._id_cards)
+
             self._users = self._models.execute_kw(self.db, self._uid, self.password,
                                     'res.partner', 'search_read',
                                     [],
                                     {'fields':['id']})
+            print("Users:")
             print(self._users)
-            #print(self.users)
-            #print(self.id_cards)
-            #print(self.machine)
+
+            product_categories = self._models.execute_kw(self.db, self._uid, self.password,
+                                    'product.category', 'search_read',
+                                    [[['name', '=', self.machine_name]]],
+                                    {'fields':['id', 'complete_name']})
+            if(len(product_categories) != 1):
+                print("NO_PRODUCT_CATEGORY_FOUND")
+                self.sell_mode = False
+                print(product_categories)
+            else:
+                print("Product Category: " + str(product_categories[0]))
+                self._product_category = product_categories[0]['id']
+
+            self.products_product = self._models.execute_kw(self.db, self._uid, self.password,
+                                    'product.product', 'search_read',
+                                    [[['categ_id', '=',  self._product_category], ['type', '=', 'product']]],
+                                    {'fields':['id', 'name']})
+            print("Products:")
+            print(self.products_product)
+
+            self.products_service = self._models.execute_kw(self.db, self._uid, self.password,
+                                    'product.product', 'search_read',
+                                    [[['categ_id', '=',  self._product_category], ['type', '=', 'service']]],
+                                    {'fields':['id', 'name', 'type']})
+            print("Services:")
+            print(self.products_service)
+
             pickle.dump(self._machine, open("db_machine.backup", "wb"))
             pickle.dump(self._id_cards, open("db_id_cards.backup", "wb"))
             pickle.dump(self._users, open("db_users.backup", "wb"))
+            pickle.dump(self.products_product, open("db_products_product.backup", "wb"))
+            pickle.dump(self.products_service, open("db_products_service.backup", "wb"))
 
             print("BACKUP_DB_SAVED")
             self._mode = 'odoo'
@@ -83,6 +122,8 @@ class OdooRemote():
                 self._machine = pickle.load(open("db_machine.backup", "rb"))
                 self._id_cards = pickle.load(open("db_id_cards.backup", "rb"))
                 self._users = pickle.load(open("db_users.backup", "rb"))
+                self.products_product = pickle.load(open("db_products_product.backup", "rb"))
+                self.products_service = pickle.load(open("db_products_service.backup", "rb"))
                 self._mode='backup'
             except ValueError:
                 print("COULD_NOT_LOAD_BACKUP_DB")
@@ -95,9 +136,9 @@ class OdooRemote():
     def check_access(self, card_number):
         if self.dummy_mode:
             return "Max Mustermann"
-        print("card: " + card_number + " ", end="")
         if card_number == None:
             return False
+        print("card: " + card_number + " ", end="")
 
         if self._mode == 'odoo':
             try:
@@ -175,6 +216,17 @@ class OdooRemote():
                 return True
         return False
 
+    def get_product(self, id):
+        ret_product = filter(lambda product: product['id'] == id, self.products_product)
+        if len(ret_product) != 1:
+            return None
+        return ret_product[0]
+
+    def get_service(self, id):
+        ret_service = filter(lambda service: service['id'] == id, self.products_service)
+        if len(ret_service) != 1:
+            return None
+        return ret_service
 
     def get_access_rfid(self):
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)

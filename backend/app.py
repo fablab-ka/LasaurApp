@@ -41,12 +41,16 @@ I18N = i18n.Translations(config.get("language", "de"))
 ACCOUNTING_FILE = config.get("accounting", {}).get("outputfile", "logs/accounting.json")
 INFLUX_CONFIG = config.get("influx", False)
 USE_ID_CARD_ACCESS_RESTRICTION = config.get("use_id_card_access_restriction", False)
+ODOO_USERNAME = config.get("odoo_username", "admin")
+ODOO_PASSWORD = config.get("odoo_password", "admin")
+ODOO_USE = config.get("odoo_use", False)
+ODOO_USE_SELL = config.get("odoo_use_sell", False)
+IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
-odooremote = OdooRemote()
+odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD)
 
 lastCardCheck = 0
-cardCheckInterval = 2
 
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
@@ -58,18 +62,21 @@ elif os.name == 'posix':
 else:
     GUESS_PREFIX = "no prefix"
 
+
 def pauseIfCardNotAvailable():
     global lastCardCheck
     if USE_ID_CARD_ACCESS_RESTRICTION:
-        if (time.time() - lastCardCheck) > cardCheckInterval:
+        if (time.time() - lastCardCheck) > IDCARD_TIMEOUT:
             lastCardCheck = time.time()
             if not has_valid_id():
                 SerialManager.set_pause(True)
+
 
 def setDummyMode():
     odooremote.dummy_mode = True
     global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
+
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -153,7 +160,6 @@ def run_with_callback(host, port):
     if not SERIAL_PORT:
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
-    odooremote.init(); #TODO: Check if correct location
     # open web-browser
     if config.get("open_browser", True):
         try:
@@ -286,6 +292,37 @@ def jobs_history():
         jobs = jobs[:limit]
     return json.dumps(jobs, default=datedecoder.default)
 
+
+@app.route('/material/services')
+def material_services():
+    return json.dumps(odooremote.products_service, default=datedecoder.default)
+
+
+@app.route('/material/products')
+def material_products():
+    return json.dumps(odooremote.products_product, default=datedecoder.default)
+
+
+@app.route('/material/set_service/<id>')
+def material_set_service(id):
+    print("ServiceID:" + str(id))
+    SerialManager.odoo_service = odooremote.get_service(id)
+    return None
+
+
+@app.route('/material/set_product/<id>')
+def material_set_service(id):
+    print("ProductID:" + str(id))
+    SerialManager.odoo_service = odooremote.get_product(id)
+
+@app.route('/material/set_comment/<comment>')
+def material_set_comment(comment):
+    print("Comment: " + str(comment))
+    SerialManager.job_comment = str(comment)
+
+@app.route('/material/get_sell_mode')
+def get_sell_mode():
+    return ODOO_USE_SELL
 
 @app.route('/queue/get/:name#.+#')
 def static_queue_handler(name):

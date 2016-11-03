@@ -440,58 +440,86 @@
             </div>
         </div>
 
-        <!-- Modal -->
+        <!-- History Modal -->
         <div class="modal fade" id="history_modal" tabindex="-1" role="dialog" aria-labelledby="history_modal_title">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
-                <span id="selected_history_label" class="pull-right">
-                    <span class="selected-label">{{History_Selected}}</span>
-                    <span class="badge"></span>
-                </span>
+                        <span id="selected_history_label" class="pull-right">
+                            <span class="selected-label">{{History_Selected}}</span>
+                            <span class="badge"></span>
+                        </span>
 
-                <h4 class="modal-title" id="history_modal_title">Job History</h4>
-              </div>
-              <div class="modal-body" style="overflow:auto; max-height:600px;">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="row-1">{{History_Name}}</th>
-                            <th class="row-2">{{History_User}}</th>
-                            <th class="row-3">{{History_Start}}</th>
-                            <th class="row-4">{{History_End}}</th>
-                            <!--<th class="row-5">{{History_LinesOfGCode}}</th>-->
-                            <th class="row-6">{{History_Duration}}</th>
-                        </tr>
-                    </thead>
-                </table>
-                <div class="scroll-container">
-                    <table id="job_history_big" class="table table-striped table-hover">
-                        <tbody></tbody>
-                    </table>
+                        <h4 class="modal-title" id="history_modal_title">Job History</h4>
+                    </div>
+                    <div class="modal-body" style="overflow:auto; max-height:600px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="row-1">{{History_Name}}</th>
+                                    <th class="row-2">{{History_User}}</th>
+                                    <th class="row-3">{{History_Start}}</th>
+                                    <th class="row-4">{{History_End}}</th>
+                                    <!--<th class="row-5">{{History_LinesOfGCode}}</th>-->
+                                    <th class="row-6">{{History_Duration}}</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="scroll-container">
+                            <table id="job_history_big" class="table table-striped table-hover">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <table class="table">
+                            <tfoot>
+                                <tr class="active">
+                                    <th class="row-1"></th>
+                                    <th class="row-2"></th>
+                                    <th class="row-3"></th>
+                                    <th class="row-4"></th>
+                                    <!--<th class="row-5">{{History_TotalDuration}}</th>-->
+                                    <th class="row-6" id="total_job_duration_big">...</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{Close}}</button>
+                    </div>
                 </div>
-                <table class="table">
-                    <tfoot>
-                        <tr class="active">
-                            <th class="row-1"></th>
-                            <th class="row-2"></th>
-                            <th class="row-3"></th>
-                            <th class="row-4"></th>
-                            <!--<th class="row-5">{{History_TotalDuration}}</th>-->
-                            <th class="row-6" id="total_job_duration_big">...</th>
-                        </tr>
-                    </tfoot>
-                </table>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{Close}}</button>
-              </div>
             </div>
-          </div>
         </div>
 
+
+        <!-- Material Modal -->
+        <div class="modal fade" id="material_modal" tabindex="-1" role="dialog" aria-labelledby="material_modal_title">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="material_modal_title">Material History</h4>
+                    </div>
+                    <div class="modal-body" style="overflow:auto; max-height:600px;">
+                        <div id="job_comment">
+                            Comment: <input type="text" name="Comment" value="" id="job_comment_input"/>
+                        </div>
+                        <div id="job_cost_mode"></div>
+                        <div id="job_products"></div>
+                        <div class="scroll-container">
+                            <table id="material_selection" class="table table-striped table-hover">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="material_selected" type="button" class="btn btn-default" data-dismiss="modal">Okay</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>

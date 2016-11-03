@@ -15,5 +15,10 @@
     "use_id_card_access_restriction": true,
     "id_card_list_path": "/etc/lasersaur/idlist.txt",
     "id_card_admin_list_path": "/etc/lasersaur/adminidlist.txt",
-    "network_port": 80
+    "network_port": 80,
+    "idcard_timeout": 10,
+    "odoo_username": "admin",
+    "odoo_password": "admin",
+    "odoo_use": false,
+    "odoo_use_sell": false
 }
