@@ -205,52 +205,48 @@ function add_to_library_queue(jobdata, name) {
 
 /// PASSES //////////////////////////////////////
 
+function addPass(passnum) {
+  var margintop = '';
+  if (passnum != 1) {
+    margintop = '6';
+  }
+
+  var colors = [];
+  for (var color in DataHandler.getColorOrder()) {
+    colors.push(color);
+  }
+
+  var html = require('pug').render($("#pass-template").html(), {
+    margintop: margintop,
+    passnum: passnum,
+    default_feedrate: app_settings.default_feedrate,
+    max_seek_speed: app_settings.max_seek_speed,
+    default_intensity: app_settings.default_intensity,
+    colors: colors
+  });
+
+  var pass_elem = $(html).appendTo('#passes');
+
+  // color pass widget toggles events registration
+  pass_elem.find('.colorbtns button.select_color').click(function(e) {
+    // toggle manually to work the same as preview buttons
+    // also need active-strong anyways
+    if($(this).hasClass('active')) {
+      $(this).removeClass('active');
+      $(this).removeClass('active-strong');
+    } else {
+      $(this).addClass('active');
+      $(this).addClass('active-strong');
+    }
+    refresh_preview(true, true);
+  });
+}
+
 function addPasses(num) {
   var pass_num_offset = getNumPasses() + 1;
-  var buttons = ''
-  for (var color in DataHandler.getColorOrder()) {
-    buttons +='<button class="select_color btn btn-small" style="margin:2px; padding:7px;"><div style="width:10px; height:10px; background-color:'+color+'"><span style="display:none">'+color+'</span></div></button>'
-  }
   for (var i=0; i<num; i++) {
     var passnum = pass_num_offset+i;
-    var margintop = '';
-    if (passnum != 1) {
-      margintop = 'margin-top:6px;'
-    }
-    var html = '<div class="row" style="margin:0px; '+margintop+
-                  ' padding:4px; background-color:#eeeeee">' +
-                '<div class="form-inline" style="margin-bottom:0px">' +
-                  '<label>Pass '+ passnum +': </label>' +
-                  '<div class="input-group" style="margin-left:6px">' +
-                    '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
-                    '<input type="text" class="feedrate" value="'+app_settings.default_feedrate+
-                      '" title="feedrate 1-'+app_settings.max_seek_speed+
-                      'mm/min" style="width:40px" data-delay="500">' +
-                  '</div>' +
-                  '<div class="input-group" style="margin-left:6px">' +
-                    '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
-                    '<input class="intensity" type="textfield" value="'+
-                      app_settings.default_intensity+
-                      '" title="intensity 0-100%" style="width:30px;" data-delay="500">' +
-                  '</div>' +
-                  '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
-                '</div>' +
-              '</div>';
-    // $('#passes').append(html);
-    var pass_elem = $(html).appendTo('#passes');
-    // color pass widget toggles events registration
-    pass_elem.find('.colorbtns button.select_color').click(function(e){
-      // toggle manually to work the same as preview buttons
-      // also need active-strong anyways
-      if($(this).hasClass('active')) {
-        $(this).removeClass('active');
-        $(this).removeClass('active-strong');
-      } else {
-        $(this).addClass('active');
-        $(this).addClass('active-strong');
-      }
-      refresh_preview(true, true);
-    });
+    addPass(passnum);
   }
   $('#passes_container').show();
 }

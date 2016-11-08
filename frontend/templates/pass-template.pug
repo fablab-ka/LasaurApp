@@ -1,0 +1,16 @@
+div.row(style="margin:0px; margin-top: " + margintop + "px; padding:4px; background-color:#eeeeee")
+  div.form-inline(style="margin-bottom:0px")
+    label Pass #{passnum}:
+    div.input-group(style="margin-left:6px")
+      span.input-group-addon(style="margin-right:-5px;")
+      input.feedrate(type=text value=default_feedrate title="feedrate 1-" + max_seek_speed + "mm/min" style="width:40px" data-delay=500)
+
+    div.input-group(style="margin-left:6px")
+      span.input-group-addon(style="margin-right:-5px;") %
+      input.intensity(type="textfield" value=default_intensity title="intensity 0-100%" style="width:30px;" data-delay="500")
+
+    span.colorbtns(style="margin-left:6px;")
+      each color in colors
+        button.select_color.btn.btn-small(style="margin:2px; padding:7px;")
+          div(style="width:10px; height:10px; background-color: " + color + ";")
+            span(style="display:none") #{color}

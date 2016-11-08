@@ -451,7 +451,7 @@ def queue_unstar_handler(name):
 @app.route('/app.html')
 def default_handler():
     filename = os.path.join(os.path.join(resources_dir(), 'frontend', 'app.html'))
-    return template(filename, list(I18N))
+    return template(filename, list(I18N), resources_dir=resources_dir())
 
 
 @app.route('/stash_download', method='POST')
