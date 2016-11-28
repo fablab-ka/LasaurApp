@@ -687,18 +687,6 @@ function selectMaterial(id) {
     $.getJSON('/material/services', function(services) {
       document.getElementById('job_cost_mode').innerHTML = '';
       for (var i in services) {
-//        var selectbutton = document.createElement("input");
-//        if(i == 1)
-//          selectbutton.checked = true;
-//        selectbutton.setAttribute("type", "radio");
-//        selectbutton.setAttribute("name", "job_cost_mode");
-//        selectbutton.setAttribute("value", services[i].id);
-//        selectbutton.setAttribute("id", "job_cost_mode_"+ services[i].id);
-//        var selectLabel = document.createElement("label");
-//        selectLabel.innerHTML = services[i].name;
-//        document.getElementById('job_cost_mode').appendChild(selectbutton);
-//        document.getElementById('job_cost_mode').appendChild(selectLabel);
-//        document.getElementById('job_cost_mode').appendChild(document.createElement("br"));
           var selectbutton = document.createElement("input");
           selectbutton.type = "button";
           selectbutton.value = services[i].name;
@@ -714,16 +702,6 @@ function selectMaterial(id) {
       var product_list = document.getElementById('job_products');
       product_list.innerHTML = '';
       for (var i in products) {
-//        var selectbutton = document.createElement("input");
-//        selectbutton.setAttribute("type", "radio");
-//        selectbutton.setAttribute("name", "job_material");
-//        selectbutton.setAttribute("id", products[i].name);
-//        selectbutton.setAttribute("value", products[i].id);
-//        var selectLabel = document.createElement("label");
-//        selectLabel.innerHTML = products[i].name
-//        product_list.appendChild(selectbutton);
-//        product_list.appendChild(selectLabel);
-//        product_list.appendChild(document.createElement("br"));
           var selectbutton = document.createElement("input");
           selectbutton.type = "button";
           selectbutton.value = products[i].name;

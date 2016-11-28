@@ -295,12 +295,12 @@ def jobs_history():
 
 @app.route('/material/services')
 def material_services():
-    return json.dumps(odooremote.products_service, default=datedecoder.default)
+    return json.dumps(odooremote.services, default=datedecoder.default)
 
 
 @app.route('/material/products')
 def material_products():
-    return json.dumps(odooremote.products_product, default=datedecoder.default)
+    return json.dumps(odooremote.materials, default=datedecoder.default)
 
 
 @app.route('/material/set_service/<id>')

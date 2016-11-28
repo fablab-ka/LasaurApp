@@ -5,6 +5,7 @@ import sys
 from smartcard.scard import *
 import smartcard.util
 import pickle
+import json
 
 
 
@@ -12,7 +13,7 @@ class OdooRemote():
 
     #url = 'https://odoo.fablab-karlsruhe.de'
     url = 'http://127.0.0.1:8069'
-    db = 'FabLabKA'
+    db = 'testDB'
     username = 'admin'
     password = 'admin'
     #username = secret_password.username
@@ -32,8 +33,12 @@ class OdooRemote():
     _users = None
     _last_acces = 0
     products_product = None
-    products_service = None
     _product_category = None
+    _material_tag_id = 0
+    _laser_tag_id = 0
+    materials = None
+    services = None
+
 
     #def main(self):
     #    self.init()
@@ -61,9 +66,18 @@ class OdooRemote():
             self._machine = self._models.execute_kw(self.db, self._uid, self.password,
                                     'lab.machine', 'search_read',
                                     [[['name', '=', self.machine_name]]],
-                                    {})
+                                    {})[0]
             print("Machine:")
             print(self._machine)
+
+            self._material_tag_id = self._machine['machine_tag_1'][0]
+            print("Material Tag ID:")
+            print(self._material_tag_id)
+
+            self._laser_tag_id = self._machine['machine_tag_2'][0]
+            print("Laser Service Tag ID:")
+            print(self._laser_tag_id)
+
 
             self._id_cards = self._models.execute_kw(self.db, self._uid, self.password,
                                     'lab.id_cards', 'search_read',
@@ -79,37 +93,29 @@ class OdooRemote():
             print("Users:")
             print(self._users)
 
-            product_categories = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'product.category', 'search_read',
-                                    [[['name', '=', self.machine_name]]],
-                                    {'fields':['id', 'complete_name']})
-            if(len(product_categories) != 1):
-                print("NO_PRODUCT_CATEGORY_FOUND")
-                self.sell_mode = False
-                print(product_categories)
-            else:
-                print("Product Category: " + str(product_categories[0]))
-                self._product_category = product_categories[0]['id']
-
-            self.products_product = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'product.product', 'search_read',
-                                    [[['categ_id', '=',  self._product_category], ['type', '=', 'product']]],
-                                    {'fields':['id', 'name']})
-            print("Products:")
-            print(self.products_product)
-
-            self.products_service = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'product.product', 'search_read',
-                                    [[['categ_id', '=',  self._product_category], ['type', '=', 'service']]],
-                                    {'fields':['id', 'name', 'type']})
+            self.materials = self._models.execute_kw(self.db, self._uid, self.password,
+                                    'product.template', 'search_read',
+                                                     [[['tag_ids', '=', self._material_tag_id]]],
+                                                     {'fields':['id', 'name', 'tag_ids']})
+            self.services = self._models.execute_kw(self.db, self._uid, self.password,
+                                    'product.template', 'search_read',
+                                                    [[['tag_ids', '=', self._laser_tag_id]]],
+                                                    {'fields':['id', 'name', 'tag_ids']})
+            print("Materials:")
+            print(self.materials)
             print("Services:")
-            print(self.products_service)
+            print(self.services)
 
-            pickle.dump(self._machine, open("db_machine.backup", "wb"))
-            pickle.dump(self._id_cards, open("db_id_cards.backup", "wb"))
-            pickle.dump(self._users, open("db_users.backup", "wb"))
-            pickle.dump(self.products_product, open("db_products_product.backup", "wb"))
-            pickle.dump(self.products_service, open("db_products_service.backup", "wb"))
+            with open('machine.json', 'w') as file:
+                json.dump(self._machine, file, indent=4, separators=(',', ': '))
+            with open('id_cards.json', 'w') as file:
+                json.dump(self._id_cards, file, indent=4, separators=(',', ': '))
+            with open('users.json', 'w') as file:
+                json.dump(self._users, file, indent=4, separators=(',', ': '))
+            with open('materials.json', 'w') as file:
+                json.dump(self.materials, file, indent=4, separators=(',', ': '))
+            with open('services.json', 'w') as file:
+                json.dump(self.services, file, indent=4, separators=(',', ': '))
 
             print("BACKUP_DB_SAVED")
             self._mode = 'odoo'
@@ -119,14 +125,22 @@ class OdooRemote():
             print("COULD_NOT_OPEN_CONNECTION")
             try:
                 print("BACKUP_DB_LOADED")
-                self._machine = pickle.load(open("db_machine.backup", "rb"))
-                self._id_cards = pickle.load(open("db_id_cards.backup", "rb"))
-                self._users = pickle.load(open("db_users.backup", "rb"))
-                self.products_product = pickle.load(open("db_products_product.backup", "rb"))
-                self.products_service = pickle.load(open("db_products_service.backup", "rb"))
+                with open('machine.json') as file:
+                    self._machine = json.load(file)
+                with open('id_cards.json') as file:
+                    self._id_cards = json.load(file)
+                with open('users.json') as file:
+                    self._users = json.load(file)
+                with open('materials.json') as file:
+                    self.materials = json.load(file)
+                with open('services.json') as file:
+                    self.services = json.load(file)
                 self._mode='backup'
-            except ValueError:
+            except IOError:
+                #TODO: Maybe just throw an error message?
                 print("COULD_NOT_LOAD_BACKUP_DB")
+                print("SHUTTING DOWN LASERSAURAPP, TRY STARTING WITHOUT ODOO SUPPORT")
+                exit(1)
                 self._mode='error'
 
         if len(self._machine) != 1:
@@ -191,13 +205,13 @@ class OdooRemote():
             self.user_level = 'owner'
             self.last_user = client['name']
             return client['name'] #Owners get full acces no matter the circumstances
-        elif self._machine[0]['status'] == 'r':
+        elif self._machine['status'] == 'r':
             if client['id'] in self._machine[0]['user_ids'] and self._machine[0]['rules'] == 'r':
                 print("CLIENT_IS_USER")
                 self.user_level = 'user'
                 self.last_user = client['name']
                 return client['name']
-            elif self._machine[0]['rules'] == 'f':
+            elif self._machine['rules'] == 'f':
                 print("FREE_ACCESS")
                 self.user_level = 'free'
                 self.last_user = client['name']
@@ -217,16 +231,17 @@ class OdooRemote():
         return False
 
     def get_product(self, id):
-        ret_product = filter(lambda product: product['id'] == id, self.products_product)
+        ret_product = filter(lambda product: product['id'] == id, self.materials)
         if len(ret_product) != 1:
             return None
         return ret_product[0]
 
     def get_service(self, id):
-        ret_service = filter(lambda service: service['id'] == id, self.products_service)
+        ret_service = filter(lambda service: service['id'] == id, self.services)
         if len(ret_service) != 1:
-            return None
+           return None
         return ret_service
+        return '0'
 
     def get_access_rfid(self):
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
