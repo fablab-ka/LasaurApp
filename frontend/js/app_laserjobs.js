@@ -199,11 +199,36 @@ function add_to_library_queue(jobdata, name) {
   });
 }
 
-
+//TODO: fill dynamicly
+default_cut_speed = 1000;
+default_cut_intensity = 100;
+default_engrave_speed = 4000;
+default_engrave_intensity = 30;
 
 /// PASSES //////////////////////////////////////
 
+
+function setDefaultCut(passnum){
+    //$('#feedrate_'+passnum).value = 100;
+    feedrate_field = document.getElementById('feedrate_' + passnum);
+    feedrate_field.value = default_cut_speed;
+    intensity_field = document.getElementById('intensity_' + passnum);
+    intensity_field.value = default_cut_intensity;
+}
+
+function setDefaultEngrave(passnum){
+    //$('#feedrate_'+passnum).value = 100;
+    feedrate_field = document.getElementById('feedrate_' + passnum);
+    feedrate_field.value = default_engrave_speed;
+    intensity_field = document.getElementById('intensity_' + passnum);
+    intensity_field.value = default_engrave_intensity;
+}
+
 function addPasses(num) {
+  $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
+  $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
+  $.get("/material/getEngraveSpeed", function(e) {default_engrave_speed = e;});
+  $.get("/material/getEngraveIntensity", function(e) {default_engrave_intensity = e;});
   var pass_num_offset = getNumPasses() + 1;
   var buttons = ''
   for (var color in DataHandler.getColorOrder()) {
@@ -220,15 +245,17 @@ function addPasses(num) {
                 '<div class="form-inline" style="margin-bottom:0px">' +
                   '<label>Pass '+ passnum +': </label>' +
                   '<div class="input-group" style="margin-left:6px">' +
+                    '<input type="button" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
+                    '<input type="button" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
                     '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
-                    '<input type="text" class="feedrate" value="'+app_settings.default_feedrate+
+                    '<input type="text" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +
                       '" title="feedrate 1-'+app_settings.max_seek_speed+
                       'mm/min" style="width:40px" data-delay="500">' +
                   '</div>' +
                   '<div class="input-group" style="margin-left:6px">' +
                     '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
-                    '<input class="intensity" type="textfield" value="'+
-                      app_settings.default_intensity+
+                    '<input class="intensity" id="intensity_' + passnum + '" type="textfield" value="'+
+                      default_cut_intensity +
                       '" title="intensity 0-100%" style="width:30px;" data-delay="500">' +
                   '</div>' +
                   '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
@@ -387,47 +414,15 @@ $(document).ready(function(){
 
   $("#progressbar").hide();
 
-  var use_sell_mode = true;
   $('#job_submit').click(function(e) {
-    $.get("/material/get_sell_mode", function(value) {use_sell_mode = value;});
-     //alert(use_sell_mode ? "true" : "false"); //TODO: Fix it please :(
-    if(use_sell_mode) {
-      $('#material_modal').modal();
-    } else {
       if ($('#door_status_btn').hasClass('btn-warning')) {
         $('#door_open_warning_modal').modal();
       } else {
         submit_job();
       }
-    }
     return false;
   });
 
-  $("#material_selected").click(function(e) {
-  //$('#job_submit').click(function(e) {
-  odoo_product = document.querySelector('input[name = "job_material"]:checked');
-  odoo_service = document.querySelector('input[name = "job_cost_mode"]:checked');
-  if(odoo_product == null)
-    odoo_product_id = 0;
-  else
-    odoo_product_id = odoo_product.value;
-
-  if(odoo_service == null)
-    odoo_service_id = 0;
-  else
-    odoo_service_id = odoo_service.value;
-
-  job_comment = document.querySelector('input[name = "job_comment_input"]').value;
-  $.get("/material/set_product/" + odoo_product_id, function(e){ });
-  $.get("/material/set_service/" + odoo_service_id, function(e){ });//TODO: finish
-  $.get("/material/set_comment/" + job_comment, function(e){ });
-    if ($('#door_status_btn').hasClass('btn-warning')) {
-      $('#door_open_warning_modal').modal();
-    } else {
-      submit_job();
-    }
-    $("#material_modal").modal('hide')
-  });
 
   $('#really_submit_job_btn').click(function() {
       submit_job();

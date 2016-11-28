@@ -313,7 +313,7 @@ def material_set_service(id):
 @app.route('/material/set_product/<id>')
 def material_set_service(id):
     print("ProductID:" + str(id))
-    SerialManager.odoo_service = odooremote.get_product(id)
+    SerialManager.odoo_material = odooremote.get_product(id)
 
 @app.route('/material/set_comment/<comment>')
 def material_set_comment(comment):
@@ -323,6 +323,21 @@ def material_set_comment(comment):
 @app.route('/material/get_sell_mode')
 def get_sell_mode():
     return ODOO_USE_SELL
+
+@app.route('/material/getCutSpeed')
+def get_Cut_Speed():
+    return int(SerialManager.odoo_material['machine_parameter_1'])
+@app.route('/material/getCutIntensity')
+def get_Cut_Speed():
+    return int(SerialManager.odoo_material['machine_parameter_2'])
+@app.route('/material/getEngraveSpeed')
+def get_Cut_Speed():
+    return SerialManager.odoo_material['machine_parameter_3']
+@app.route('/material/getEngraveIntensity')
+def get_Cut_Speed():
+    return SerialManager.odoo_material['machine_parameter_4']
+
+
 
 @app.route('/queue/get/:name#.+#')
 def static_queue_handler(name):

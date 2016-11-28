@@ -96,15 +96,18 @@ class OdooRemote():
             self.materials = self._models.execute_kw(self.db, self._uid, self.password,
                                     'product.template', 'search_read',
                                                      [[['tag_ids', '=', self._material_tag_id]]],
-                                                     {'fields':['id', 'name', 'tag_ids']})
+                                                     {})
             self.services = self._models.execute_kw(self.db, self._uid, self.password,
                                     'product.template', 'search_read',
                                                     [[['tag_ids', '=', self._laser_tag_id]]],
-                                                    {'fields':['id', 'name', 'tag_ids']})
+                                                    {})
             print("Materials:")
-            print(self.materials)
+            for mat in self.materials:
+                print(str(mat['id']) + "   " + mat['name'])
+            #print(self.materials)
             print("Services:")
-            print(self.services)
+            for serv in self.services:
+                print(str(serv['id']) + "   " + serv['name'])
 
             with open('machine.json', 'w') as file:
                 json.dump(self._machine, file, indent=4, separators=(',', ': '))
@@ -143,8 +146,8 @@ class OdooRemote():
                 exit(1)
                 self._mode='error'
 
-        if len(self._machine) != 1:
-            print("NO_OR_MULTIPLE_MACHINES_FOUND")
+        if not self._machine:
+            print("NO_MACHINE_FOUND")
             return False
 
     def check_access(self, card_number):
@@ -231,17 +234,17 @@ class OdooRemote():
         return False
 
     def get_product(self, id):
-        ret_product = filter(lambda product: product['id'] == id, self.materials)
+        print("search for product '" + str(id)+"'")
+        ret_product = filter(lambda product: product['id'] == int(id), self.materials)
         if len(ret_product) != 1:
             return None
         return ret_product[0]
 
     def get_service(self, id):
-        ret_service = filter(lambda service: service['id'] == id, self.services)
+        ret_service = filter(lambda service: service['id'] == int(id), self.services)
         if len(ret_service) != 1:
            return None
         return ret_service
-        return '0'
 
     def get_access_rfid(self):
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)
