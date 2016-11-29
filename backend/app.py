@@ -305,15 +305,13 @@ def material_products():
 
 @app.route('/material/set_service/<id>')
 def material_set_service(id):
-    print("ServiceID:" + str(id))
     SerialManager.odoo_service = odooremote.get_service(id)
     return None
 
 
 @app.route('/material/set_product/<id>')
 def material_set_service(id):
-    print("ProductID:" + str(id))
-    SerialManager.odoo_material = odooremote.get_product(id)
+    SerialManager.odoo_product = odooremote.get_product(id)
 
 @app.route('/material/set_comment/<comment>')
 def material_set_comment(comment):
@@ -325,17 +323,17 @@ def get_sell_mode():
     return ODOO_USE_SELL
 
 @app.route('/material/getCutSpeed')
-def get_Cut_Speed():
-    return int(SerialManager.odoo_material['machine_parameter_1'])
+def get_cut_speed():
+    return int(SerialManager.odoo_product['machine_parameter_1'])
 @app.route('/material/getCutIntensity')
-def get_Cut_Speed():
-    return int(SerialManager.odoo_material['machine_parameter_2'])
+def get_cut_intensity():
+    return int(SerialManager.odoo_product['machine_parameter_2'])
 @app.route('/material/getEngraveSpeed')
-def get_Cut_Speed():
-    return SerialManager.odoo_material['machine_parameter_3']
+def get_engrave_speed():
+    return SerialManager.odoo_product['machine_parameter_3']
 @app.route('/material/getEngraveIntensity')
-def get_Cut_Speed():
-    return SerialManager.odoo_material['machine_parameter_4']
+def get_engrave_intensity():
+    return SerialManager.odoo_product['machine_parameter_4']
 
 
 

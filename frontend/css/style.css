@@ -109,8 +109,3 @@ button.active-strong {
   background-color: #00C320;
   text-decoration: underline;
 }
-
-
-input[type="radio"]:checked + label {
-    color:#00C320;
-}

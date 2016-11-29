@@ -654,36 +654,13 @@ $(document).ready(function(){
   });
 });  // ready
 
-//TODO: Finish modifying
-current_service_id = null;
-current_material_id = null;
 
-function selectService(id) {
-  if(current_service_id != null) {
-    document.getElementById("btn_service_" + current_service_id).classList.remove("btn-success");
-  }
-  this.classList.add("btn-success");
-  current_service_id = this.name;
-}
-
-function selectMaterial(id) {
-  if(current_material_id != null) {
-    document.getElementById("btn_material_" + current_material_id).classList.remove("btn-success");
-  }
-  this.classList.add("btn-success");
-  current_material_id = this.name;
-}
-
-isMaterialModálAlreadyDone = false;
+isMaterialModalAlreadyDone = false;
 
  $('#material_modal').on('show.bs.modal', function (e) {
-    current_service_id = null;
-    //document.getElementById("btn_service_" + current_service_id).classList.remove("btn-success");
-    current_material_id = null;
-    //document.getElementById("btn_material_" + current_material_id).classList.remove("btn-success");
     $("#job_comment_input").value = "";
-    if(isMaterialModálAlreadyDone) {
-      return;
+    if(isMaterialModalAlreadyDone) {
+      //return;
     }
 
     var comment_div = document.getElementById('job_comment');
@@ -699,38 +676,39 @@ isMaterialModálAlreadyDone = false;
       var service_list = document.getElementById('job_services');
       service_list.innerHTML = '';
       for (var i in services) {
+          var btnLabel = document.createElement("label");
+          btnLabel.classList = "btn";
           var selectbutton = document.createElement("input");
-          selectbutton.type = "button";
-          selectbutton.name = services[i].id;
-          selectbutton.value = services[i].name;
-          selectbutton.id = "btn_service_" + services[i].id;
-          selectbutton.onclick = selectService;
-          selectbutton.classList = "btn btn-default";
-          service_list.appendChild(selectbutton);
+          selectbutton.type = "radio";
+          selectbutton.name = "service";
+          selectbutton.value = services[i].id;
+          selectbutton.classList = "btn";
+          selectbutton.setAttribute("checked", "checked");
+          btnLabel.appendChild(selectbutton);
+          btnLabel.innerHTML += services[i].name;
+          service_list.appendChild(btnLabel);
+
       }
-      //services[0].checked = true;
     });
 
     $.getJSON('/material/products', function(products) {
       var product_list = document.getElementById('job_materials');
       product_list.innerHTML = '';
       for (var i in products) {
-          //var btnLabel = document.createElement("label");
-          //btnLabel.classList = "btn";
+          var btnLabel = document.createElement("label");
+          btnLabel.classList = "btn";
           var selectbutton = document.createElement("input");
-          selectbutton.type = "button";
-          selectbutton.name = products[i].id;
-          selectbutton.value = products[i].name;
-          selectbutton.id = "btn_material_" + products[i].id;
-          selectbutton.onclick = selectMaterial;
+          selectbutton.type = "radio";
+          selectbutton.name = "material";
+          selectbutton.value = products[i].id;
           selectbutton.classList = "btn";
-          //btnLabel.appendChild(selectbutton);
-          //btnLabel.innerHTML += products[i].name;
-          //product_list.appendChild(btnLabel);
-          product_list.appendChild(selectbutton);
+          selectbutton.setAttribute("checked", "checked");
+          btnLabel.appendChild(selectbutton);
+          btnLabel.innerHTML += products[i].name;
+          product_list.appendChild(btnLabel);
       }
     });
-    isMaterialModálAlreadyDone = true;
+    isMaterialModalAlreadyDone = true;
   });
 
 /*

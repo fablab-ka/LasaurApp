@@ -237,14 +237,16 @@ class OdooRemote():
         print("search for product '" + str(id)+"'")
         ret_product = filter(lambda product: product['id'] == int(id), self.materials)
         if len(ret_product) != 1:
+            print("product " + id + " not found!")
             return None
         return ret_product[0]
 
     def get_service(self, id):
         ret_service = filter(lambda service: service['id'] == int(id), self.services)
         if len(ret_service) != 1:
-           return None
-        return ret_service
+            print("service " + id + " not found!")
+            return None
+        return ret_service[0]
 
     def get_access_rfid(self):
         hresult, hcontext = SCardEstablishContext(SCARD_SCOPE_USER)

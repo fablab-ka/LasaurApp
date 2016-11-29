@@ -6,6 +6,7 @@ var preview_canvas_obj = null;
 
 function load_into_job_widget(name, jobdata) {
   // create some empty pass widgets
+  $('#material_modal').modal();
   $('#passes').html('');
   DataHandler.setByJson(jobdata);
   addPasses(minNumPassWidgets);
@@ -225,10 +226,6 @@ function setDefaultEngrave(passnum){
 }
 
 function addPasses(num) {
-  $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
-  $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
-  $.get("/material/getEngraveSpeed", function(e) {default_engrave_speed = e;});
-  $.get("/material/getEngraveIntensity", function(e) {default_engrave_intensity = e;});
   var pass_num_offset = getNumPasses() + 1;
   var buttons = ''
   for (var color in DataHandler.getColorOrder()) {
@@ -248,14 +245,14 @@ function addPasses(num) {
                     '<input type="button" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
                     '<input type="button" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
                     '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
-                    '<input type="text" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +
+                    '<input type="text" id="feedrate_' + passnum + '" class="feedrate" value="'+ app_settings.default_feedrate +
                       '" title="feedrate 1-'+app_settings.max_seek_speed+
                       'mm/min" style="width:40px" data-delay="500">' +
                   '</div>' +
                   '<div class="input-group" style="margin-left:6px">' +
                     '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
                     '<input class="intensity" id="intensity_' + passnum + '" type="textfield" value="'+
-                      default_cut_intensity +
+                      app_settings.default_intensity +
                       '" title="intensity 0-100%" style="width:30px;" data-delay="500">' +
                   '</div>' +
                   '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
@@ -523,5 +520,29 @@ $(document).ready(function(){
     return false;
   });
 
+  $("#material_selected").click(function(e) {
+    odoo_product = document.querySelector('input[name = "material"]:checked').value;
+    //odoo_product = document.getElementById("job_materials")//.elements("job_material").value;
+    //odoo_product = $("input[name=job_material]:checked").value;
+    //odoo_product = current_material_id;
+    odoo_service = document.querySelector('input[name = "service"]:checked').value;
+    //odoo_service = current_service_id
+    if(odoo_product == null)
+      odoo_product = 0;
+    if(odoo_service == null)
+      odoo_service = 0;
+
+    job_comment = document.querySelector('input[name = "job_comment_input"]').value;
+    $.get("/material/set_product/" + odoo_product, function(e){ });
+    $.get("/material/set_service/" + odoo_service, function(e){ });
+    $.get("/material/set_comment/" + job_comment, function(e){ });
+
+    $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
+    $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
+    $.get("/material/getEngraveSpeed", function(e) {default_engrave_speed = e;});
+    $.get("/material/getEngraveIntensity", function(e) {default_engrave_intensity = e;});
+
+      $("#material_modal").modal('hide')
+  });
 
 });  // ready

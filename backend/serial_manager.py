@@ -70,7 +70,7 @@ class SerialManagerClass(object):
             if not os.path.exists(folder):
                 os.makedirs(folder)
             with open(self.accountingFile, 'w+') as json_file:
-                json.dump(self.lastJobs, json_file, default=datedecoder.default)
+                json.dump(self.lastJobs, json_file, default=datedecoder.default, indent=4, separators=(',', ': '))
 
         self.logger.info("Init Accounting")
 
@@ -84,8 +84,8 @@ class SerialManagerClass(object):
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name,
             'user_id'    : user_id,
-            'odoo_service': self.odoo_service,
-            'odoo_product': self.odoo_product,
+            'odoo_service': self.odoo_service['id'],
+            'odoo_product': self.odoo_product['id'],
             'comment'     : self.job_comment
         }
         self.logger.info(
@@ -108,15 +108,17 @@ class SerialManagerClass(object):
             'duration': jobtime,
             'lines': self.job_accounting['gcode_lines'],
             'total': int(current_total + jobtime),
-            'user_id': self.job_accounting['user_id']
+            'user_id': self.job_accounting['user_id'],
+            'odoo_service_id': self.job_accounting['odoo_service'],
+            'odoo_product_id': self.job_accounting['odoo_product'],
+            'comment': self.job_accounting['comment']
         }
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
         #CHANGE_ME
         with open(self.accountingFile, 'w') as json_file:
-            json.dump(self.lastJobs, json_file, default=datedecoder.default)
-
+            json.dump(self.lastJobs, json_file, default=datedecoder.default, indent=4, separators=(',', ': '))
         self.logger.info(
             "Stop Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
             " jobname: ", self.job_accounting['job_name'],

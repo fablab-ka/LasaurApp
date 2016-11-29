@@ -242,8 +242,8 @@ $(document).ready(function(){
     if (!(DataHandler.isEmpty())) {
       //TODO: Finish writing
       //if($.get("/material/get_sell_mode")) {
-      if(true) {
-        $('#material_modal').modal();
+      if(false) {
+        //$('#material_modal').modal();
       } else {
         addToQueue();
       }
@@ -252,28 +252,5 @@ $(document).ready(function(){
     }
     return false;
   });
-
-  $("#material_selected").click(function(e) {
-    //odoo_product = document.querySelector('input[name = "material"]:checked').value;
-    //odoo_product = document.getElementById("job_materials")//.elements("job_material").value;
-    //odoo_product = $("input[name=job_material]:checked").value;
-    odoo_product = current_material_id;
-    //odoo_service = document.querySelector('input[name = "job_cost_mode"]:checked');
-    odoo_service = current_service_id
-    if(odoo_product == null)
-      odoo_product = 0;
-    if(odoo_service == null)
-      odoo_service = 0;
-
-    job_comment = document.querySelector('input[name = "job_comment_input"]').value;
-    $.get("/material/set_product/" + odoo_product, function(e){ });
-    $.get("/material/set_service/" + odoo_service, function(e){ });
-    $.get("/material/set_comment/" + job_comment, function(e){ });
-
-
-
-      $("#material_modal").modal('hide')
-      addToQueue();
-    });
 
 });  // ready
