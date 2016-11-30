@@ -16,7 +16,7 @@ class OdooRemote():
     db = None
     username = 'admin'
     password = 'admin'
-    machine_name = 'LaserSaur'
+    machine_name = 'LaserSaur' #TODO get machine name from Odoo (new machine field)
     user_level = None
     unlock_time = 5 #how long is the machine unlocked?
     dummy_mode = False

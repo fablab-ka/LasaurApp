@@ -687,15 +687,20 @@ isMaterialModalAlreadyDone = false;
           btnLabel.appendChild(selectbutton);
           btnLabel.innerHTML += services[i].name;
           service_list.appendChild(btnLabel);
-
       }
     });
 
     $.getJSON('/material/products', function(products) {
       var product_list = document.getElementById('job_materials');
+      var select_list = document.createElement(select);
+      select_list.id = "material_select";
       product_list.innerHTML = '';
       for (var i in products) {
-          var btnLabel = document.createElement("label");
+          var option = document.createElement("option");
+          option.value = products[i].name;
+          select_list.appendChild(option);
+          product_list.appendChild(select_list);
+          /*var btnLabel = document.createElement("label");
           btnLabel.classList = "btn";
           var selectbutton = document.createElement("input");
           selectbutton.type = "radio";
@@ -705,7 +710,7 @@ isMaterialModalAlreadyDone = false;
           selectbutton.setAttribute("checked", "checked");
           btnLabel.appendChild(selectbutton);
           btnLabel.innerHTML += products[i].name;
-          product_list.appendChild(btnLabel);
+          product_list.appendChild(btnLabel);*/
       }
     });
     isMaterialModalAlreadyDone = true;
