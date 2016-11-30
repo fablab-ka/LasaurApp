@@ -17,6 +17,8 @@
     "id_card_admin_list_path": "/etc/lasersaur/adminidlist.txt",
     "network_port": 80,
     "idcard_timeout": 10,
+    "odoo_url": "http://127.0.0.1:8069",
+    "odoo_db": "testDB",
     "odoo_username": "admin",
     "odoo_password": "admin",
     "odoo_use": false,

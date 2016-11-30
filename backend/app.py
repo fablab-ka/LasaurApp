@@ -43,12 +43,14 @@ INFLUX_CONFIG = config.get("influx", False)
 USE_ID_CARD_ACCESS_RESTRICTION = config.get("use_id_card_access_restriction", False)
 ODOO_USERNAME = config.get("odoo_username", "admin")
 ODOO_PASSWORD = config.get("odoo_password", "admin")
+ODOO_URL = config.get("odoo_url", "http://127.0.0.1:8069")
+ODOO_DB = config.get("odoo_db", "testDB")
 ODOO_USE = config.get("odoo_use", False)
 ODOO_USE_SELL = config.get("odoo_use_sell", False)
 IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
-odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD)
+odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
 
 lastCardCheck = 0
 

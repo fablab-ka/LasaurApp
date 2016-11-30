@@ -12,12 +12,10 @@ import json
 class OdooRemote():
 
     #url = 'https://odoo.fablab-karlsruhe.de'
-    url = 'http://127.0.0.1:8069'
-    db = 'testDB'
+    url = None
+    db = None
     username = 'admin'
     password = 'admin'
-    #username = secret_password.username
-    #password = secret_password.password
     machine_name = 'LaserSaur'
     user_level = None
     unlock_time = 5 #how long is the machine unlocked?
@@ -50,9 +48,11 @@ class OdooRemote():
     #            #TODO: Try to go live again
     #        time.sleep(1)
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, url, db):
         self.username = username
         self.password = password
+        self.url = url
+        self.db = db
         self.init()
 
     def init(self):
