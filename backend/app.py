@@ -326,10 +326,11 @@ def get_sell_mode():
 
 @app.route('/material/getCutSpeed')
 def get_cut_speed():
-    return int(SerialManager.odoo_product['machine_parameter_1'])
+    print(SerialManager.odoo_product['machine_parameter_1'])
+    return SerialManager.odoo_product['machine_parameter_1']
 @app.route('/material/getCutIntensity')
 def get_cut_intensity():
-    return int(SerialManager.odoo_product['machine_parameter_2'])
+    return SerialManager.odoo_product['machine_parameter_2']
 @app.route('/material/getEngraveSpeed')
 def get_engrave_speed():
     return SerialManager.odoo_product['machine_parameter_3']

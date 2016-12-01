@@ -655,14 +655,15 @@ $(document).ready(function(){
 });  // ready
 
 
-isMaterialModalAlreadyDone = false;
-
  $('#material_modal').on('show.bs.modal', function (e) {
     $("#job_comment_input").value = "";
-    if(isMaterialModalAlreadyDone) {
-      //return;
-    }
+    $('#job_materials').val([]);
+    $('#job_services').val([]);
+    $('#material_selected').removeClass("btn-primary");
+});
 
+
+$(document).ready(function() {
     var comment_div = document.getElementById('job_comment');
     comment_div.innerHTML = "Comment: ";
     var comment_input = document.createElement("input");
@@ -673,69 +674,88 @@ isMaterialModalAlreadyDone = false;
     comment_div.appendChild(comment_input);
 
     $.getJSON('/material/services', function(services) {
-      var service_list = document.getElementById('job_services');
-      service_list.innerHTML = '';
+      var select_list = document.getElementById('job_services');
       for (var i in services) {
-          var btnLabel = document.createElement("label");
-          btnLabel.classList = "btn";
-          var selectbutton = document.createElement("input");
-          selectbutton.type = "radio";
-          selectbutton.name = "service";
-          selectbutton.value = services[i].id;
-          selectbutton.classList = "btn";
-          selectbutton.setAttribute("checked", "checked");
-          btnLabel.appendChild(selectbutton);
-          btnLabel.innerHTML += services[i].name;
-          service_list.appendChild(btnLabel);
+          var option = document.createElement("option");
+          option.value = services[i].id;
+          option.innerHTML = services[i].name;
+          select_list.appendChild(option);
       }
+      select_list.size = Math.min(services.length, select_list.size);
     });
 
     $.getJSON('/material/products', function(products) {
-      var product_list = document.getElementById('job_materials');
-      var select_list = document.createElement(select);
-      select_list.id = "material_select";
-      product_list.innerHTML = '';
+      var select_list = document.getElementById("job_materials");
       for (var i in products) {
           var option = document.createElement("option");
-          option.value = products[i].name;
+          option.value = products[i].id;
+          option.innerHTML = products[i].name;
           select_list.appendChild(option);
-          product_list.appendChild(select_list);
-          /*var btnLabel = document.createElement("label");
-          btnLabel.classList = "btn";
-          var selectbutton = document.createElement("input");
-          selectbutton.type = "radio";
-          selectbutton.name = "material";
-          selectbutton.value = products[i].id;
-          selectbutton.classList = "btn";
-          selectbutton.setAttribute("checked", "checked");
-          btnLabel.appendChild(selectbutton);
-          btnLabel.innerHTML += products[i].name;
-          product_list.appendChild(btnLabel);*/
       }
+      select_list.size = Math.min(products.length, select_list.size);
     });
     isMaterialModalAlreadyDone = true;
   });
 
-/*
-  $('#job_history_big tbody').on('click', 'tr', function() {
-    $(this).toggleClass('selected');
+var material_form_ok_clickable = false;
 
-    var selected = $('#job_history_big tbody tr.selected');
-    if (selected.length <= 0) {
-      $('#selected_history_label').hide();
+  $('#material_form').change(function(){
+    if($('#job_materials').val() != null && $('#job_materials').val() != null) {
+      material_form_ok_clickable = true;
+      $('#material_selected').addClass("btn-primary");
     } else {
-      $('#selected_history_label').show();
-
-      var duration = 0;
-      selected.each(function(i, row) {
-        duration += $(row).data('duration');
-      });
-
-      var durationString = getDurationString(duration);
-      $('#selected_history_label .badge').text(durationString);
+      material_form_ok_clickable = false;
+      $('#material_selected').removeClass("btn-primary");
     }
   });
-});  // ready*/
+
+default_cut_speed = 1500;
+default_cut_intensity = 100;
+default_engrave_speed = 4000;
+default_engrave_intensity = 20;
+
+  $("#material_selected").click(function(e) {
+    if(!material_form_ok_clickable)
+      return;
+    odoo_product = $('#job_materials').val();
+    odoo_service = $('#job_services').val();
+    job_comment = document.querySelector('input[name = "job_comment_input"]').value;
+
+    $.get("/material/set_product/" + odoo_product, function(e){ });
+    $.get("/material/set_service/" + odoo_service, function(e){ });
+    $.get("/material/set_comment/" + job_comment, function(e){ });
+
+    $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
+    $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
+    $.get("/material/getEngraveSpeed", function(e) {default_engrave_speed = e;});
+    $.get("/material/getEngraveIntensity", function(e) {default_engrave_intensity = e;});
+
+    $("#material_modal").modal('hide');
+
+    $('#material_selected').trigger("addToQueue");
+
+});
+
+
+/// PASSES //////////////////////////////////////
+
+
+function setDefaultCut(passnum){
+    //$('#feedrate_'+passnum).value = 100;
+    feedrate_field = document.getElementById('feedrate_' + passnum);
+    feedrate_field.value = default_cut_speed;
+    intensity_field = document.getElementById('intensity_' + passnum);
+    intensity_field.value = default_cut_intensity;
+}
+
+function setDefaultEngrave(passnum){
+    //$('#feedrate_'+passnum).value = 100;
+    feedrate_field = document.getElementById('feedrate_' + passnum);
+    feedrate_field.value = default_engrave_speed;
+    intensity_field = document.getElementById('intensity_' + passnum);
+    intensity_field.value = default_engrave_intensity;
+}
+
 
 jQuery.fn.shake = function(intShakes, intDistance, intDuration) {
     this.each(function() {

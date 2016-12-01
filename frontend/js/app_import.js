@@ -237,15 +237,21 @@ $(document).ready(function(){
       $('#import_name').val('');
   }
 
+    $('#material_selected').click(function(){
+    //$('#material_selected').on("addToQueue"), function() {
+      if($('#material_selected').hasClass('btn-primary')) {
+        setTimeout(addToQueue, 1000);
+      }
+    });
+
   // setting up add to queue button
   $("#import_to_queue").click(function(e) {
     if (!(DataHandler.isEmpty())) {
-      //TODO: Finish writing
-      //if($.get("/material/get_sell_mode")) {
       if(false) {
         //$('#material_modal').modal();
       } else {
-        addToQueue();
+        $('#material_modal').modal();
+        //addToQueue();
       }
     } else {
       $().uxmessage('warning', "no data");
