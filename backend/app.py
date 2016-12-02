@@ -322,7 +322,7 @@ def material_set_comment(comment):
 
 @app.route('/material/get_sell_mode')
 def get_sell_mode():
-    return ODOO_USE_SELL
+    return 'true' #ODOO_USE_SELL
 
 @app.route('/material/getCutSpeed')
 def get_cut_speed():

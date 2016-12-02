@@ -238,7 +238,6 @@ $(document).ready(function(){
   }
 
     $('#material_selected').click(function(){
-    //$('#material_selected').on("addToQueue"), function() {
       if($('#material_selected').hasClass('btn-primary')) {
         setTimeout(addToQueue, 1000);
       }
@@ -247,11 +246,10 @@ $(document).ready(function(){
   // setting up add to queue button
   $("#import_to_queue").click(function(e) {
     if (!(DataHandler.isEmpty())) {
-      if(false) {
-        //$('#material_modal').modal();
+      if(!useOdoo) {//TODO: implement Fallback without Odoo
+        addToQueue();
       } else {
         $('#material_modal').modal();
-        //addToQueue();
       }
     } else {
       $().uxmessage('warning', "no data");

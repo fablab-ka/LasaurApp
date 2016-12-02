@@ -199,29 +199,10 @@ function add_to_library_queue(jobdata, name) {
   });
 }
 
-//default_cut_speed = 1000;
-//default_cut_intensity = 100;
-//default_engrave_speed = 4000;
-//default_engrave_intensity = 30;
+
 //
 ///// PASSES //////////////////////////////////////
 //
-//
-//function setDefaultCut(passnum){
-//    //$('#feedrate_'+passnum).value = 100;
-//    feedrate_field = document.getElementById('feedrate_' + passnum);
-//    feedrate_field.value = default_cut_speed;
-//    intensity_field = document.getElementById('intensity_' + passnum);
-//    intensity_field.value = default_cut_intensity;
-//}
-//
-//function setDefaultEngrave(passnum){
-//    //$('#feedrate_'+passnum).value = 100;
-//    feedrate_field = document.getElementById('feedrate_' + passnum);
-//    feedrate_field.value = default_engrave_speed;
-//    intensity_field = document.getElementById('intensity_' + passnum);
-//    intensity_field.value = default_engrave_intensity;
-//}
 
 function addPasses(num) {
   var pass_num_offset = getNumPasses() + 1;

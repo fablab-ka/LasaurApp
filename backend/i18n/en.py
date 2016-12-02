@@ -82,5 +82,9 @@ dictionary = {
     "History_TotalDuration": "Total Duration",
     "History_Selected": "Selected",
     "NoIntensityForMove": "no laser intensity for move required",
-
+    "Sensors": "Sensors",
+    "Material_Selection": "Material Selection",
+    "Comment": "Comment",
+    "Laser_usage": "Laser usage",
+    "Material": "Material",
 }

@@ -229,6 +229,12 @@ $(document).ready(function(){
     $('#tab_logs div.alert').show();
   });
 
+  //TODO finish writing
+  $('#tab_sensors_button').click(function(){
+    $('#sensor_values').show();
+    $('#tab_sensors div.alert').show();
+  });
+
   if (app_settings.custom_buttons) {
     for (var i = 0; i < app_settings.custom_buttons.length; i++) {
       var btn = app_settings.custom_buttons[i];
@@ -603,6 +609,11 @@ $(document).ready(function(){
     return false;
   });
 
+  $(document).on('keypress', null, 's', function(e){
+    $('#tab_sensors_button').trigger('click');
+    return false;
+  });
+
   $('#history_modal').on('show.bs.modal', function (e) {
 
     $.getJSON('/jobs/history', function(history) {
@@ -662,8 +673,17 @@ $(document).ready(function(){
     $('#material_selected').removeClass("btn-primary");
 });
 
+useOdoo = true;
 
 $(document).ready(function() {
+    //check if we use Odoo
+    $.get('/material/get_sell_mode', function(e){
+    useOdoo = e;
+    });
+
+    if(!useOdoo)
+        return;
+
     var comment_div = document.getElementById('job_comment');
     comment_div.innerHTML = "Comment: ";
     var comment_input = document.createElement("input");
@@ -694,13 +714,12 @@ $(document).ready(function() {
       }
       select_list.size = Math.min(products.length, select_list.size);
     });
-    isMaterialModalAlreadyDone = true;
   });
 
 var material_form_ok_clickable = false;
 
   $('#material_form').change(function(){
-    if($('#job_materials').val() != null && $('#job_materials').val() != null) {
+    if($('#job_materials').val() != null && $('#job_services').val() != null) {
       material_form_ok_clickable = true;
       $('#material_selected').addClass("btn-primary");
     } else {

@@ -38,17 +38,17 @@ def getId():
                     #print(smartcard.util.toHexString(response))
 
                     result = smartcard.util.toHexString(response)
-                else:
-                    print("NO_CARD")
-            else:
-                print("NO_READER")
+            #     else:
+            #         print("NO_CARD")
+            # else:
+            #     print("NO_READER")
 
 
             hresult = SCardReleaseContext(hcontext)
             if hresult != SCARD_S_SUCCESS:
                 raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
-        else:
-            print("FAILED")
+        # else:
+        #     print("FAILED")
 
     return result
 

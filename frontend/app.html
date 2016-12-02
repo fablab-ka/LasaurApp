@@ -180,6 +180,13 @@
                                         {{Logs}}
                                     </a>
                                 </li>
+                                <!--<li>-->
+                                    <!--<a class="btn btn-link " href="#tab_logs" id="tab_sensors_button" data-toggle="tab" style="text-align: left;">-->
+                                        <!--<i class="glyphicon glyphicon-exclamation-sign" style="margin-right:2px"></i>-->
+                                        <!--{{Sensors}}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+
                             </ul>
                         </div>
                         <!--tabbar end-->
@@ -431,7 +438,12 @@
                                     <div id="log_content" style="clear:both; overflow:auto; display:none">
                                         <!-- log -->
                                     </div>
-                                </div> <!-- end of log tab -->
+                                </div>
+                                <div id="tab_sensors" class="tab-pane active">
+                                    <div id="sensor_values">
+
+                                    </div>
+                                </div><!-- end of log tab -->
                                 <!--content end-->
                             </div>
                         </div>
@@ -500,17 +512,17 @@
                     <form id="material_form">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="material_modal_title">Material Selection</h4>
+                            <h4 class="modal-title" id="material_modal_title">{{Material_Selection}}</h4>
                         </div>
                         <div class="modal-body" style="overflow:auto; max-height:600px;">
-                            <h4>Comment:</h4>
+                            <h4>{{Comment}}:</h4>
                             <div id="job_comment">
                                 <input type="text" name="Comment" value="" id="job_comment_input"/>
                             </div>
-                            <h4>Laser usage:</h4>
-                            <select id="job_services" size="4"></select>
-                            <h4>Material:</h4>
-                            <select id="job_materials" size="15"></select>
+                            <h4>{{Laser_usage}}:</h4>
+                            <select id="job_services" size="4" style="width: 80%"></select>
+                            <h4>{{Material}}:</h4>
+                            <select id="job_materials" size="15" style="width: 80%"></select>
                         </div>
                         <div class="modal-footer">
                             <button id="material_selected" type="button" class="btn btn-primary" data-dismiss="modal">Okay</button>
