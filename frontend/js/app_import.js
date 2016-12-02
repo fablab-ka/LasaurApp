@@ -237,20 +237,14 @@ $(document).ready(function(){
       $('#import_name').val('');
   }
 
-    $('#material_selected').click(function(){
-      if($('#material_selected').hasClass('btn-primary')) {
-        setTimeout(addToQueue, 1000);
-      }
-    });
-
   // setting up add to queue button
   $("#import_to_queue").click(function(e) {
     if (!(DataHandler.isEmpty())) {
-      if(!useOdoo) {//TODO: implement Fallback without Odoo
+      //if(!useOdoo) {
         addToQueue();
-      } else {
-        $('#material_modal').modal();
-      }
+//      } else {
+//        $('#material_modal').modal();
+//      }
     } else {
       $().uxmessage('warning', "no data");
     }

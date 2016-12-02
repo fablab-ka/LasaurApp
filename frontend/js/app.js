@@ -751,7 +751,7 @@ default_engrave_intensity = 20;
 
     $("#material_modal").modal('hide');
 
-    $('#material_selected').trigger("addToQueue");
+    //$('#material_selected').trigger("addToQueue");
 
 });
 

@@ -2,18 +2,31 @@ var minNumPassWidgets = 3;
 var maxNumPassWidgets = 32;
 var preview_canvas_obj = null;
 
+$('#material_selected').click(function(){
+  if($('#material_selected').hasClass('btn-primary')) {
+    setTimeout(continue_load_into_job_widget, 1000);
+  }
+});
 
 
+var tmp_name;
+var tmp_jobdata;
 function load_into_job_widget(name, jobdata) {
   // create some empty pass widgets
+  tmp_name = name;
+  tmp_jobdata = jobdata;
+  $('#material_modal').modal();
+}
+
+function continue_load_into_job_widget() {
   $('#passes').html('');
-  DataHandler.setByJson(jobdata);
+  DataHandler.setByJson(tmp_jobdata);
   addPasses(minNumPassWidgets);
   writePassesWidget();
   $('#passes_info').show();
 
-  $('#job_name').val(name);
-  $('#job_data').val(jobdata);
+  $('#job_name').val(tmp_name);
+  $('#job_data').val(tmp_jobdata);
   // make sure preview refreshes
   refresh_preview(false, false);
   // scroll to top
@@ -64,6 +77,7 @@ function populate_job_library() {
     });
     $('#job_library li a').click(function(){
       var name = $(this).text();
+      $('#material_modal').show();
       $.get("/library/get/" + name, function(jobdata) {
         load_into_job_widget(name, jobdata);
       });
@@ -224,15 +238,15 @@ function addPasses(num) {
                     '<input type="button" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
                     '<input type="button" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
                     '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
-                    '<input type="text" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +//+ app_settings.default_feedrate +
+                    '<input type="text" maxlength="4" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +//+ app_settings.default_feedrate +
                       '" title="feedrate 1-'+app_settings.max_seek_speed+
                       'mm/min" style="width:40px" data-delay="500">' +
                   '</div>' +
                   '<div class="input-group" style="margin-left:6px">' +
                     '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
-                    '<input class="intensity" id="intensity_' + passnum + '" type="textfield" value="'+
+                    '<input class="intensity" maxlength="3" id="intensity_' + passnum + '" type="textfield" value="'+
                       default_cut_intensity + //app_settings.default_intensity +
-                      '" title="intensity 0-100%" style="width:30px;" data-delay="500">' +
+                      '" title="intensity 0-100%" style="width:35px;" data-delay="500">' +
                   '</div>' +
                   '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
                 '</div>' +
