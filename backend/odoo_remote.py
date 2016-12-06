@@ -159,18 +159,18 @@ class OdooRemote():
         print("card: " + card_number + " ", end="")
 
         if self._mode == 'odoo':
-            try:
-                self._machine = self._models.execute_kw(self.db, self._uid, self.password,
-                                        'lab.machine', 'search_read',
-                                        [[['name', '=', self.machine_name]]],
-                                        {})
-                card = self._models.execute_kw(self.db, self._uid, self.password,
-                                        'lab.id_cards', 'search_read',
-                                        [[['card_id', '=', card_number]]],
-                                        {})
-            except IOError:
-                print("CONNECTIN_FAILED")
-                self._mode = 'backup'
+            # try:
+            #     self._machine = self._models.execute_kw(self.db, self._uid, self.password,
+            #                             'lab.machine', 'search_read',
+            #                             [[['name', '=', self.machine_name]]],
+            #                             {})[0]
+            #     card = self._models.execute_kw(self.db, self._uid, self.password,
+            #                             'lab.id_cards', 'search_read',
+            #                             [[['card_id', '=', card_number]]],
+            #                             {})
+            # except IOError:
+            #     print("CONNECTIN_FAILED")
+            #     self._mode = 'backup'
         if self._mode == 'backup':
             card = filter(lambda x: x['card_id'] == card_number, self._id_cards)
         if len(card) != 1:
@@ -200,17 +200,13 @@ class OdooRemote():
             self._mode = 'error'
             return False
         client = client[0]
-        #TODO: Check if user is member(Mitglied)
-        #if client[0]['is_member'] == False:
-        #   print("CLIENT_NOT_MEMBER")
-        #   return False
-        if client['id'] in self._machine[0]['owner_ids']:
+        if client['id'] in self._machine['owner_ids']:
             print("CLIENT_IS_OWNER")
             self.user_level = 'owner'
             self.last_user = client['name']
             return client['name'] #Owners get full acces no matter the circumstances
         elif self._machine['status'] == 'r':
-            if client['id'] in self._machine[0]['user_ids'] and self._machine[0]['rules'] == 'r':
+            if client['id'] in self._machine['user_ids'] and self._machine['rules'] == 'r':
                 print("CLIENT_IS_USER")
                 self.user_level = 'user'
                 self.last_user = client['name']
