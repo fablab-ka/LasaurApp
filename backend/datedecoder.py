@@ -74,4 +74,4 @@ def object_hook(dct):
         return uuid.UUID(dct["$uuid"])
     if "$undefined" in dct:
         return None
-return dct
+    return dct
