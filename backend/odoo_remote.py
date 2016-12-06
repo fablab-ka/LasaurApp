@@ -89,7 +89,7 @@ class OdooRemote():
             self._users = self._models.execute_kw(self.db, self._uid, self.password,
                                     'res.partner', 'search_read',
                                     [],
-                                    {'fields':['id']})
+                                    {'fields':['id', 'name']})
             print("Users:")
             print(self._users)
 
