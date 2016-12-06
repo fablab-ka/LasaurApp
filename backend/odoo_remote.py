@@ -153,9 +153,9 @@ class OdooRemote():
     def check_access(self, card_number):
         if self.dummy_mode:
             return "Max Mustermann"
-        card_number = card_number.upper()
         if card_number == None:
             return False
+        card_number = card_number.upper()
         print("card: " + card_number + " ", end="")
 
         if self._mode == 'odoo':
