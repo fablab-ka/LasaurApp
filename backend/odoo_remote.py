@@ -158,21 +158,21 @@ class OdooRemote():
         card_number = card_number.upper()
         print("card: " + card_number + " ", end="")
 
-        if self._mode == 'odoo':
-            # try:
-            #     self._machine = self._models.execute_kw(self.db, self._uid, self.password,
-            #                             'lab.machine', 'search_read',
-            #                             [[['name', '=', self.machine_name]]],
-            #                             {})[0]
-            #     card = self._models.execute_kw(self.db, self._uid, self.password,
-            #                             'lab.id_cards', 'search_read',
-            #                             [[['card_id', '=', card_number]]],
-            #                             {})
-            # except IOError:
-            #     print("CONNECTIN_FAILED")
-            #     self._mode = 'backup'
-        if self._mode == 'backup':
-            card = filter(lambda x: x['card_id'] == card_number, self._id_cards)
+        # if self._mode == 'odoo':
+        #     try:
+        #         self._machine = self._models.execute_kw(self.db, self._uid, self.password,
+        #                                 'lab.machine', 'search_read',
+        #                                 [[['name', '=', self.machine_name]]],
+        #                                 {})[0]
+        #         card = self._models.execute_kw(self.db, self._uid, self.password,
+        #                                 'lab.id_cards', 'search_read',
+        #                                 [[['card_id', '=', card_number]]],
+        #                                 {})
+        #     except IOError:
+        #         print("CONNECTIN_FAILED")
+        #         self._mode = 'backup'
+        # if self._mode == 'backup':
+        card = filter(lambda x: x['card_id'] == card_number, self._id_cards)
         if len(card) != 1:
             print("CARD_NOT_FOUND")
             return False
@@ -183,17 +183,17 @@ class OdooRemote():
         if card[0]['assigned_client'] == 0:
             print("CARD_NOT_ASSIGNED")
             return False
-        if self._mode == 'odoo':
-            try:
-                client = self._models.execute_kw(self.db, self._uid, self.password,
-                                        'res.partner', 'read',
-                                        [[card[0]['assigned_client'][0]]],
-                                        {'fields': ['name']})
-            except IOError:
-                print("CONNECTIN_FAILED")
-                self._mode = 'backup'
-        if self._mode == 'backup':
-            client = filter(lambda user: user['id'] == card[0]['assigned_client'][0], self._users)
+        # if self._mode == 'odoo':
+        #     try:
+        #         client = self._models.execute_kw(self.db, self._uid, self.password,
+        #                                 'res.partner', 'read',
+        #                                 [[card[0]['assigned_client'][0]]],
+        #                                 {'fields': ['name']})
+        #     except IOError:
+        #         print("CONNECTIN_FAILED")
+        #         self._mode = 'backup'
+        # if self._mode == 'backup':
+        client = filter(lambda user: user['id'] == card[0]['assigned_client'][0], self._users)
 
         if(len(client) != 1):
             print("FUCKED_UP_EVERYTHING")
