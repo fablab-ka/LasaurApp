@@ -232,7 +232,7 @@ $(document).ready(function(){
   //TODO finish writing
   $('#tab_sensors_button').click(function(){
     $('#sensor_values').show();
-    $('#tab_sensors div.alert').show();
+    //$('#tab_sensors div.alert').show();
   });
 
   if (app_settings.custom_buttons) {

@@ -52,7 +52,7 @@ def object_hook(dct):
     if "$date" in dct:
         dtm = dct["$date"]
         if isinstance(dtm, basestring):
-            aware = datetime.datetime.strptime(dtm[:23], "%Y-%m-%dT%H:%M:%S.%f")
+            aware = datetime.datetime.strptime(dtm[:23], "%Y-%m-%dT%H:%M:%S")
             return aware
         else:
             secs = float(dtm) / 1000.0

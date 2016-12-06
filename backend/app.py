@@ -12,11 +12,13 @@ from flash import flash_upload, reset_atmega
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
 from serial import SerialException
+import serial
 import i18n
 import datedecoder
 import readid
 import os.path
 from odoo_remote import OdooRemote
+import SensorShield
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024 # 20MB max upload
 
@@ -48,9 +50,13 @@ ODOO_DB = config.get("odoo_db", "testDB")
 ODOO_USE = config.get("odoo_use", False)
 ODOO_USE_SELL = config.get("odoo_use_sell", False)
 IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
+SENSOR_SHIELD_PORT = config.get("sensor_shield_port", "/dev/ttyACM1")
+SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", 9600)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
 odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
+sensor_serial = None
+dummy_mode = False
 
 lastCardCheck = 0
 
@@ -78,7 +84,7 @@ def setDummyMode():
     odooremote.dummy_mode = True
     global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
-
+    dummy_mode = True
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -134,6 +140,7 @@ class HackedWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
+
 def run_with_callback(host, port):
     """ Start a wsgiref server instance with control over the main loop.
         This is a function that I derived from the bottle.py run()
@@ -156,12 +163,18 @@ def run_with_callback(host, port):
     print("Use Ctrl-C to quit.")
     print("-----------------------------------------------------------------------------")
     print("")
-
     # auto-connect on startup
     global SERIAL_PORT
     if not SERIAL_PORT:
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
+
+    if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
+        sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=1)
+        print("Sensor Shield at " + sensor_serial.name + " is (hopefully) ready!")
+        time.sleep(2)
+        sensor_serial.flush()
+
     # open web-browser
     if config.get("open_browser", True):
         try:
@@ -169,6 +182,8 @@ def run_with_callback(host, port):
             pass
         except:
             print("Cannot open Webbrowser, please do so manually at http://127.0.0.1:" + str(port))
+
+
 
     sys.stdout.flush()  # make sure everything gets flushed
     server.timeout = 0
