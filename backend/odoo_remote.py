@@ -177,7 +177,7 @@ class OdooRemote():
             print("CARD_NOT_FOUND")
             return False
         #print(card[0])
-        if card[0]['status'] != 'active':
+        if card[0]['status'] != 'a':
             print("CARD_NOT_ACTIVE")
             return False
         if card[0]['assigned_client'] == 0:
