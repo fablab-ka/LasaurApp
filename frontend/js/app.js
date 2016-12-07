@@ -722,22 +722,30 @@ $(document).ready(function() {
 
 var material_form_ok_clickable = false;
 
-  $('#material_form').change(function(){
+$('#material_form').change(function(){
     if($('#job_materials').val() != null && $('#job_services').val() != null) {
-      material_form_ok_clickable = true;
-      $('#material_selected').addClass("btn-primary");
+        material_form_ok_clickable = true;
+        $('#material_selected').addClass("btn-primary");
     } else {
-      material_form_ok_clickable = false;
-      $('#material_selected').removeClass("btn-primary");
+        material_form_ok_clickable = false;
+        $('#material_selected').removeClass("btn-primary");
     }
-  });
+});
+
+$('#job_materials').dblclick(function(){
+    $('#job_materials').trigger("click");
+    if(material_form_ok_clickable)
+        $("#material_selected").trigger("click");
+});
 
 default_cut_speed = 1500;
 default_cut_intensity = 100;
 default_engrave_speed = 4000;
 default_engrave_intensity = 20;
 
-  $("#material_selected").click(function(e) {
+
+
+$("#material_selected").click(function(e) {
     if(!material_form_ok_clickable)
       return;
     odoo_product = $('#job_materials').val();
@@ -756,8 +764,9 @@ default_engrave_intensity = 20;
     $("#material_modal").modal('hide');
 
     //$('#material_selected').trigger("addToQueue");
-
 });
+
+
 
 
 /// PASSES //////////////////////////////////////

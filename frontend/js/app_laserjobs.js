@@ -2,6 +2,8 @@ var minNumPassWidgets = 3;
 var maxNumPassWidgets = 32;
 var preview_canvas_obj = null;
 
+
+
 $('#material_selected').click(function(){
   if($('#material_selected').hasClass('btn-primary')) {
     setTimeout(continue_load_into_job_widget, 1000);
