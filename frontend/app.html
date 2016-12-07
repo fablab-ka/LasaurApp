@@ -515,14 +515,18 @@
                             <h4 class="modal-title" id="material_modal_title">{{Material_Selection}}</h4>
                         </div>
                         <div class="modal-body" style="overflow:auto; max-height:600px;">
-                            <h4>{{Comment}}:</h4>
-                            <div id="job_comment">
-                                <input type="text" name="Comment" value="" id="job_comment_input"/>
+                            <div style="float:left; width:50%">
+                                <h4>{{Material}}:</h4>
+                                <select id="job_materials" size="15" style="width: 80%"></select>
                             </div>
-                            <h4>{{Laser_usage}}:</h4>
-                            <select id="job_services" size="4" style="width: 80%"></select>
-                            <h4>{{Material}}:</h4>
-                            <select id="job_materials" size="15" style="width: 80%"></select>
+                            <div style="float:left; width:50%">
+                                <h4>{{Comment}}:</h4>
+                                <div id="job_comment">
+                                    <input type="text" name="Comment" value="" id="job_comment_input"/>
+                                </div>
+                                <h4>{{Laser_usage}}:</h4>
+                                <select id="job_services" size="4" style="width: 80%"></select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button id="material_selected" type="button" class="btn btn-primary" data-dismiss="modal">Okay</button>

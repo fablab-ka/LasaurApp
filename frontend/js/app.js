@@ -669,7 +669,10 @@ $(document).ready(function(){
  $('#material_modal').on('show.bs.modal', function (e) {
     $("#job_comment_input").value = "";
     $('#job_materials').val([]);
-    $('#job_services').val([]);
+    //$('#job_services').val([]);
+    //TODO: Fix hard coded default
+    $('#job_services').val(20);
+    //$("#job_services").val = [$("option[value='20']")];
     $('#material_selected').removeClass("btn-primary");
 });
 
@@ -703,6 +706,7 @@ $(document).ready(function() {
       }
       select_list.size = Math.min(services.length, select_list.size);
     });
+
 
     $.getJSON('/material/products', function(products) {
       var select_list = document.getElementById("job_materials");

@@ -169,11 +169,11 @@ def run_with_callback(host, port):
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
 
-    if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
-        sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=1)
-        print("Sensor Shield at " + sensor_serial.name + " is (hopefully) ready!")
-        time.sleep(2)
-        sensor_serial.flush()
+    # if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
+    #     sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=1)
+    #     print("Sensor Shield at " + sensor_serial.name + " is (hopefully) ready!")
+    #     time.sleep(2)
+    #     sensor_serial.flush()
 
     # open web-browser
     if config.get("open_browser", True):

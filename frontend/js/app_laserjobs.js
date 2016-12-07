@@ -235,8 +235,8 @@ function addPasses(num) {
                 '<div class="form-inline" style="margin-bottom:0px">' +
                   '<label>Pass '+ passnum +': </label>' +
                   '<div class="input-group" style="margin-left:6px">' +
-                    '<input type="button" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
-                    '<input type="button" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
+                    '<input type="button" title="Cut" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
+                    '<input type="button" title="Engrave" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
                     '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
                     '<input type="text" maxlength="4" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +//+ app_settings.default_feedrate +
                       '" title="feedrate 1-'+app_settings.max_seek_speed+
