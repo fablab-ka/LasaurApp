@@ -22,5 +22,7 @@
     "odoo_username": "admin",
     "odoo_password": "admin",
     "odoo_use": false,
-    "odoo_use_sell": false
+    "odoo_use_sell": false,
+    "sensor_shield_port": "/dev/ttyACM1",
+    "sensor_shield_baud": 115200
 }

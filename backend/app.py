@@ -50,8 +50,8 @@ ODOO_DB = config.get("odoo_db", "testDB")
 ODOO_USE = config.get("odoo_use", False)
 ODOO_USE_SELL = config.get("odoo_use_sell", False)
 IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
-SENSOR_SHIELD_PORT = config.get("sensor_shield_port", "/dev/ttyACM1")
-SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", 9600)
+SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
+SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
 odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
@@ -139,7 +139,8 @@ class HackedWSGIRequestHandler(WSGIRequestHandler):
         # return wsgiref.simple_server.WSGIRequestHandler.log_request(*args, **kw)
         pass
 
-
+sensor_names = None
+sensor_values = None
 
 def run_with_callback(host, port):
     """ Start a wsgiref server instance with control over the main loop.
@@ -169,11 +170,23 @@ def run_with_callback(host, port):
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
 
-    # if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
-    #     sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=1)
-    #     print("Sensor Shield at " + sensor_serial.name + " is (hopefully) ready!")
-    #     time.sleep(2)
-    #     sensor_serial.flush()
+
+    global sensor_names
+    global sensor_values
+    if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
+        sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
+        #print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
+        print(sensor_serial)
+        time.sleep(0.2)
+        sensor_serial.flushInput()
+        str = sensor_serial.readline().replace('\r\n', '')
+        #print(str)
+        str = str.split(';')
+        sensor_names = [0.00] * len(str)
+        sensor_values = [0.00] * len(str)
+        for i in range(0,len(str),1):
+            sensor_names[i] = str[i]
+        print(sensor_names)
 
     # open web-browser
     if config.get("open_browser", True):
@@ -191,7 +204,11 @@ def run_with_callback(host, port):
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
-
+            if sensor_serial.inWaiting() > 10:
+                str = sensor_serial.readline().split(';')
+                for i in range(0,len(str), 1):
+                    sensor_values[i] = float(str[i])
+                #print(sensor_values)
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)
@@ -318,6 +335,19 @@ def material_services():
 @app.route('/material/products')
 def material_products():
     return json.dumps(odooremote.materials, default=datedecoder.default)
+
+@app.route('/sensors/names')
+def get_sensorNames():
+    #out = list()
+    #for i in range(0, len(sensor_names), 1):
+    #    out += [(zip({"Name", "Value", "Symbol"}, {sensor_names[i], sensor_values[i], ""}))]
+    #print(dict(zip(["Sensor"] * len(sensor_names), out)))
+    #print(out)
+    return json.dumps((sensor_names))
+
+@app.route('/sensors/values')
+def get_sensor_values():
+    return json.dumps(sensor_values)
 
 
 @app.route('/material/set_service/<id>')

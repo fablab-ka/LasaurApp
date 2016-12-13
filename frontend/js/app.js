@@ -743,7 +743,26 @@ default_cut_intensity = 100;
 default_engrave_speed = 4000;
 default_engrave_intensity = 20;
 
+var sensor_names = null;
+var sensor_values = null;
 
+setInterval(function(){
+    str = "";
+    if(sensor_names && sensor_values){
+        str = "";
+        for(i = 0; i < sensor_names.length; i++) {
+            str += "<p>";
+            str += sensor_names[i];
+            str += ": ";
+            str += sensor_values[i];
+            str += "</p>";
+        }
+    }
+    document.getElementById('sensor_values').innerHTML = str;
+
+    $.getJSON("/sensors/names", function(e){sensor_names = e;})
+    $.getJSON("/sensors/values", function(e){sensor_values = e;})
+}, 3000);
 
 $("#material_selected").click(function(e) {
     if(!material_form_ok_clickable)
