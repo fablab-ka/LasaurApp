@@ -179,6 +179,7 @@ def run_with_callback(host, port):
         print(sensor_serial)
         time.sleep(1)
         sensor_serial.flushInput()
+        print(sensor_serial.readline())
         str = sensor_serial.readline().replace('\r\n', '')
         print(str)
         str = str.split(';')
