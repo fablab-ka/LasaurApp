@@ -174,20 +174,26 @@ def run_with_callback(host, port):
     global sensor_names
     global sensor_values
     if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
-        sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
-        #print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
-        print(sensor_serial)
-        time.sleep(1)
-        sensor_serial.flushInput()
-        print(sensor_serial.readline())
-        str = sensor_serial.readline().replace('\r\n', '')
-        print(str)
-        str = str.split(';')
-        sensor_names = [0.00] * len(str)
-        sensor_values = [0.00] * len(str)
-        for i in range(0,len(str),1):
-            sensor_names[i] = str[i]
-        print(sensor_names)
+        print("Initializing Sensor Board!")
+        try:
+            sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
+            #print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
+            print(sensor_serial)
+            time.sleep(1)
+            sensor_serial.flushInput()
+            print(sensor_serial.readline())
+            str = sensor_serial.readline().replace('\r\n', '')
+            print(str)
+            str = str.split(';')
+            sensor_names = [0.00] * len(str)
+            sensor_values = [0.00] * len(str)
+            for i in range(0,len(str),1):
+                sensor_names[i] = str[i]
+            print(sensor_names)
+        except(SerialException):
+            sensor_serial = None
+            print("COULD NOT CONNECT TO SENSOR BOARD!")
+
 
     # open web-browser
     if config.get("open_browser", True):
@@ -205,7 +211,7 @@ def run_with_callback(host, port):
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
-            if sensor_serial.inWaiting() > 10:
+            if sensor_serial and sensor_serial.inWaiting() > 10:
                 str = sensor_serial.readline().split(';')
                 for i in range(0,len(str), 1):
                     sensor_values[i] = float(str[i])
