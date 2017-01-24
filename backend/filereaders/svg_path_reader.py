@@ -332,8 +332,14 @@ class SVGPathReader:
         d2 = abs(((x2 - x4) * dy - (y2 - y4) * dx))
         d3 = abs(((x3 - x4) * dy - (y3 - y4) * dx))
 
-        if (d2+d3)**2 < 5.0 * self._tolerance2 * (dx*dx + dy*dy):
+        # Stop recursion if current changes are already less then the tolerance
+        abort = False
+        if dx*dx < self._tolerance2 and dy*dy < self._tolerance2 and d2*d2 < self._tolerance2 and d3*d3 < self._tolerance2:
+            abort = True
+        elif (d2+d3)**2 < 5.0 * self._tolerance2 * (dx*dx + dy*dy):
             # added factor of 5.0 to match circle resolution
+            abort = True
+        if abort:
             subpath.append([x1234, y1234])
             return
 
@@ -361,8 +367,14 @@ class SVGPathReader:
         dy = y3-y1
         d = abs(((x2 - x3) * dy - (y2 - y3) * dx))
 
-        if d*d <= 5.0 * self._tolerance2 * (dx*dx + dy*dy):
+        # Stop recursion if current changes are already less then the tolerance
+        abort = False
+        if dx*dx < self._tolerance2 and dy*dy < self._tolerance2 and d*d < self._tolerance2:
+            abort = True
+        elif d*d <= 5.0 * self._tolerance2 * (dx*dx + dy*dy):
             # added factor of 5.0 to match circle resolution
+            abort = True
+        if abort:
             subpath.append([x123, y123])
             return
 
