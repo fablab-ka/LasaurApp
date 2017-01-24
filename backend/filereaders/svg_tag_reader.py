@@ -49,7 +49,7 @@ class SVGTagReader:
         node.
 
         Any path data is ultimately handled by
-        self._pathReader.add_path(...). For any  geometry that is not
+        self._pathReader.add_path(...). For any geometry that is not
         already in the 'd' attribute of a 'path' tag this class
         converts it first to this format and then delegates it to
         add_path(...).
@@ -224,7 +224,7 @@ class SVGTagReader:
         # =pass5:4000mm/min:100%=
         # =pass6:4000:100=
         text_accum = [tag.text or '']
-        # # search one level deep
+        # search one level deep
         for child in tag:
             text_accum.append(child.text or '')
         text_accum = ' '.join(text_accum)
