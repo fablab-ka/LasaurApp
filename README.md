@@ -1,3 +1,4 @@
+[![GetBadges Game](https://fablab-ka-lasaurapp.getbadges.io/shield/company/fablab-ka-lasaurapp)](https://fablab-ka-lasaurapp.getbadges.io/?ref=shield-game)
 
 LasaurApp
 =========
