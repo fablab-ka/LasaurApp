@@ -173,6 +173,7 @@ def run_with_callback(host, port):
 
     global sensor_names
     global sensor_values
+    sensor_serial = None
     if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
         print("Initializing Sensor Board!")
         try:
