@@ -201,22 +201,22 @@ class OdooRemote():
             return False
         client = client[0]
         if client['id'] in self._machine['owner_ids']:
-            print("CLIENT_IS_OWNER")
+            print("CLIENT_IS_OWNER: " + client['name'])
             self.user_level = 'owner'
             self.last_user = client['name']
             return client['name'] #Owners get full acces no matter the circumstances
         elif self._machine['status'] == 'r':
             if client['id'] in self._machine['user_ids'] and self._machine['rules'] == 'r':
-                print("CLIENT_IS_USER")
+                print("CLIENT_IS_USER: " + client['name'])
                 self.user_level = 'user'
                 self.last_user = client['name']
                 return client['name']
             elif self._machine['rules'] == 'f':
-                print("FREE_ACCESS")
+                print("free access")
                 self.user_level = 'free'
                 self.last_user = client['name']
                 return client['name']
-        print("NO_ACCESS")
+        print("no acces for " + client['name'])
         return False
 
     def get_access(self):
