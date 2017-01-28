@@ -174,14 +174,14 @@ class OdooRemote():
         # if self._mode == 'backup':
         card = filter(lambda x: x['card_id'] == card_number, self._id_cards)
         if len(card) != 1:
-            print("CARD_NOT_FOUND")
+            #print("CARD_NOT_FOUND")
             return False
         #print(card[0])
         if card[0]['status'] != 'a':
-            print("CARD_NOT_ACTIVE")
+            #print("CARD_NOT_ACTIVE")
             return False
         if card[0]['assigned_client'] == 0:
-            print("CARD_NOT_ASSIGNED")
+            #print("CARD_NOT_ASSIGNED")
             return False
         # if self._mode == 'odoo':
         #     try:
@@ -201,47 +201,46 @@ class OdooRemote():
             return False
         client = client[0]
         if client['id'] in self._machine['owner_ids']:
-            print("CLIENT_IS_OWNER: " + client['name'])
+            #print("CLIENT_IS_OWNER: " + client['name'])
             self.user_level = 'owner'
             self.last_user = client['name']
             return client['name'] #Owners get full acces no matter the circumstances
         elif self._machine['status'] == 'r':
             if client['id'] in self._machine['user_ids'] and self._machine['rules'] == 'r':
-                print("CLIENT_IS_USER: " + client['name'])
+                #print("CLIENT_IS_USER: " + client['name'])
                 self.user_level = 'user'
                 self.last_user = client['name']
                 return client['name']
             elif self._machine['rules'] == 'f':
-                print("free access")
+                #print("free access")
                 self.user_level = 'free'
                 self.last_user = client['name']
                 return client['name']
-        print("no acces for " + client['name'])
+        #print("no acces for " + client['name'])
         return False
 
     def get_access(self):
         if self.get_access_rfid():
             self._last_acces = time.time()
-            print("ACCESS_UNLOCKED")
+            #print("ACCESS_UNLOCKED")
             return True
         else:
             if (time.time() - self._last_acces) < self.unlock_time:
-                print("STILL_UNLOCKED")
+                #print("STILL_UNLOCKED")
                 return True
         return False
 
     def get_product(self, id):
-        print("search for product '" + str(id)+"'")
         ret_product = filter(lambda product: product['id'] == int(id), self.materials)
         if len(ret_product) != 1:
-            print("product " + id + " not found!")
+            #print("product " + id + " not found!")
             return None
         return ret_product[0]
 
     def get_service(self, id):
         ret_service = filter(lambda service: service['id'] == int(id), self.services)
         if len(ret_service) != 1:
-            print("service " + id + " not found!")
+            #print("service " + id + " not found!")
             return None
         return ret_service[0]
 
