@@ -56,6 +56,7 @@ class OdooRemote():
         self.init()
 
     def init(self):
+        print("Initializing Odoo remote connection")
         if self.dummy_mode:
             self.last_user = 'Max Mustermann'
         try:
@@ -67,31 +68,31 @@ class OdooRemote():
                                     'lab.machine', 'search_read',
                                     [[['name', '=', self.machine_name]]],
                                     {})[0]
-            print("Machine:")
-            print(self._machine)
+            #print("Machine:")
+            #print(self._machine)
 
             self._material_tag_id = self._machine['machine_tag_1'][0]
-            print("Material Tag ID:")
-            print(self._material_tag_id)
+            #print("Material Tag ID:")
+            #print(self._material_tag_id)
 
             self._laser_tag_id = self._machine['machine_tag_2'][0]
-            print("Laser Service Tag ID:")
-            print(self._laser_tag_id)
+            #print("Laser Service Tag ID:")
+            #print(self._laser_tag_id)
 
 
             self._id_cards = self._models.execute_kw(self.db, self._uid, self.password,
                                     'lab.id_cards', 'search_read',
                                     [],
                                     {'fields':['card_id', 'status', 'assigned_client']})
-            print("ID Cards: ")
-            print(self._id_cards)
+            #print("ID Cards: ")
+            #print(self._id_cards)
 
             self._users = self._models.execute_kw(self.db, self._uid, self.password,
                                     'res.partner', 'search_read',
                                     [],
                                     {'fields':['id', 'name']})
-            print("Users:")
-            print(self._users)
+            #print("Users:")
+            #print(self._users)
 
             self.materials = self._models.execute_kw(self.db, self._uid, self.password,
                                     'product.template', 'search_read',
@@ -101,13 +102,12 @@ class OdooRemote():
                                     'product.template', 'search_read',
                                                     [[['tag_ids', '=', self._laser_tag_id]]],
                                                     {})
-            print("Materials:")
-            for mat in self.materials:
-                print(str(mat['id']) + "   " + mat['name'])
-            #print(self.materials)
-            print("Services:")
-            for serv in self.services:
-                print(str(serv['id']) + "   " + serv['name'])
+            #print("Materials:")
+            #for mat in self.materials:
+            #    print(str(mat['id']) + "   " + mat['name'])
+            #print("Services:")
+            #for serv in self.services:
+            #    print(str(serv['id']) + "   " + serv['name'])
 
             with open('machine.json', 'w') as file:
                 json.dump(self._machine, file, indent=4, separators=(',', ': '))
@@ -120,14 +120,13 @@ class OdooRemote():
             with open('services.json', 'w') as file:
                 json.dump(self.services, file, indent=4, separators=(',', ': '))
 
-            print("BACKUP_DB_SAVED")
+            print("Odoo Database loaded and saved locally")
             self._mode = 'odoo'
 
 
         except IOError:
-            print("COULD_NOT_OPEN_CONNECTION")
+            print("Couldn't open Database, trying to load backup...")
             try:
-                print("BACKUP_DB_LOADED")
                 with open('machine.json') as file:
                     self._machine = json.load(file)
                 with open('id_cards.json') as file:
@@ -139,15 +138,16 @@ class OdooRemote():
                 with open('services.json') as file:
                     self.services = json.load(file)
                 self._mode='backup'
+                print("Backup loaded!")
             except IOError:
                 #TODO: Maybe just throw an error message?
-                print("COULD_NOT_LOAD_BACKUP_DB")
-                print("SHUTTING DOWN LASERSAURAPP, TRY STARTING WITHOUT ODOO SUPPORT")
+                print("Couldn't find or load local backup Database.")
+                print("Shutting down LaserSaurApp, try starting without Odoo support.")
                 exit(1)
                 self._mode='error'
 
         if not self._machine:
-            print("NO_MACHINE_FOUND")
+            print("Odoo error: No matching machine found")
             return False
 
     def check_access(self, card_number):
@@ -156,7 +156,7 @@ class OdooRemote():
         if card_number == None:
             return False
         card_number = card_number.upper()
-        print("card: " + card_number + " ", end="")
+        #print("card: " + card_number + " ", end="")
 
         # if self._mode == 'odoo':
         #     try:
@@ -178,10 +178,10 @@ class OdooRemote():
             return False
         #print(card[0])
         if card[0]['status'] != 'a':
-            #print("CARD_NOT_ACTIVE")
+            print("Odoo warning: Card is not active!")
             return False
         if card[0]['assigned_client'] == 0:
-            #print("CARD_NOT_ASSIGNED")
+            print("Odoo warning: Card is not assigned")
             return False
         # if self._mode == 'odoo':
         #     try:
@@ -196,7 +196,7 @@ class OdooRemote():
         client = filter(lambda user: user['id'] == card[0]['assigned_client'][0], self._users)
 
         if(len(client) != 1):
-            print("FUCKED_UP_EVERYTHING")
+            print("Odoo Error: Fucked up everything, contact Philip Caroli")
             self._mode = 'error'
             return False
         client = client[0]

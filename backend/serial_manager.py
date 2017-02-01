@@ -261,7 +261,7 @@ class SerialManagerClass(object):
 
     def queue_gcode(self, gcode, name=None, user_id=None):
         lines = gcode.split('\n')
-        print("Adding to queue %s lines" % len(lines))
+        #print("Adding to queue %s lines" % len(lines))
         job_list = []
         for line in lines:
             line = line.strip()
