@@ -360,12 +360,14 @@ def get_sensor_values():
 
 @app.route('/material/set_service/<id>')
 def material_set_service(id):
+    print("Setting Odoo Service ID: " + str(id))
     SerialManager.odoo_service = odooremote.get_service(id)
     return None
 
 
 @app.route('/material/set_product/<id>')
 def material_set_service(id):
+    print("Setting Odoo Material ID: " + str(id))
     SerialManager.odoo_product = odooremote.get_product(id)
 
 @app.route('/material/set_comment/<comment>')
