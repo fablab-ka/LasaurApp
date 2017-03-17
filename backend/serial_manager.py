@@ -56,8 +56,8 @@ class SerialManagerClass(object):
         self.accountingFile = accountingFile
         self.reset_accounting()
 
-        self.odoo_service = None
-        self.odoo_product = None
+        self.odoo_service = -1
+        self.odoo_product = -1
         self.job_comment = ""
 
         # Path to a json file, which stores the last n jobs.
