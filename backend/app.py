@@ -12,10 +12,13 @@ from flash import flash_upload, reset_atmega
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
 from serial import SerialException
+import serial
 import i18n
 import datedecoder
 import readid
 import os.path
+from odoo_remote import OdooRemote
+import SensorShield
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024 # 20MB max upload
 
@@ -40,11 +43,21 @@ I18N = i18n.Translations(config.get("language", "de"))
 ACCOUNTING_FILE = config.get("accounting", {}).get("outputfile", "logs/accounting.json")
 INFLUX_CONFIG = config.get("influx", False)
 USE_ID_CARD_ACCESS_RESTRICTION = config.get("use_id_card_access_restriction", False)
+ODOO_USERNAME = config.get("odoo_username", "admin")
+ODOO_PASSWORD = config.get("odoo_password", "admin")
+ODOO_URL = config.get("odoo_url", "http://127.0.0.1:8069")
+ODOO_DB = config.get("odoo_db", "testDB")
+ODOO_USE = config.get("odoo_use", False)
+IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
+SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
+SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
+odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
+sensor_serial = None
+dummy_mode = False
 
 lastCardCheck = 0
-cardCheckInterval = 2
 
 if os.name == 'nt':  # sys.platform == 'win32':
     GUESS_PREFIX = "Arduino"
@@ -56,17 +69,21 @@ elif os.name == 'posix':
 else:
     GUESS_PREFIX = "no prefix"
 
+
 def pauseIfCardNotAvailable():
     global lastCardCheck
     if USE_ID_CARD_ACCESS_RESTRICTION:
-        if (time.time() - lastCardCheck) > cardCheckInterval:
+        if (time.time() - lastCardCheck) > IDCARD_TIMEOUT:
             lastCardCheck = time.time()
             if not has_valid_id():
                 SerialManager.set_pause(True)
 
+
 def setDummyMode():
+    odooremote.dummy_mode = True
     global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
+    dummy_mode = True
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -121,6 +138,8 @@ class HackedWSGIRequestHandler(WSGIRequestHandler):
         # return wsgiref.simple_server.WSGIRequestHandler.log_request(*args, **kw)
         pass
 
+sensor_names = None
+sensor_values = None
 
 def run_with_callback(host, port):
     """ Start a wsgiref server instance with control over the main loop.
@@ -144,12 +163,37 @@ def run_with_callback(host, port):
     print("Use Ctrl-C to quit.")
     print("-----------------------------------------------------------------------------")
     print("")
-
     # auto-connect on startup
     global SERIAL_PORT
     if not SERIAL_PORT:
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
+
+
+    global sensor_names
+    global sensor_values
+    sensor_serial = None
+    if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
+        print("Initializing Sensor Board!")
+        try:
+            sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
+            #print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
+            print(sensor_serial)
+            time.sleep(1)
+            sensor_serial.flushInput()
+            print(sensor_serial.readline())
+            str = sensor_serial.readline().replace('\r\n', '')
+            print(str)
+            str = str.split(';')
+            sensor_names = [0.00] * len(str)
+            sensor_values = [0.00] * len(str)
+            for i in range(0,len(str),1):
+                sensor_names[i] = str[i]
+            print(sensor_names)
+        except(SerialException):
+            sensor_serial = None
+            print("COULD NOT CONNECT TO SENSOR BOARD!")
+
 
     # open web-browser
     if config.get("open_browser", True):
@@ -159,13 +203,19 @@ def run_with_callback(host, port):
         except:
             print("Cannot open Webbrowser, please do so manually at http://127.0.0.1:" + str(port))
 
+
+
     sys.stdout.flush()  # make sure everything gets flushed
     server.timeout = 0
     while 1:
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
-
+            if sensor_serial and sensor_serial.inWaiting() > 10:
+                str = sensor_serial.readline().split(';')
+                for i in range(0,len(str), 1):
+                    sensor_values[i] = float(str[i])
+                #print(sensor_values)
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)
@@ -190,67 +240,12 @@ def clean_id(id):
 
     return id.lower()
 
-def read_id_list(path):
-    result = []
-
-    if not os.path.isfile(path):
-        print("id card list file '" + path + "' is missing")
-        return result
-
-    with open(path) as f:
-        for line in f.readlines():
-            if clean_id(line) != "":
-                result.append(clean_id(line))
-
-    return result
-
-def get_id_list():
-    result = read_id_list(config.get("id_card_list_path", "/etc/lasersaur/idlist.txt"))
-    print("Number of Ids registerd: " + str(len(result)))
-
-    return result
-
-def get_admin_id_list():
-    result = read_id_list(config.get("id_card_admin_list_path", "/etc/lasersaur/adminidlist.txt"))
-    print("Number of Admin Ids registerd: " + str(len(result)))
-
-    return result
-
-def get_user_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
-        return None
-
-    return clean_id(readid.getId())
 
 def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
-
-    if has_valid_admin_id():
-        return True
-
-    id = get_user_id()
-
-    if id is None:
-        return False
-
-    id_list = get_id_list()
-
-    return id in id_list
-
-def has_valid_admin_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
-        return True
-
-    id = get_user_id()
-
-    if id is None:
-        return False
-
-    admin_id_list = get_admin_id_list()
-
-    return id in admin_id_list
-
+    id = clean_id(readid.getId())
+    return odooremote.check_access(id)
 
 # @app.route('/longtest')
 # def longtest_handler():
@@ -337,6 +332,66 @@ def jobs_history():
         limit = int(request.params["limit"])
         jobs = jobs[:limit]
     return json.dumps(jobs, default=datedecoder.default)
+
+
+@app.route('/material/services')
+def material_services():
+    return json.dumps(odooremote.services, default=datedecoder.default)
+
+
+@app.route('/material/products')
+def material_products():
+    return json.dumps(odooremote.materials, default=datedecoder.default)
+
+@app.route('/sensors/names')
+def get_sensorNames():
+    #out = list()
+    #for i in range(0, len(sensor_names), 1):
+    #    out += [(zip({"Name", "Value", "Symbol"}, {sensor_names[i], sensor_values[i], ""}))]
+    #print(dict(zip(["Sensor"] * len(sensor_names), out)))
+    #print(out)
+    return json.dumps((sensor_names))
+
+@app.route('/sensors/values')
+def get_sensor_values():
+    return json.dumps(sensor_values)
+
+
+@app.route('/material/set_service/<id>')
+def material_set_service(id):
+    print("Setting Odoo Service ID: " + str(id))
+    SerialManager.odoo_service = odooremote.get_service(id)
+    return None
+
+
+@app.route('/material/set_product/<id>')
+def material_set_service(id):
+    print("Setting Odoo Material ID: " + str(id))
+    SerialManager.odoo_product = odooremote.get_product(id)
+
+@app.route('/material/set_comment/<comment>')
+def material_set_comment(comment):
+    print("Comment: " + str(comment))
+    SerialManager.job_comment = str(comment)
+
+@app.route('/material/get_sell_mode')
+def get_sell_mode():
+    return str(ODOO_USE)
+
+@app.route('/material/getCutSpeed')
+def get_cut_speed():
+    print(SerialManager.odoo_product['machine_parameter_1'])
+    return SerialManager.odoo_product['machine_parameter_1']
+@app.route('/material/getCutIntensity')
+def get_cut_intensity():
+    return SerialManager.odoo_product['machine_parameter_2']
+@app.route('/material/getEngraveSpeed')
+def get_engrave_speed():
+    return SerialManager.odoo_product['machine_parameter_3']
+@app.route('/material/getEngraveIntensity')
+def get_engrave_intensity():
+    return SerialManager.odoo_product['machine_parameter_4']
+
 
 
 @app.route('/queue/get/:name#.+#')
@@ -545,10 +600,6 @@ def set_pause(flag):
 def flash_firmware_handler(firmware_file=FIRMWARE):
     global SERIAL_PORT, GUESS_PREFIX
 
-    if not has_valid_admin_id():
-        print("ERROR: Failed to flash Arduino. No Admin ID entered.")
-        return '<br/><h2>Failed to flash Arduino. No Admin ID entered.</h2>'
-
     return_code = 1
     if SerialManager.is_connected():
         SerialManager.close()
@@ -598,11 +649,6 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
 
 @app.route('/build_firmware')
 def build_firmware_handler():
-
-    if not has_valid_admin_id():
-        print("ERROR: Failed to build firmware. No Admin ID entered.")
-        return '<br/><h2>Failed to build firmware. No Admin ID entered.</h2>'
-
     ret = []
     buildname = "LasaurGrbl_from_src"
     firmware_dir = os.path.join(resources_dir(), 'firmware')
@@ -639,7 +685,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name, get_user_id())
+        SerialManager.queue_gcode(job_data, name, odooremote.last_user)
         return "__ok__"
     else:
         return "serial disconnected"

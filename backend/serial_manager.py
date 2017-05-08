@@ -20,7 +20,6 @@ class SerialManagerClass(object):
     def __init__(self, accountingFile, influxConfig, dummyMode=False):
 
         self.device = None
-
         self.dummyMode = dummyMode
 
         self.rx_buffer = ""
@@ -57,6 +56,10 @@ class SerialManagerClass(object):
         self.accountingFile = accountingFile
         self.reset_accounting()
 
+        self.odoo_service = -1
+        self.odoo_product = -1
+        self.job_comment = ""
+
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
         if os.path.isfile(self.accountingFile):
@@ -67,7 +70,7 @@ class SerialManagerClass(object):
             if not os.path.exists(folder):
                 os.makedirs(folder)
             with open(self.accountingFile, 'w+') as json_file:
-                json.dump(self.lastJobs, json_file, default=datedecoder.default)
+                json.dump(self.lastJobs, json_file, default=datedecoder.default, indent=4, separators=(',', ': '))
 
         self.logger.info("Init Accounting")
 
@@ -80,7 +83,10 @@ class SerialManagerClass(object):
             'start_job'  : datetime.now(),
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name,
-            'user_id'    : user_id
+            'user_id'    : user_id,
+            'odoo_service': self.odoo_service['id'],
+            'odoo_product': self.odoo_product['id'],
+            'comment'     : self.job_comment
         }
         self.logger.info(
             "Start Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
@@ -101,15 +107,18 @@ class SerialManagerClass(object):
             'name': self.job_accounting['job_name'],
             'duration': jobtime,
             'lines': self.job_accounting['gcode_lines'],
-            'total': int(current_total + jobtime)
+            'total': int(current_total + jobtime),
+            'user_id': self.job_accounting['user_id'],
+            'odoo_service_id': self.job_accounting['odoo_service'],
+            'odoo_product_id': self.job_accounting['odoo_product'],
+            'comment': self.job_accounting['comment']
         }
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
         #CHANGE_ME
         with open(self.accountingFile, 'w') as json_file:
-            json.dump(self.lastJobs, json_file, default=datedecoder.default)
-
+            json.dump(self.lastJobs, json_file, default=datedecoder.default, indent=4, separators=(',', ': '))
         self.logger.info(
             "Stop Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
             " jobname: ", self.job_accounting['job_name'],
@@ -252,7 +261,7 @@ class SerialManagerClass(object):
 
     def queue_gcode(self, gcode, name=None, user_id=None):
         lines = gcode.split('\n')
-        print("Adding to queue %s lines" % len(lines))
+        #print("Adding to queue %s lines" % len(lines))
         job_list = []
         for line in lines:
             line = line.strip()

@@ -229,6 +229,12 @@ $(document).ready(function(){
     $('#tab_logs div.alert').show();
   });
 
+  //TODO finish writing
+  $('#tab_sensors_button').click(function(){
+    $('#sensor_values').show();
+    //$('#tab_sensors div.alert').show();
+  });
+
   if (app_settings.custom_buttons) {
     for (var i = 0; i < app_settings.custom_buttons.length; i++) {
       var btn = app_settings.custom_buttons[i];
@@ -603,6 +609,11 @@ $(document).ready(function(){
     return false;
   });
 
+  $(document).on('keypress', null, 's', function(e){
+    $('#tab_sensors_button').trigger('click');
+    return false;
+  });
+
   $('#history_modal').on('show.bs.modal', function (e) {
 
     $.getJSON('/jobs/history', function(history) {
@@ -615,10 +626,11 @@ $(document).ready(function(){
 
         var row = $('<tr/>');
         row.append($('<td />').append($('<span class="cell row-1" />').text(job.name).attr('data-original-title', job.name)));
-        row.append($('<td />').append($('<span class="cell row-2" />').text(start_date)));
-        row.append($('<td />').append($('<span class="cell row-3" />').text(end_date)));
-        row.append($('<td />').append($('<span class="cell row-4" />').text(job.lines)));
-        row.append($('<td />').append($('<span class="cell row-5" />').text(duration)));
+        row.append($('<td />').append($('<span class="cell row-2" />').text(job.user_id)));
+        row.append($('<td />').append($('<span class="cell row-3" />').text(start_date)));
+        row.append($('<td />').append($('<span class="cell row-4" />').text(end_date)));
+        //row.append($('<td />').append($('<span class="cell row-5" />').text(job.lines)));
+        row.append($('<td />').append($('<span class="cell row-6" />').text(duration)));
         row.data('duration', job.duration);
         $('#history_modal tbody').append(row);
       }
@@ -652,6 +664,171 @@ $(document).ready(function(){
     }
   });
 });  // ready
+
+
+ $('#material_modal').on('show.bs.modal', function (e) {
+    $("#job_comment_input").value = "";
+    $('#job_materials').val([]);
+    //$('#job_services').val([]);
+    //TODO: Fix hard coded default
+    $('#job_services').val(20);
+    //$("#job_services").val = [$("option[value='20']")];
+    $('#material_selected').removeClass("btn-primary");
+});
+
+useOdoo = true;
+
+$(document).ready(function() {
+    //check if we use Odoo
+    $.get('/material/get_sell_mode', function(e){
+        alert(e)
+        useOdoo = e;
+        odoo_product = 0;
+        odoo_service = 0;
+        job_comment = "";
+
+        default_cut_speed = 1500;
+        default_cut_intensity = 100;
+        default_engrave_speed = 4000;
+        default_engrave_intensity = 30;
+
+        if(useOdoo == 'True'){
+            var comment_div = document.getElementById('job_comment');
+            comment_div.innerHTML = "Comment: ";
+            var comment_input = document.createElement("input");
+            comment_input.setAttribute("id", "job_comment_input");
+            comment_input.setAttribute("type", "text");
+            comment_input.setAttribute("name", "job_comment_input");
+            comment_input.setAttribute("value", "");
+            comment_div.appendChild(comment_input);
+
+            $.getJSON('/material/services', function(services) {
+              var select_list = document.getElementById('job_services');
+              for (var i in services) {
+                  var option = document.createElement("option");
+                  option.value = services[i].id;
+                  option.innerHTML = services[i].name;
+                  select_list.appendChild(option);
+              }
+              select_list.size = Math.min(services.length, select_list.size);
+            });
+
+
+            $.getJSON('/material/products', function(products) {
+              var select_list = document.getElementById("job_materials");
+              for (var i in products) {
+                  var option = document.createElement("option");
+                  option.value = products[i].id;
+                  option.innerHTML = products[i].name;
+                  select_list.appendChild(option);
+              }
+              select_list.size = Math.min(products.length, select_list.size);
+            });
+        }
+    });
+
+//    if(!useOdoo) {
+//
+//
+//        $.get("/material/set_product/" + odoo_product, function(e){ });
+//        $.get("/material/set_service/" + odoo_service, function(e){ });
+//        $.get("/material/set_comment/" + job_comment, function(e){ });
+//
+//        return();
+//    }
+
+//    $("#material_modal").modal('hide');
+//        return;
+//    }
+  });
+
+var material_form_ok_clickable = false;
+
+$('#material_form').change(function(){
+    if($('#job_materials').val() != null && $('#job_services').val() != null) {
+        material_form_ok_clickable = true;
+        $('#material_selected').addClass("btn-primary");
+    } else {
+        material_form_ok_clickable = false;
+        $('#material_selected').removeClass("btn-primary");
+    }
+});
+
+$('#job_materials').dblclick(function(){
+    $('#job_materials').trigger("click");
+    if(material_form_ok_clickable)
+        $("#material_selected").trigger("click");
+});
+
+default_cut_speed = 1500;
+default_cut_intensity = 100;
+default_engrave_speed = 4000;
+default_engrave_intensity = 20;
+
+var sensor_names = null;
+var sensor_values = null;
+
+setInterval(function(){
+    str = "";
+    if(sensor_names && sensor_values){
+        str = "";
+        for(i = 0; i < sensor_names.length; i++) {
+            str += "<p>";
+            str += sensor_names[i];
+            str += ": ";
+            str += sensor_values[i];
+            str += "</p>";
+        }
+    }
+    document.getElementById('sensor_values').innerHTML = str;
+
+    $.getJSON("/sensors/names", function(e){sensor_names = e;})
+    $.getJSON("/sensors/values", function(e){sensor_values = e;})
+}, 3000);
+
+$("#material_selected").click(function(e) {
+    if(!material_form_ok_clickable)
+      return;
+    odoo_product = $('#job_materials').val();
+    odoo_service = $('#job_services').val();
+    job_comment = document.querySelector('input[name = "job_comment_input"]').value;
+
+    $.get("/material/set_product/" + odoo_product, function(e){ });
+    $.get("/material/set_service/" + odoo_service, function(e){ });
+    $.get("/material/set_comment/" + job_comment, function(e){ });
+
+    $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
+    $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
+    $.get("/material/getEngraveSpeed", function(e) {default_engrave_speed = e;});
+    $.get("/material/getEngraveIntensity", function(e) {default_engrave_intensity = e;});
+
+    $("#material_modal").modal('hide');
+
+    //$('#material_selected').trigger("addToQueue");
+});
+
+
+
+
+/// PASSES //////////////////////////////////////
+
+
+function setDefaultCut(passnum){
+    //$('#feedrate_'+passnum).value = 100;
+    feedrate_field = document.getElementById('feedrate_' + passnum);
+    feedrate_field.value = default_cut_speed;
+    intensity_field = document.getElementById('intensity_' + passnum);
+    intensity_field.value = default_cut_intensity;
+}
+
+function setDefaultEngrave(passnum){
+    //$('#feedrate_'+passnum).value = 100;
+    feedrate_field = document.getElementById('feedrate_' + passnum);
+    feedrate_field.value = default_engrave_speed;
+    intensity_field = document.getElementById('intensity_' + passnum);
+    intensity_field.value = default_engrave_intensity;
+}
+
 
 jQuery.fn.shake = function(intShakes, intDistance, intDuration) {
     this.each(function() {

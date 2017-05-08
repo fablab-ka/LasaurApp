@@ -35,20 +35,20 @@ def getId():
                 if hresult == 0:
                     hresult, response = SCardTransmit(hcard, dwActiveProtocol, [0xFF, 0xCA, 0x00, 0x00, 0x00])
 
-                    print(smartcard.util.toHexString(response))
+                    #print(smartcard.util.toHexString(response))
 
                     result = smartcard.util.toHexString(response)
-                else:
-                    print("NO_CARD")
-            else:
-                print("NO_READER")
+            #     else:
+            #         print("NO_CARD")
+            # else:
+            #     print("NO_READER")
 
 
             hresult = SCardReleaseContext(hcontext)
             if hresult != SCARD_S_SUCCESS:
                 raise Exception('Failed to release context: ' + SCardGetErrorMessage(hresult))
-        else:
-            print("FAILED")
+        # else:
+        #     print("FAILED")
 
     return result
 
