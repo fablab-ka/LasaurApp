@@ -17,7 +17,15 @@ function load_into_job_widget(name, jobdata) {
   // create some empty pass widgets
   tmp_name = name;
   tmp_jobdata = jobdata;
-  $('#material_modal').modal();
+  //TODO dont show when no odoo is used
+  $.get('/material/get_sell_mode', function(e){
+    alert(e);
+    if(e == 'True') {
+       $('#material_modal').modal();
+     } else {
+       continue_load_into_job_widget();
+     }
+   });
 }
 
 function continue_load_into_job_widget() {

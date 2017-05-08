@@ -48,13 +48,12 @@ ODOO_PASSWORD = config.get("odoo_password", "admin")
 ODOO_URL = config.get("odoo_url", "http://127.0.0.1:8069")
 ODOO_DB = config.get("odoo_db", "testDB")
 ODOO_USE = config.get("odoo_use", False)
-ODOO_USE_SELL = config.get("odoo_use_sell", False)
 IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
 SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
 SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
-odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
+odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
 sensor_serial = None
 dummy_mode = False
 
@@ -377,7 +376,7 @@ def material_set_comment(comment):
 
 @app.route('/material/get_sell_mode')
 def get_sell_mode():
-    return 'true' #ODOO_USE_SELL
+    return str(ODOO_USE)
 
 @app.route('/material/getCutSpeed')
 def get_cut_speed():

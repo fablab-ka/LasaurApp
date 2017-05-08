@@ -3,11 +3,10 @@ import xmlrpclib
 import time
 import sys
 from smartcard.scard import *
-import smartcard.util
-import pickle
 import json
+from odooHelper import *
 
-
+import traceback
 
 class OdooRemote():
 
@@ -22,6 +21,7 @@ class OdooRemote():
     dummy_mode = False
     sell_mode = False
     last_user = ''
+    use_odoo = False
 
     _common = None
     _uid = None
@@ -48,66 +48,27 @@ class OdooRemote():
     #            #TODO: Try to go live again
     #        time.sleep(1)
 
-    def __init__(self, username, password, url, db):
+    def __init__(self, username, password, url, db, use_odoo):
         self.username = username
         self.password = password
         self.url = url
         self.db = db
-        self.init()
+        self.use_odoo = use_odoo
+        if use_odoo:
+            self.init()
+
 
     def init(self):
         print("Initializing Odoo remote connection")
         if self.dummy_mode:
             self.last_user = 'Max Mustermann'
         try:
-            self._common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.url))
-            self._uid = self._common.authenticate(self.db, self.username, self.password, {})
-            self._models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(self.url))
-            #TODO: Save ID-Cards, Users and Machines locally (in case of odoo/internet failure)
-            self._machine = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'lab.machine', 'search_read',
-                                    [[['name', '=', self.machine_name]]],
-                                    {})[0]
-            #print("Machine:")
-            #print(self._machine)
-
-            self._material_tag_id = self._machine['machine_tag_1'][0]
-            #print("Material Tag ID:")
-            #print(self._material_tag_id)
-
-            self._laser_tag_id = self._machine['machine_tag_2'][0]
-            #print("Laser Service Tag ID:")
-            #print(self._laser_tag_id)
-
-
-            self._id_cards = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'lab.id_cards', 'search_read',
-                                    [],
-                                    {'fields':['card_id', 'status', 'assigned_client']})
-            #print("ID Cards: ")
-            #print(self._id_cards)
-
-            self._users = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'res.partner', 'search_read',
-                                    [],
-                                    {'fields':['id', 'name']})
-            #print("Users:")
-            #print(self._users)
-
-            self.materials = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'product.template', 'search_read',
-                                                     [[['tag_ids', '=', self._material_tag_id]]],
-                                                     {})
-            self.services = self._models.execute_kw(self.db, self._uid, self.password,
-                                    'product.template', 'search_read',
-                                                    [[['tag_ids', '=', self._laser_tag_id]]],
-                                                    {})
-            #print("Materials:")
-            #for mat in self.materials:
-            #    print(str(mat['id']) + "   " + mat['name'])
-            #print("Services:")
-            #for serv in self.services:
-            #    print(str(serv['id']) + "   " + serv['name'])
+            self.helper = OdooHelper(self.username, self.password, self.url, self.db)
+            self._machine = self.helper.callAPI("/machine_management/getMachine/1")
+            self._id_cards = self.helper.callAPI("/machine_management/getIdCards/")
+            self._users = self.helper.callAPI("/machine_management/getUsers/")
+            self.materials = self.helper.callAPI("/machine_management/getProductByTag/" + str(self._machine['machine_tag_1']) + "/")
+            self.services = self.helper.callAPI("/machine_management/getProductByTag/" + str(self._machine['machine_tag_2']) + "/")
 
             with open('machine.json', 'w') as file:
                 json.dump(self._machine, file, indent=4, separators=(',', ': '))
@@ -125,7 +86,9 @@ class OdooRemote():
 
 
         except IOError:
+
             print("Couldn't open Database, trying to load backup...")
+            traceback.print_exc()
             try:
                 with open('machine.json') as file:
                     self._machine = json.load(file)
@@ -151,7 +114,7 @@ class OdooRemote():
             return False
 
     def check_access(self, card_number):
-        if self.dummy_mode:
+        if self.dummy_mode or not self.use_odoo:
             return "Max Mustermann"
         if card_number == None:
             return False
@@ -231,6 +194,8 @@ class OdooRemote():
         return False
 
     def get_product(self, id):
+        if not self.use_odoo:
+            return 0
         ret_product = filter(lambda product: product['id'] == int(id), self.materials)
         if len(ret_product) != 1:
             #print("product " + id + " not found!")
@@ -238,6 +203,8 @@ class OdooRemote():
         return ret_product[0]
 
     def get_service(self, id):
+        if not self.use_odoo:
+            return 0
         ret_service = filter(lambda service: service['id'] == int(id), self.services)
         if len(ret_service) != 1:
             #print("service " + id + " not found!")

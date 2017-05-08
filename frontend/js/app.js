@@ -681,43 +681,65 @@ useOdoo = true;
 $(document).ready(function() {
     //check if we use Odoo
     $.get('/material/get_sell_mode', function(e){
-    useOdoo = e;
+        alert(e)
+        useOdoo = e;
+        odoo_product = 0;
+        odoo_service = 0;
+        job_comment = "";
+
+        default_cut_speed = 1500;
+        default_cut_intensity = 100;
+        default_engrave_speed = 4000;
+        default_engrave_intensity = 30;
+
+        if(useOdoo == 'True'){
+            var comment_div = document.getElementById('job_comment');
+            comment_div.innerHTML = "Comment: ";
+            var comment_input = document.createElement("input");
+            comment_input.setAttribute("id", "job_comment_input");
+            comment_input.setAttribute("type", "text");
+            comment_input.setAttribute("name", "job_comment_input");
+            comment_input.setAttribute("value", "");
+            comment_div.appendChild(comment_input);
+
+            $.getJSON('/material/services', function(services) {
+              var select_list = document.getElementById('job_services');
+              for (var i in services) {
+                  var option = document.createElement("option");
+                  option.value = services[i].id;
+                  option.innerHTML = services[i].name;
+                  select_list.appendChild(option);
+              }
+              select_list.size = Math.min(services.length, select_list.size);
+            });
+
+
+            $.getJSON('/material/products', function(products) {
+              var select_list = document.getElementById("job_materials");
+              for (var i in products) {
+                  var option = document.createElement("option");
+                  option.value = products[i].id;
+                  option.innerHTML = products[i].name;
+                  select_list.appendChild(option);
+              }
+              select_list.size = Math.min(products.length, select_list.size);
+            });
+        }
     });
 
-    if(!useOdoo)
-        return;
+//    if(!useOdoo) {
+//
+//
+//        $.get("/material/set_product/" + odoo_product, function(e){ });
+//        $.get("/material/set_service/" + odoo_service, function(e){ });
+//        $.get("/material/set_comment/" + job_comment, function(e){ });
+//
+//        return();
+//    }
 
-    var comment_div = document.getElementById('job_comment');
-    comment_div.innerHTML = "Comment: ";
-    var comment_input = document.createElement("input");
-    comment_input.setAttribute("id", "job_comment_input");
-    comment_input.setAttribute("type", "text");
-    comment_input.setAttribute("name", "job_comment_input");
-    comment_input.setAttribute("value", "");
-    comment_div.appendChild(comment_input);
-
-    $.getJSON('/material/services', function(services) {
-      var select_list = document.getElementById('job_services');
-      for (var i in services) {
-          var option = document.createElement("option");
-          option.value = services[i].id;
-          option.innerHTML = services[i].name;
-          select_list.appendChild(option);
-      }
-      select_list.size = Math.min(services.length, select_list.size);
-    });
-
-
-    $.getJSON('/material/products', function(products) {
-      var select_list = document.getElementById("job_materials");
-      for (var i in products) {
-          var option = document.createElement("option");
-          option.value = products[i].id;
-          option.innerHTML = products[i].name;
-          select_list.appendChild(option);
-      }
-      select_list.size = Math.min(products.length, select_list.size);
-    });
+//    $("#material_modal").modal('hide');
+//        return;
+//    }
   });
 
 var material_form_ok_clickable = false;
