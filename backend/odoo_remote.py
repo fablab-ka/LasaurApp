@@ -85,7 +85,7 @@ class OdooRemote():
             self._mode = 'odoo'
 
 
-        except IOError:
+        except IOError, requests.exceptions.RequestException:
 
             print("Couldn't open Database, trying to load backup...")
             traceback.print_exc()

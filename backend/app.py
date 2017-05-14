@@ -437,8 +437,8 @@ def login():
     print(uid)
     info = {
         'session_id': str(uuid.uuid4()),
-        'odoo_uid': uid['user_id'],
-        'user_name': str(uid['name'])
+        'odoo_uid': uid,
+        'user_name': login_email
     }
     session_info.append(info)
     print(session_info)
