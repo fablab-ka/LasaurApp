@@ -137,13 +137,13 @@ class OdooRemote():
         # if self._mode == 'backup':
         card = filter(lambda x: x['card_id'] == card_number, self._id_cards)
         if len(card) != 1:
-            #print("CARD_NOT_FOUND")
+            print("card " + card_number + " was not found!")
             return False
-        #print(card[0])
-        if card[0]['status'] != 'a':
+        card = card[0]
+        if card['status'] != 'a':
             print("Odoo warning: Card is not active!")
             return False
-        if card[0]['assigned_client'] == 0:
+        if card['assigned_client'] == 0:
             print("Odoo warning: Card is not assigned")
             return False
         # if self._mode == 'odoo':
@@ -156,7 +156,7 @@ class OdooRemote():
         #         print("CONNECTIN_FAILED")
         #         self._mode = 'backup'
         # if self._mode == 'backup':
-        client = filter(lambda user: user['id'] == card[0]['assigned_client'][0], self._users)
+        client = filter(lambda user: user['id'] == card['assigned_client'], self._users)
 
         if(len(client) != 1):
             print("Odoo Error: Fucked up everything, contact Philip Caroli")
