@@ -64,24 +64,20 @@
                     <ul class="nav navbar-nav">
 
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account<b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#about_modal" data-toggle="modal">{{About}}</a></li>
-
-                                <li><a href="http://www.lasersaur.com/manual/">{{ManualTOC}}</a></li>
-                                <li><a href="http://www.lasersaur.com/manual/operation">{{OperatingALasersaur}}</a></li>
-                                <li><a href="http://www.lasersaur.com/manual/lasertags">{{LaserTags}}</a></li>
+                                <li><a href="#login_modal" data-toggle="modal">Login/Switch User</a></li>
                             </ul>
                         </li>
 
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Admin}}<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="flash_firmware">{{FlashFirmwareLatest}}</a></li>
-                                <li><a href="build_firmware">{{BuildAndFlashFromSource}}</a></li>
-                                <li><a id="reset_atmega" href="reset_atmega">{{ResetAtmegaRestartsFirmware}}</a></li>
-                            </ul>
-                        </li>
+                        <!--<li class="dropdown">-->
+                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Admin}}<b class="caret"></b></a>-->
+                            <!--<ul class="dropdown-menu">-->
+                                <!--<li><a href="flash_firmware">{{FlashFirmwareLatest}}</a></li>-->
+                                <!--<li><a href="build_firmware">{{BuildAndFlashFromSource}}</a></li>-->
+                                <!--<li><a id="reset_atmega" href="reset_atmega">{{ResetAtmegaRestartsFirmware}}</a></li>-->
+                            <!--</ul>-->
+                        <!--</li>-->
                     </ul>
                 </div>
             </div>
@@ -531,6 +527,36 @@
                         <div class="modal-footer">
                             <button id="material_selected" type="button" class="btn btn-primary" data-dismiss="modal">Okay</button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+                <!-- Login Modal -->
+        <div class="modal fade" id="login_modal" tabindex="-1" role="dialog" aria-labelledby="material_modal_title">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form id="login_form" method="post">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="login_modal_title">Login</h4>
+                        </div>
+                        <div class="modal-body" style="overflow:auto; max-height:600px;">
+                            <div>
+                                <h4>Email:</h4>
+                                <input type="text" id="login_email" name="login_email", value="">
+                            </div>
+                            <div>
+                                <h4>Password:</h4>
+                                <input type="password" id="login_password" name="login_password", value="">
+                            </div>
+                            <div>
+                                <h4><span style="color:red" id="login_text"></span></h4>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="login_btn" type="button" class="btn btn-primary">Login</button>
                         </div>
                     </form>
                 </div>
