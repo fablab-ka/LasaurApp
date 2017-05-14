@@ -19,7 +19,7 @@ function load_into_job_widget(name, jobdata) {
   tmp_jobdata = jobdata;
   //TODO dont show when no odoo is used
   $.get('/material/get_sell_mode', function(e){
-    alert(e);
+    //alert(document.cookie);
     if(e == 'True') {
        $('#material_modal').modal();
      } else {

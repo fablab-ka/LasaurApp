@@ -209,6 +209,20 @@ function poll_job_history() {
   });
 }
 
+$('#login_btn').click(function(){
+  $.post("/login", {'login_email': $('#login_email').val(), 'login_password': $('#login_password').val()}, function(e){
+
+    if(e == "true"){
+      $('#login_modal').modal('hide');
+    }else {
+      $('#login_text').text(e);
+    }
+  });
+});
+    //$.post("/login", data=$('#login_form'))
+//
+//    return false;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,7 +230,11 @@ function poll_job_history() {
 
 
 $(document).ready(function(){
-
+    //window.location.replace("HTTP://127.0.0.1:8069/web/login/?redirect=http://127.0.0.1:8070/")
+//    $.post("http://127.0.0.1:8069/machine_management/getCurrentUser",function(e){
+//        alert(e);
+//    });//TODO add parameter
+//  $('#login_modal').modal('show');
   $().uxmessage('notice', "Frontend started.");
 
   $('#feedrate_field').val(app_settings.max_seek_speed);
@@ -681,7 +699,6 @@ useOdoo = true;
 $(document).ready(function() {
     //check if we use Odoo
     $.get('/material/get_sell_mode', function(e){
-        alert(e)
         useOdoo = e;
         odoo_product = 0;
         odoo_service = 0;

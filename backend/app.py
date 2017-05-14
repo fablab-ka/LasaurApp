@@ -6,7 +6,7 @@ import tempfile
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
 import bottle
-from bottle import Bottle, static_file, request, debug, default_app, template
+from bottle import Bottle, static_file, request, debug, template
 from serial_manager import SerialManagerClass
 from flash import flash_upload, reset_atmega
 from build import build_firmware
@@ -19,8 +19,10 @@ import readid
 import os.path
 from odoo_remote import OdooRemote
 import SensorShield
+import uuid
+from odooHelper import *
 
-bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024 # 20MB max upload
+bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
 
 APPNAME = "lasaurapp"
 VERSION = "14.11b"
@@ -56,6 +58,7 @@ SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
 odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
 sensor_serial = None
 dummy_mode = False
+session_info = []
 
 lastCardCheck = 0
 
@@ -84,6 +87,7 @@ def setDummyMode():
     global SerialManager
     SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
     dummy_mode = True
+
 
 def resources_dir():
     """This is to be used with all relative file access.
@@ -138,8 +142,10 @@ class HackedWSGIRequestHandler(WSGIRequestHandler):
         # return wsgiref.simple_server.WSGIRequestHandler.log_request(*args, **kw)
         pass
 
+
 sensor_names = None
 sensor_values = None
+
 
 def run_with_callback(host, port):
     """ Start a wsgiref server instance with control over the main loop.
@@ -169,7 +175,6 @@ def run_with_callback(host, port):
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
 
-
     global sensor_names
     global sensor_values
     sensor_serial = None
@@ -177,7 +182,7 @@ def run_with_callback(host, port):
         print("Initializing Sensor Board!")
         try:
             sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
-            #print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
+            # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
             print(sensor_serial)
             time.sleep(1)
             sensor_serial.flushInput()
@@ -187,13 +192,12 @@ def run_with_callback(host, port):
             str = str.split(';')
             sensor_names = [0.00] * len(str)
             sensor_values = [0.00] * len(str)
-            for i in range(0,len(str),1):
+            for i in range(0, len(str), 1):
                 sensor_names[i] = str[i]
             print(sensor_names)
         except(SerialException):
             sensor_serial = None
             print("COULD NOT CONNECT TO SENSOR BOARD!")
-
 
     # open web-browser
     if config.get("open_browser", True):
@@ -203,8 +207,6 @@ def run_with_callback(host, port):
         except:
             print("Cannot open Webbrowser, please do so manually at http://127.0.0.1:" + str(port))
 
-
-
     sys.stdout.flush()  # make sure everything gets flushed
     server.timeout = 0
     while 1:
@@ -213,9 +215,9 @@ def run_with_callback(host, port):
             server.handle_request()
             if sensor_serial and sensor_serial.inWaiting() > 10:
                 str = sensor_serial.readline().split(';')
-                for i in range(0,len(str), 1):
+                for i in range(0, len(str), 1):
                     sensor_values[i] = float(str[i])
-                #print(sensor_values)
+                    # print(sensor_values)
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)
@@ -224,6 +226,7 @@ def run_with_callback(host, port):
     print("\nShutting down...")
     SerialManager.close()
 
+
 def clean_id(id):
     if not isinstance(id, basestring):
         return None
@@ -231,9 +234,9 @@ def clean_id(id):
     id = id.split('#', 1)[0]
 
     # remove separators
-    id = id.replace('-','')
-    id = id.replace(':','')
-    id = id.replace(' ','')
+    id = id.replace('-', '')
+    id = id.replace(':', '')
+    id = id.replace(' ', '')
 
     # remove any left over whitespace
     id = id.strip()
@@ -246,6 +249,7 @@ def has_valid_id():
         return True
     id = clean_id(readid.getId())
     return odooremote.check_access(id)
+
 
 # @app.route('/longtest')
 # def longtest_handler():
@@ -343,14 +347,16 @@ def material_services():
 def material_products():
     return json.dumps(odooremote.materials, default=datedecoder.default)
 
+
 @app.route('/sensors/names')
 def get_sensorNames():
-    #out = list()
-    #for i in range(0, len(sensor_names), 1):
+    # out = list()
+    # for i in range(0, len(sensor_names), 1):
     #    out += [(zip({"Name", "Value", "Symbol"}, {sensor_names[i], sensor_values[i], ""}))]
-    #print(dict(zip(["Sensor"] * len(sensor_names), out)))
-    #print(out)
+    # print(dict(zip(["Sensor"] * len(sensor_names), out)))
+    # print(out)
     return json.dumps((sensor_names))
+
 
 @app.route('/sensors/values')
 def get_sensor_values():
@@ -369,29 +375,76 @@ def material_set_service(id):
     print("Setting Odoo Material ID: " + str(id))
     SerialManager.odoo_product = odooremote.get_product(id)
 
+
 @app.route('/material/set_comment/<comment>')
 def material_set_comment(comment):
     print("Comment: " + str(comment))
     SerialManager.job_comment = str(comment)
 
+
 @app.route('/material/get_sell_mode')
 def get_sell_mode():
     return str(ODOO_USE)
+
 
 @app.route('/material/getCutSpeed')
 def get_cut_speed():
     print(SerialManager.odoo_product['machine_parameter_1'])
     return SerialManager.odoo_product['machine_parameter_1']
+
+
 @app.route('/material/getCutIntensity')
 def get_cut_intensity():
     return SerialManager.odoo_product['machine_parameter_2']
+
+
 @app.route('/material/getEngraveSpeed')
 def get_engrave_speed():
     return SerialManager.odoo_product['machine_parameter_3']
+
+
 @app.route('/material/getEngraveIntensity')
 def get_engrave_intensity():
     return SerialManager.odoo_product['machine_parameter_4']
 
+
+@app.route('/checkLogin', method='POST')
+def checkLogin():
+    session_id = bottle.request.get_cookie('session_id')
+    user_name = bottle.request.get_cookie('user_name')
+    if not session_id or not user_name:
+        return "false"
+    info = next(item for item in session_info if item['session_id'] == session_id)
+    if not info:
+        return "false"
+    if info['user_name'] != user_name:
+        return "false"
+    return "true"
+
+
+@app.route('/login', method='POST')
+def login():
+    login_email = request.forms.get('login_email')
+    login_password = request.forms.get('login_password')  # TODO dont save plaintext passwords
+    if not login_email:
+        return "Email missing"
+    if not login_password:
+        return "Password missing"
+    helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
+    uid = helper.callAPI('/machine_management/getCurrentUser')
+    if not uid:
+        return "Couldn't find Odoo User"
+    print(uid)
+    info = {
+        'session_id': str(uuid.uuid4()),
+        'odoo_uid': uid['user_id'],
+        'user_name': str(uid['name'])
+    }
+    session_info.append(info)
+    print(session_info)
+    bottle.response.set_cookie('user_name', info['user_name'])
+    bottle.response.set_cookie('session_id', info['session_id'])
+    return "true"
 
 
 @app.route('/queue/get/:name#.+#')
@@ -639,7 +692,7 @@ def flash_firmware_handler(firmware_file=FIRMWARE):
         ret.append('<h2>Flashing Failed!</h2> Check terminal window for possible errors. ')
         ret.append('Most likely LasaurApp could not find the right serial port.')
         ret.append(
-                '<br><a href="/flash_firmware/' + firmware_file + '">try again</a> or <a href="/">return</a><br><br>')
+            '<br><a href="/flash_firmware/' + firmware_file + '">try again</a> or <a href="/">return</a><br><br>')
         if os.name != 'posix':
             ret.append('If you know the COM ports the Arduino is connected to you can specifically select it here:')
             for i in range(1, 13):
