@@ -185,6 +185,7 @@ def run_with_callback(host, port):
             # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
             time.sleep(1)
             sensor_serial.flushInput()
+            sensor_serial.readline()
             str = sensor_serial.readline().replace('\r\n', '')
             str = str.split(';')
             sensor_names = [0.00] * len(str)
