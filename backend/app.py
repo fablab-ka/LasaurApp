@@ -413,12 +413,18 @@ def get_engrave_intensity():
 def checkLogin():
     session_id = bottle.request.get_cookie('session_id')
     user_name = bottle.request.get_cookie('user_name')
-    if not session_id or not user_name:
+    if not session_id or not user_name or len(session_info) < 1:
+        bottle.response.delete_cookie('user_name')
+        bottle.response.delete_cookie('session_id')
         return "false"
     info = next(item for item in session_info if item['session_id'] == session_id)
     if not info:
+        bottle.response.delete_cookie('user_name')
+        bottle.response.delete_cookie('session_id')
         return "false"
     if info['user_name'] != user_name:
+        bottle.response.delete_cookie('user_name')
+        bottle.response.delete_cookie('session_id')
         return "false"
     return "true"
 
@@ -432,7 +438,7 @@ def login():
     if not login_password:
         return "Password missing"
     helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
-    uid = helper.callAPI('/machine_management/getCurrentUser')
+    uid = helper.callAPI('/machine_management/getCurrentUser', {'tset': 2})
     if not uid:
         return "Couldn't find Odoo User"
     print(uid)
@@ -797,31 +803,6 @@ def file_reader():
         print(msg)
         return msg
     return "You missed a field."
-
-
-# def check_user_credentials(username, password):
-#     return username in allowed and allowed[username] == password
-#
-# @app.route('/login')
-# def login():
-#     username = request.forms.get('username')
-#     password = request.forms.get('password')
-#     if check_user_credentials(username, password):
-#         response.set_cookie("account", username, secret=COOKIE_KEY)
-#         return "Welcome %s! You are now logged in." % username
-#     else:
-#         return "Login failed."
-#
-# @app.route('/logout')
-# def login():
-#     username = request.forms.get('username')
-#     password = request.forms.get('password')
-#     if check_user_credentials(username, password):
-#         response.delete_cookie("account", username, secret=COOKIE_KEY)
-#         return "Welcome %s! You are now logged out." % username
-#     else:
-#         return "Already logged out."
-
 
 
 ### Setup Argument Parser

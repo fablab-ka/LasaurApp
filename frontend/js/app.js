@@ -5,6 +5,11 @@ var firmware_version_reported = false;
 var lasaurapp_version_reported = false;
 var progress_not_yet_done_flag = false;
 
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
 
 (function($){
   $.fn.uxmessage = function(kind, text, max_length) {
@@ -232,16 +237,19 @@ $('#login_btn').click(function(){
   $.post("/login", {'login_email': $('#login_email').val(), 'login_password': $('#login_password').val()}, function(e){
 
     if(e == "true"){
+      $('#account_drop').html(getCookie("user_name") + '<b class="caret">');
       $('#login_modal').modal('hide');
     }else {
       $('#login_text').text(e);
     }
   });
 });
-    //$.post("/login", data=$('#login_form'))
-//
-//    return false;
-//}
+
+$('#login_modal').bind('keypress', function(e) {
+    if(e.keyCode==13){
+        $('#login_btn').click();
+    }
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -719,6 +727,12 @@ useOdoo = true;
 
 
 $(document).ready(function() {
+    $.post('/checkLogin', function(e){
+        if(e=="true"){
+             $('#account_drop').html(getCookie("user_name") + '<b class="caret">');
+        }
+
+    });
     //check if we use Odoo
     $.get('/material/get_sell_mode', function(e){
         useOdoo = e;

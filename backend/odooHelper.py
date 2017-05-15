@@ -29,6 +29,17 @@ class OdooHelper:
         #TODO find way of checking if /web/login or /web get reached
 
 
-    def callAPI(self, path, args=None):
-        req = self.session.post(self.url + path, data={"csrf_token": self.csrf_token})
-        return json.loads(req.content)
+    def callAPI(self, path, data=None):
+        payload = None
+        if data:
+            try:
+                data = json.dumps(data)
+            except:
+                data = None
+                print("data is not JSON-compatible: " + data)
+        req = self.session.post(self.url + path, data={"csrf_token": self.csrf_token, "params": data})
+        try:
+            return json.loads(req.content)
+        except ValueError:
+            print("Couldn't decode JSON Element")
+            return False
