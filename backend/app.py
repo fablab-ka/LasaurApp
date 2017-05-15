@@ -332,7 +332,6 @@ def accounting():
 @app.route('/jobs/history')
 def jobs_history():
     jobs = SerialManager.lastJobs
-    print(jobs)
     if "limit" in request.params.keys():
         limit = int(request.params["limit"])
         jobs = jobs[:limit]
