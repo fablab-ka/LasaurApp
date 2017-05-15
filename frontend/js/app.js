@@ -1,6 +1,7 @@
 
 var hardware_ready_state = false;
 var has_valid_id = false;
+var id_card_status = "Card missing"
 var firmware_version_reported = false;
 var lasaurapp_version_reported = false;
 var progress_not_yet_done_flag = false;
@@ -328,7 +329,7 @@ $(document).ready(function(){
         if (has_valid_id) {
           $("#connect_btn").html("Connected");
         } else {
-          $("#connect_btn").html("Card Missing");
+          $("#connect_btn").html(id_card_status);
           $("#connect_btn").addClass("btn-warning");
         }
       }
@@ -366,8 +367,9 @@ $(document).ready(function(){
 
       // ready state
       has_valid_id = data.has_valid_id;
+      id_card_status = data.id_card_status;
       if (!data.has_valid_id) {
-        $("#connect_btn").html("Card Missing").addClass("btn-warning");
+        $("#connect_btn").html(id_card_status).addClass("btn-warning");
         hardware_ready_state = false;
       } else if (data.ready) {
         hardware_ready_state = true;
@@ -503,7 +505,7 @@ $(document).ready(function(){
     function () {
       connect_btn_in_hover = false;
       if (!has_valid_id) {
-        $(this).html("Card Missing");
+        $(this).html(id_card_status);
         $("#connect_btn").addClass("btn-warning");
       } else if (connect_btn_state) {
         $(this).html("Connected");

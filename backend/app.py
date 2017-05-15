@@ -179,25 +179,22 @@ def run_with_callback(host, port):
     global sensor_values
     sensor_serial = None
     if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
-        print("Initializing Sensor Board!")
+        print("Initializing sensor board!")
         try:
             sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
             # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
-            print(sensor_serial)
             time.sleep(1)
             sensor_serial.flushInput()
-            print(sensor_serial.readline())
             str = sensor_serial.readline().replace('\r\n', '')
-            print(str)
             str = str.split(';')
             sensor_names = [0.00] * len(str)
             sensor_values = [0.00] * len(str)
             for i in range(0, len(str), 1):
                 sensor_names[i] = str[i]
-            print(sensor_names)
+            print("Connected to sensor board!")
         except(SerialException):
             sensor_serial = None
-            print("COULD NOT CONNECT TO SENSOR BOARD!")
+            print("Unable to connect to sensor board!")
 
     # open web-browser
     if config.get("open_browser", True):
@@ -217,7 +214,6 @@ def run_with_callback(host, port):
                 str = sensor_serial.readline().split(';')
                 for i in range(0, len(str), 1):
                     sensor_values[i] = float(str[i])
-                    # print(sensor_values)
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)
@@ -243,20 +239,15 @@ def clean_id(id):
 
     return id.lower()
 
+state = "Access"
 
 def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
     id = clean_id(readid.getId())
-    return odooremote.check_access(id)
+    state = odooremote.check_access(id)
+    return state == "access"
 
-
-# @app.route('/longtest')
-# def longtest_handler():
-# fp = open("longtest.ngc")
-#     for line in fp:
-#         SerialManager.queue_gcode_line(line)
-#     return "Longtest queued."
 
 app = Bottle()
 
@@ -365,20 +356,17 @@ def get_sensor_values():
 
 @app.route('/material/set_service/<id>')
 def material_set_service(id):
-    print("Setting Odoo Service ID: " + str(id))
     SerialManager.odoo_service = odooremote.get_service(id)
     return None
 
 
 @app.route('/material/set_product/<id>')
 def material_set_service(id):
-    print("Setting Odoo Material ID: " + str(id))
     SerialManager.odoo_product = odooremote.get_product(id)
 
 @app.route('/material/set_comment/')
 @app.route('/material/set_comment/<comment>')
 def material_set_comment(comment=""):
-    print("Comment: " + str(comment))
     SerialManager.job_comment = str(comment)
 
 
@@ -389,7 +377,6 @@ def get_sell_mode():
 
 @app.route('/material/getCutSpeed')
 def get_cut_speed():
-    print(SerialManager.odoo_product['machine_parameter_1'])
     return SerialManager.odoo_product['machine_parameter_1']
 
 
@@ -440,14 +427,12 @@ def login():
     uid = helper.callAPI('/machine_management/getCurrentUser', {'tset': 2})
     if not uid:
         return "Couldn't find Odoo User"
-    print(uid)
     info = {
         'session_id': str(uuid.uuid4()),
         'odoo_uid': uid,
         'user_name': login_email
     }
     session_info.append(info)
-    print(session_info)
     bottle.response.set_cookie('user_name', info['user_name'])
     bottle.response.set_cookie('session_id', info['session_id'])
     return "true"
@@ -631,6 +616,7 @@ def get_status():
     status['serial_connected'] = SerialManager.is_connected()
     status['lasaurapp_version'] = VERSION
     status['has_valid_id'] = has_valid_id()
+    status['id_card_status'] = state
     return json.dumps(status)
 
 
