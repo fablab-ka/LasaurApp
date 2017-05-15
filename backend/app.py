@@ -247,6 +247,7 @@ def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
     id = clean_id(readid.getId())
+    global state
     state = odooremote.check_access(id)
     print(state)
     return state == "access"
