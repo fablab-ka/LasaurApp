@@ -249,7 +249,6 @@ def has_valid_id():
     id = clean_id(readid.getId())
     global state
     state = odooremote.check_access(id)
-    print(state)
     return state == "access"
 
 
