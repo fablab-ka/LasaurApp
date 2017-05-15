@@ -74,7 +74,9 @@ class SerialManagerClass(object):
 
         self.logger.info("Init Accounting")
 
-    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>', user_id='<unknown>'):
+    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>', user={'name':'unknown', 'id':'0'}):
+        if user == None:
+            user = {'name':'unknown', 'id':'0'}
         # initialize all accounting data, get start time, write log information
         self.job_accounting = {
             'running'    : True,
@@ -83,9 +85,12 @@ class SerialManagerClass(object):
             'start_job'  : datetime.now(),
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name,
-            'user_id'    : user_id,
+            'user_id'    : user['id'],
+            'user_name'  : user['name'],
             'odoo_service': self.odoo_service['id'],
+            'odoo_service_name': self.odoo_service['name'],
             'odoo_product': self.odoo_product['id'],
+            'odoo_product_name': self.odoo_product['name'],
             'comment'     : self.job_comment
         }
         self.logger.info(
@@ -109,8 +114,11 @@ class SerialManagerClass(object):
             'lines': self.job_accounting['gcode_lines'],
             'total': int(current_total + jobtime),
             'user_id': self.job_accounting['user_id'],
+            'user_name': self.job_accounting['user_name'],
             'odoo_service_id': self.job_accounting['odoo_service'],
+            'odoo_service_name': self.job_accounting['odoo_service_name'],
             'odoo_product_id': self.job_accounting['odoo_product'],
+            'odoo_product_name': self.job_accounting['odoo_product_name'],
             'comment': self.job_accounting['comment']
         }
 
@@ -259,7 +267,7 @@ class SerialManagerClass(object):
         if self.device:
             self.device.flushOutput()
 
-    def queue_gcode(self, gcode, name=None, user_id=None):
+    def queue_gcode(self, gcode, name=None, user_id={'name':'unknown', 'id':'0'}):
         lines = gcode.split('\n')
         #print("Adding to queue %s lines" % len(lines))
         job_list = []

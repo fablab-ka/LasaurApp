@@ -332,6 +332,7 @@ def accounting():
 @app.route('/jobs/history')
 def jobs_history():
     jobs = SerialManager.lastJobs
+    print(jobs)
     if "limit" in request.params.keys():
         limit = int(request.params["limit"])
         jobs = jobs[:limit]
@@ -375,9 +376,9 @@ def material_set_service(id):
     print("Setting Odoo Material ID: " + str(id))
     SerialManager.odoo_product = odooremote.get_product(id)
 
-
+@app.route('/material/set_comment/')
 @app.route('/material/set_comment/<comment>')
-def material_set_comment(comment):
+def material_set_comment(comment=""):
     print("Comment: " + str(comment))
     SerialManager.job_comment = str(comment)
 

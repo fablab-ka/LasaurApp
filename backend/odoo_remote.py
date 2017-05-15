@@ -20,7 +20,7 @@ class OdooRemote():
     unlock_time = 5 #how long is the machine unlocked?
     dummy_mode = False
     sell_mode = False
-    last_user = ''
+    last_user = {'name':'Max Mustermann', 'id':0}
     use_odoo = False
 
     _common = None
@@ -61,7 +61,7 @@ class OdooRemote():
     def init(self):
         print("Initializing Odoo remote connection")
         if self.dummy_mode:
-            self.last_user = 'Max Mustermann'
+            self.last_user = {'name':'Max Mustermann', 'id':'0'}
         try:
             self.helper = OdooHelper(self.username, self.password, self.url, self.db)
             self._machine = self.helper.callAPI("/machine_management/getMachine/1")
@@ -166,18 +166,18 @@ class OdooRemote():
         if client['id'] in self._machine['owner_ids']:
             #print("CLIENT_IS_OWNER: " + client['name'])
             self.user_level = 'owner'
-            self.last_user = client['name']
+            self.last_user = {'name':client['name'], 'id':client['id']}
             return client['name'] #Owners get full acces no matter the circumstances
         elif self._machine['status'] == 'r':
             if client['id'] in self._machine['user_ids'] and self._machine['rules'] == 'r':
                 #print("CLIENT_IS_USER: " + client['name'])
                 self.user_level = 'user'
-                self.last_user = client['name']
+                self.last_user = {'name':client['name'], 'id':client['id']}
                 return client['name']
             elif self._machine['rules'] == 'f':
                 #print("free access")
                 self.user_level = 'free'
-                self.last_user = client['name']
+                self.last_user = {'name':client['name'], 'id':client['id']}
                 return client['name']
         #print("no acces for " + client['name'])
         return False

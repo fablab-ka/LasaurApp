@@ -36,15 +36,15 @@
                 </div>
 
                 <div id="navbar" class="collapse navbar-collapse">
-                    <a class="btn btn-default navbar-btn" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="glyphicon glyphicon-bar"></span>
-                        <span class="glyphicon glyphicon-bar"></span>
-                        <span class="glyphicon glyphicon-bar"></span>
-                    </a>
+                    <!--<a class="btn btn-default navbar-btn" data-toggle="collapse" data-target=".navbar-collapse">-->
+                        <!--<span class="glyphicon glyphicon-bar"></span>-->
+                        <!--&lt;!&ndash;<span class="glyphicon glyphicon-bar"></span>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<span class="glyphicon glyphicon-bar"></span>&ndash;&gt;-->
+                    <!--</a>-->
                     <div class="btn-group pull-right">
                         <button id="connect_btn" class="btn btn-default btn-warning" type="submit">Disconnected</button>
-                        <button id="door_status_btn" class="btn btn-default disabled btn-warning" type="submit">Door</button>
-                        <button id="chiller_status_btn" class="btn btn-default disabled btn-warning" type="submit">Chiller</button>
+                        <button id="door_status_btn" class="btn btn-default disabled btn-warning" type="submit">Laser</button>
+                        <!--<button id="chiller_status_btn" class="btn btn-default disabled btn-warning" type="submit">Chiller</button>-->
                     </div>
                     <div id="button_container" class="btn-group pull-right">
                     </div>
@@ -533,7 +533,7 @@
             </div>
         </div>
 
-                <!-- Login Modal -->
+        <!-- Login Modal -->
         <div class="modal fade" id="login_modal" tabindex="-1" role="dialog" aria-labelledby="material_modal_title">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -557,6 +557,47 @@
                         </div>
                         <div class="modal-footer">
                             <button id="login_btn" type="button" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Job Modal -->
+        <div class="modal fade" id="job_modal" tabindex="-1" role="dialog" aria-labelledby="material_modal_title">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form id="job_form" method="post">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="job_modal_title"></h4>
+                        </div>
+                        <div class="modal-body" style="overflow:auto; max-height:600px;">
+                            <div>
+                                <h4><b>Material:</b>  <span id="job_material"></span></h4>
+                            </div>
+                            <div>
+                                <h4><b>Service:</b> <span id="job_service"></span></h4>
+                            </div>
+                            <div>
+                                <h4><b>Comment:</b> <span id="job_comment_"></span></h4>
+                            </div>
+                            <div>
+                                <h4><b>Start Time:</b> <span id="job_start_time"></span></h4>
+                            </div>
+                            <div>
+                                <h4><b>Start Time:</b> <span id="job_end_time"></span></h4>
+                            </div>
+                            <div>
+                                <h4><b>Duration:</b> <span id="job_duration"></span> min</h4>
+                            </div>
+                            <div>
+                                <h4><b>Laser User:</b> <span id="job_laser_user"></span></h4>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </div>
                     </form>
                 </div>

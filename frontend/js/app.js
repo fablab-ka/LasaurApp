@@ -194,8 +194,7 @@ function poll_job_history() {
       var job = history[i];
       var date = new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss');
       var duration = getDurationString(job.duration);
-
-      var row = $('<tr title="'+date+'" data-toggle="tooltip" data-placement="right"/>');
+      var row = $('<tr style="cursor: pointer;" title="'+date+'" data-toggle="tooltip" data-placement="right" onclick="show_job('+i+')"/>');
       row.append($('<td class="name" />').append($('<span/>').text(job.name)));
       row.append($('<td/>').append($('<span/>').text(duration)));
       $('#job_history tbody').append(row);
@@ -207,6 +206,26 @@ function poll_job_history() {
 
     $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
   });
+}
+
+//TODO: Write and check
+function show_job(i) {
+    $.getJSON('/jobs/history', function(history) {
+        job = history[i];
+        product =
+        $('#job_modal_title').text(job['name']);
+        $('#job_material').text(job['odoo_product_name']);
+        $('#job_service').text(job['odoo_service_name']);
+        $('#job_comment_').text(job['comment']);
+        $('#job_start_time').text(new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss'));
+        $('#job_end_time').text(new Date(job.end.$date).format('dd.mm.yyyy hh:MM:ss'));
+        duration = job['duration']
+        $('#job_duration').text(Math.floor(duration / 60) + ":" + ((duration % 60 < 10) ? "0" : "") + (duration % 60));
+        $('#job_laser_user').text(job['user_name']);
+
+        $('#job_modal').modal('show');
+
+    });
 }
 
 $('#login_btn').click(function(){
@@ -695,6 +714,9 @@ $(document).ready(function(){
 });
 
 useOdoo = true;
+//odoo_products;
+//odoo_services;
+
 
 $(document).ready(function() {
     //check if we use Odoo
@@ -720,6 +742,7 @@ $(document).ready(function() {
             comment_div.appendChild(comment_input);
 
             $.getJSON('/material/services', function(services) {
+//              odoo_services = services
               var select_list = document.getElementById('job_services');
               for (var i in services) {
                   var option = document.createElement("option");
@@ -732,6 +755,7 @@ $(document).ready(function() {
 
 
             $.getJSON('/material/products', function(products) {
+//              odoo_products = products;
               var select_list = document.getElementById("job_materials");
               for (var i in products) {
                   var option = document.createElement("option");
