@@ -240,13 +240,15 @@ def clean_id(id):
 
     return id.lower()
 
-state = "Access"
+state = "Uninitiated"
+
 
 def has_valid_id():
     if not USE_ID_CARD_ACCESS_RESTRICTION:
         return True
     id = clean_id(readid.getId())
     state = odooremote.check_access(id)
+    print(state)
     return state == "access"
 
 
