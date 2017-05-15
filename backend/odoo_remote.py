@@ -116,7 +116,7 @@ class OdooRemote():
         if self.dummy_mode or not self.use_odoo:
             return "access"
         if card_number == None:
-            return "no_id"
+            return "Missing ID Card"
         card_number = card_number.upper()
         card = filter(lambda x: x['card_id'] == card_number, self._id_cards)
         if len(card) != 1:
@@ -152,7 +152,7 @@ class OdooRemote():
                 self.user_level = 'free'
                 self.last_user = {'name':client['name'], 'id':client['id']}
                 return "access"
-        return False
+        return "User not allowed"
 
     def get_access(self):
         if self.get_access_rfid():
