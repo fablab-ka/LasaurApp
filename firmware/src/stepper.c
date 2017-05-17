@@ -263,7 +263,8 @@ ISR(TIMER1_COMPA_vect) {
     }      
     if (current_block->type == TYPE_LINE) {  // starting on new line block
       adjusted_rate = current_block->initial_rate;
-      acceleration_tick_counter = CYCLES_PER_ACCELERATION_TICK/2; // start halfway, midpoint rule.
+      //acceleration_tick_counter = CYCLES_PER_ACCELERATION_TICK/2; // start halfway, midpoint rule.
+      acceleration_tick_counter = CYCLES_PER_ACCELERATION_TICK >> 1; //PCAROLI: Never trust the optimizer
       adjust_speed( adjusted_rate ); // initialize cycles_per_step_event
       counter_x = -(current_block->step_event_count >> 1);
       counter_y = counter_x;
@@ -334,8 +335,8 @@ ISR(TIMER1_COMPA_vect) {
         } else if (step_events_completed == current_block->decelerate_after) {
             // reset counter, midpoint rule
             // makes sure deceleration is performed the same every time
-            acceleration_tick_counter = CYCLES_PER_ACCELERATION_TICK/2;
-                 
+            //acceleration_tick_counter = CYCLES_PER_ACCELERATION_TICK/2;
+            acceleration_tick_counter = CYCLES_PER_ACCELERATION_TICK >> 1; //PCAROLI: Never trust the optimizer   
         // decelerating
         } else if (step_events_completed >= current_block->decelerate_after) {
           if ( acceleration_tick() ) {  // scheduled speed change
@@ -410,12 +411,10 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 
-
-
 // This function determines an acceleration velocity change every CYCLES_PER_ACCELERATION_TICK by
 // keeping track of the number of elapsed cycles during a de/ac-celeration. The code assumes that
 // step_events occur significantly more often than the acceleration velocity iterations.
-static bool acceleration_tick() {
+static inline bool acceleration_tick() {
   acceleration_tick_counter += cycles_per_step_event;
   if(acceleration_tick_counter > CYCLES_PER_ACCELERATION_TICK) {
     acceleration_tick_counter -= CYCLES_PER_ACCELERATION_TICK;
@@ -428,7 +427,7 @@ static bool acceleration_tick() {
 
 // Configures the prescaler and ceiling of timer 1 to produce the given rate as accurately as possible.
 // Returns the actual number of cycles per interrupt
-static uint32_t config_step_timer(uint32_t cycles) {
+static inline uint32_t config_step_timer(uint32_t cycles) {
   uint16_t ceiling;
   uint16_t prescaler;
   uint32_t actual_cycles;
@@ -466,35 +465,33 @@ static uint32_t config_step_timer(uint32_t cycles) {
 }
 
 
-static void adjust_speed( uint32_t steps_per_minute ) {
+static inline void adjust_speed( uint32_t steps_per_minute ) {
   // steps_per_minute is typicaly just adjusted_rate
   if (steps_per_minute < MINIMUM_STEPS_PER_MINUTE) { steps_per_minute = MINIMUM_STEPS_PER_MINUTE; }
-  cycles_per_step_event = config_step_timer((CYCLES_PER_MICROSECOND*1000000*60)/steps_per_minute);
+  cycles_per_step_event = config_step_timer((CYCLES_PER_MICROSECOND*1000000l*60l)/steps_per_minute);
   // beam dynamics
   uint8_t adjusted_intensity = current_block->nominal_laser_intensity * 
-                               ((float)steps_per_minute/(float)current_block->nominal_rate);
-  uint8_t constrained_intensity = max(adjusted_intensity, 0);
+                                 ((float)steps_per_minute/(float)current_block->nominal_rate);
+  uint8_t constrained_intensity;
+  if(current_block->nominal_laser_intensity > 0) { //PCAROLI: Use at least 10% power
+    constrained_intensity = max(adjusted_intensity, MIN_LASER_INTENSITY * 255 / 100);
+  } else {
+    constrained_intensity = 0;
+  }
   control_laser_intensity(constrained_intensity);
 
-  #ifndef SYNRAD // don't change PWM for SYNRAD to avoid problems with tickle
-    // depending on intensity adapt PWM freq
-    // assuming: TCCR0A = _BV(COM0A1) | _BV(WGM00);  // phase correct PWM mode
-    if (constrained_intensity > 40) {
-      // set PWM freq to 3.9kHz
-      TCCR0B = _BV(CS01);
-    } else if (constrained_intensity > 10) {
-      // set PWM freq to 489Hz
-      TCCR0B = _BV(CS01) | _BV(CS00);
-    } else {
-      // set PWM freq to 122Hz
-      TCCR0B = _BV(CS02); 
-    }
-  #endif
+  if (constrained_intensity > 40) {
+    // set PWM freq to 3.9kHz
+    TCCR0B = _BV(CS01);
+  } else if (constrained_intensity > 10) {
+    // set PWM freq to 489Hz
+    TCCR0B = _BV(CS01) | _BV(CS00);
+  } else {
+    // set PWM freq to 122Hz
+    TCCR0B = _BV(CS02);
+  }
+  //TCCR0B = _BV(CS01); //PCAROLI: Since we use the intensity input of the tube, always use full frequency
 }
-
-
-
-
 
 static void homing_cycle(bool x_axis, bool y_axis, bool z_axis, bool reverse_direction, uint32_t microseconds_per_pulse) {
   

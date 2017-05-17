@@ -86,7 +86,7 @@ void control_init() {
 
 
 void control_laser_intensity(uint8_t intensity) {
-  #ifndef SYNRAD
+  #ifdef SYNRAD
     uint16_t temp = intensity;
     temp = temp * 200; //Adjust the maximum value to be 200, since we
     temp = temp >> 8;  //  only count to 200.

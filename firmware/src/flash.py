@@ -57,7 +57,7 @@ elif sys.platform == "linux" or sys.platform == "linux2":  #Linux
 # =============================================================================
 # No need to edit anything below this line
 
-SERIAL_PORT = None
+SERIAL_PORT = "usb"
 CONFIG_FILE = "lasaurapp.conf"
 GUESS_PPREFIX = "tty.usbmodem"
 
@@ -69,8 +69,10 @@ def build():
         PROGRAMMER = "usbtiny"    # use this for programmer
         SERIAL_OPTION = ""
     else:
-        PROGRAMMER = "arduino"    # use this for bootloader
-        SERIAL_OPTION = '-P %(port)s' % {'port':SERIAL_PORT}
+        #PROGRAMMER = "arduino"    # use this for bootloader
+        #SERIAL_OPTION = '-P %(port)s' % {'port':SERIAL_PORT}
+	PROGRAMMER = "avrisp2"
+	SERIAL_OPTION = ""
     BITRATE = "115200"
 
     BUILDNAME = "LasaurGrbl"

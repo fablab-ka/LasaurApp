@@ -28,13 +28,15 @@
 #define LASAURGRBL_VERSION "14.11b"
 // build for new driveboard hardware
 #define DRIVEBOARD
-
+//#define USE_Z_AXIS
 #define V1401
+
+#define MIN_LASER_INTENSITY 10 //(0-100%) Avoids uncut corners related to the laser tube not working when going under a power threshold 
 
 #define BAUD_RATE 57600
 // #define DEBUG_IGNORE_SENSORS  // set for debugging
 
-#define MICROSTEPS 10 // 10 for Gecko, 8 for most other stepper drivers
+#define MICROSTEPS 8 // 10 for Gecko, 8 for most other stepper drivers
 
 // #define SYNRAD        // define this, for using a Synrad 48-5 or similar
 /* When using a Synrad Laser instead of an RECI tube PWM shall have 5kHz with additional 1µs tickle
@@ -58,8 +60,8 @@
 #define CONFIG_PULSE_MICROSECONDS 5
 #define CONFIG_FEEDRATE 8000.0 // in millimeters per minute
 #define CONFIG_SEEKRATE 8000.0
-#define CONFIG_ACCELERATION 1800000.0 // mm/min^2, typically 1000000-8000000, divide by (60*60) to get mm/sec^2
-#define CONFIG_JUNCTION_DEVIATION 0.006 // mm
+#define CONFIG_ACCELERATION 1800000.0 // mm/min^2, typically 1000000-8000000, divide by (60*60) to get mm/sec^2, was 1800000.0
+#define CONFIG_JUNCTION_DEVIATION 0.006 // mm, was 0.006
 #define CONFIG_X_ORIGIN_OFFSET 5.0  // mm, x-offset of table origin from physical home
 #define CONFIG_Y_ORIGIN_OFFSET 5.0  // mm, y-offset of table origin from physical home
 #define CONFIG_Z_ORIGIN_OFFSET 0.0   // mm, z-offset of table origin from physical home
@@ -163,19 +165,19 @@
 // round-off can be great enough to cause problems and/or it's too fast for the Arduino. The correct
 // value for this parameter is machine dependent, so it's advised to set this only as high as needed.
 // Approximate successful values can range from 30L to 100L or more.
-#define ACCELERATION_TICKS_PER_SECOND 200L
+#define ACCELERATION_TICKS_PER_SECOND 200L //was 200
 
 // Minimum planner junction speed. Sets the default minimum speed the planner plans for at the end
 // of the buffer and all stops. This should not be much greater than zero and should only be changed
 // if unwanted behavior is observed on a user's machine when running at very slow speeds.
-#define ZERO_SPEED 0.0 // (mm/min)
+#define ZERO_SPEED 0.0 // (mm/min), was 0.0
 
 // Minimum stepper rate. Sets the absolute minimum stepper rate in the stepper program and never runs
 // slower than this value, except when sleeping. This parameter overrides the minimum planner speed.
 // This is primarily used to guarantee that the end of a movement is always reached and not stop to
 // never reach its target. This parameter should always be greater than zero.
-#define MINIMUM_STEPS_PER_MINUTE 1600U // (steps/min) - Integer value only
-// 1600 @ 32step_per_mm = 50mm/min
+#define MINIMUM_STEPS_PER_MINUTE 3600U // (steps/min) - Integer value only, was 1600
+// 3200 @ 72step_per_mm = 50mm/min
 
 
 #define X_AXIS 0
