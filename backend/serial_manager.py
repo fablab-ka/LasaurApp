@@ -9,6 +9,7 @@ from datetime import datetime
 from serial.tools import list_ports
 from serial import dummy_serial
 import datedecoder
+from odoo_remote import OdooRemote
 
 dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
@@ -17,11 +18,11 @@ dummy_serial.DEFAULT_RESPONSE = '\n'
 #extended Class of Lasersaur project
 class SerialManagerClass(object):
 
-    def __init__(self, accountingFile, influxConfig, dummyMode=False):
-
+    def __init__(self, accountingFile, influxConfig, odoo, dummyMode=False):
         self.device = None
         self.dummyMode = dummyMode
 
+        self.odoo = odoo
         self.rx_buffer = ""
         self.tx_buffer = ""
         self.tx_index = 0
@@ -56,8 +57,8 @@ class SerialManagerClass(object):
         self.accountingFile = accountingFile
         self.reset_accounting()
 
-        self.odoo_service = -1
-        self.odoo_product = -1
+        self.odoo_service = {'id':-1, 'name':'Error'}
+        self.odoo_product = {'id':-1, 'name':'Error'}
         self.job_comment = ""
 
         # Path to a json file, which stores the last n jobs.
@@ -121,6 +122,12 @@ class SerialManagerClass(object):
             'odoo_product_name': self.job_accounting['odoo_product_name'],
             'comment': self.job_accounting['comment']
         }
+
+        #Send the job information to Odoo
+
+        print(self.odoo)
+        if self.odoo:
+            self.odoo.helper.callAPI("/machine_management/registerUsage/123",job)
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs

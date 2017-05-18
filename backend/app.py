@@ -54,8 +54,9 @@ IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
 SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
 SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
-SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
 odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
+SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, odooremote, False)
+
 sensor_serial = None
 dummy_mode = False
 session_info = []
@@ -85,7 +86,7 @@ def pauseIfCardNotAvailable():
 def setDummyMode():
     odooremote.dummy_mode = True
     global SerialManager
-    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
+    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, odooremote, True)
     dummy_mode = True
 
 
@@ -211,10 +212,13 @@ def run_with_callback(host, port):
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
-            if sensor_serial and sensor_serial.inWaiting() > 10:
-                str = sensor_serial.readline().split(';')
-                for i in range(0, len(str), 1):
-                    sensor_values[i] = float(str[i])
+            try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
+                if sensor_serial and sensor_serial.inWaiting() > 10:
+                    str = sensor_serial.readline().split(';')
+                    for i in range(0, len(str), 1):
+                        sensor_values[i] = float(str[i])
+            except IOError:
+                print("Sensor Failure")
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)

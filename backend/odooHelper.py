@@ -3,11 +3,10 @@ from requests.auth import HTTPBasicAuth
 #import BeautifulSoup
 import re
 import json
+import datedecoder
 
 
 class OdooHelper:
-
-
 
     def __init__(self, username, password, url, db):
         self.username = username
@@ -30,13 +29,14 @@ class OdooHelper:
 
 
     def callAPI(self, path, data=None):
+        print("API call " + path)
         payload = None
         if data:
             try:
-                data = json.dumps(data)
+                data = json.dumps(data, default=datedecoder.default, indent=4, separators=(',', ': '))
             except:
+                print("data is not JSON-compatible: " + str(data))
                 data = None
-                print("data is not JSON-compatible: " + data)
         req = self.session.post(self.url + path, data={"csrf_token": self.csrf_token, "params": data})
         try:
             return json.loads(req.content)

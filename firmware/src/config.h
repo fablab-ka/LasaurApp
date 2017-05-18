@@ -39,7 +39,7 @@
 #define MICROSTEPS 8 // 10 for Gecko, 8 for most other stepper drivers
 
 // #define SYNRAD        // define this, for using a Synrad 48-5 or similar
-/* When using a Synrad Laser instead of an RECI tube PWM shall have 5kHz with additional 1µs tickle
+/* When using a Synrad Laser instead of an RECI tube PWM shall have 5kHz with additional 1ï¿½s tickle
    pulses in idle phases, to keep ionisation up
    tickle pulses must not exceed this limit nor shall the PWM frequency go higher than 5kHz to prevent
    unwanted laser fire
@@ -60,7 +60,7 @@
 #define CONFIG_PULSE_MICROSECONDS 5
 #define CONFIG_FEEDRATE 8000.0 // in millimeters per minute
 #define CONFIG_SEEKRATE 8000.0
-#define CONFIG_ACCELERATION 1800000.0 // mm/min^2, typically 1000000-8000000, divide by (60*60) to get mm/sec^2, was 1800000.0
+#define CONFIG_ACCELERATION 1800000.0 * 0.5 // mm/min^2, typically 1000000-8000000, divide by (60*60) to get mm/sec^2, was 1800000.0
 #define CONFIG_JUNCTION_DEVIATION 0.006 // mm, was 0.006
 #define CONFIG_X_ORIGIN_OFFSET 5.0  // mm, x-offset of table origin from physical home
 #define CONFIG_Y_ORIGIN_OFFSET 5.0  // mm, y-offset of table origin from physical home
