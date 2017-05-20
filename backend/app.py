@@ -219,6 +219,7 @@ def run_with_callback(host, port):
                         sensor_values[i] = float(str[i])
             except IOError:
                 print("Sensor Failure")
+                sensor_serial = None
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)

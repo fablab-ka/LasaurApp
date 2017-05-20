@@ -21,7 +21,12 @@ dictionary = {
     "PressEnterToStopJob": "Press ENTER to confirm stopping the current job.",
     "StopJob": "Stop Job!",
     "DoorIsOpen": "Door is open",
-    "ReallyStartJobWithOpenDoor": "Are you sure you want to start the job with an open Door?",
+    "ReallyStartJobWithOpenDoor": """Are you sure you want to start the job while the laser is not ready?
+        \nCheck the following points to ready the laser:
+        \n\nThe Door is closed
+        \nall 3 switches are in 'ON' posiotion
+        \nthe emergency stop is off (not glowing red)
+        \nthe fan had enough time to spin up""",
     "No": "No",
     "IKnowWhatImDoing": "Sure I know what I'm doing",
     "LaserJobs": "Laser Jobs",
