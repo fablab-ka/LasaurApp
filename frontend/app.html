@@ -514,6 +514,12 @@
                             <div style="float:left; width:50%">
                                 <h4>{{Material}}:</h4>
                                 <select id="job_materials" size="15" style="width: 80%"></select>
+
+                                <h4>Material Quantity:</h4>
+                                <div id="material_qty">
+                                    <input type="number" step="any" name="Material Qty" value="" id="job_material_qty_input"/>
+                                </div>
+
                             </div>
                             <div style="float:left; width:50%">
                                 <h4>{{Comment}}:</h4>
@@ -556,12 +562,15 @@
                             </div>
                         </div>
                         <div class="modal-footer">
+                            <button id="reset_pw_btn" type="button" class="btn ">Reset Password</button>
+                            <button id="create_account_btn" type="button" class="btn ">Create Account</button>
                             <button id="login_btn" type="button" class="btn btn-primary">Login</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
 
 
         <!-- Job Modal -->
@@ -576,6 +585,9 @@
                         <div class="modal-body" style="overflow:auto; max-height:600px;">
                             <div>
                                 <h4><b>Material:</b>  <span id="job_material"></span></h4>
+                            </div>
+                            <div>
+                                <h4><b>Material Quantity:</b>  <span id="job_material_qty"></span></h4>
                             </div>
                             <div>
                                 <h4><b>Service:</b> <span id="job_service"></span></h4>

@@ -24,9 +24,9 @@ dictionary = {
     "ReallyStartJobWithOpenDoor": """Are you sure you want to start the job while the laser is not ready?
         Check the following points to ready the laser: The Door is closed, 
         all 3 switches are in 'ON' position, the emergency stop is off (not glowing red),
-        and the fan had enough time to spin up""",
+        and the fan had enough time to spin up. Start job anyway?""",
     "No": "No",
-    "IKnowWhatImDoing": "Sure I know what I'm doing",
+    "IKnowWhatImDoing": "Sure, I know what I'm doing",
     "LaserJobs": "Laser Jobs",
     "FileImport": "File Import",
     "MoveJog": "Move/Jog",

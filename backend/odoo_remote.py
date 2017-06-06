@@ -1,16 +1,10 @@
 from __future__ import print_function
-import xmlrpclib
 import time
-import sys
-from smartcard.scard import *
-import json
 from odooHelper import *
 
 import traceback
 
 class OdooRemote():
-
-    #url = 'https://odoo.fablab-karlsruhe.de'
     url = None
     db = None
     username = 'admin'

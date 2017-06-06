@@ -1,63 +1,58 @@
 [![GetBadges Game](https://fablab-ka-lasaurapp.getbadges.io/shield/company/fablab-ka-lasaurapp)](https://fablab-ka-lasaurapp.getbadges.io/?ref=shield-game)
 
-LasaurApp
+LasaurApp (FabLab Karlsruhe)
 =========
+This is a fork of the official [Lasersaur](http://lasersaur.com) app.
 
-LasaurApp is the official [Lasersaur](http://lasersaur.com) app. It has all the functionality to operate this kind of laser cutter:
+It is tuned to run together with [Odoo](http://odoo.com) for administrative purposed, but can also be used as a standalone.
+To use the app with odoo, you need an instance of Odoo 10 running, and to install the module [machine_management](TODO Link).
 
-- load vector files and send them to the Lasersaur
-- file support for SVG, G-code (subset), DXF (subset)
-- GUI widget to move the laser head
-- pausing/continuing a job
-- firmware flashing
-- handy G-code programs for the optics calibration process
+Work in Progress
+=========
+  - Add Authentification with Odoo for Laser Customers (not Laser Users, as those are already auhentificated with their ID Card)
+  - Send Laser Job information to Odoo, currently only for logging.
 
-This app is written mostly in cross-platform, cross-browser Javascript and Python. This allows for very flexible setup. The backend can either run directly on the Lasersaur (Driveboard) or on the client computer. The frontend runs in a web browser either on the same client computer or on a tablet computer.
-
-When running on the Driveboard people can start using the 'saur' directly from their laptop without having to setup any software or drivers. This is done this way because we imagine laser cutters being shared in shops. We see people controlling laser cutters from their laptops and not wanting to go through annoying setup processes. Besides this, html-based GUIs are just awesome :)
-
-**DISCLAIMER:** Please be aware that operating a self-built laser cutter can be dangerous and requires full awareness of the risks involved. NORTD Labs does not warrant for any contents of the manual and does not assume any risks whatsoever with regard to the contents of this manual or the machine assembled by you. NORTD Labs further does not warrant for and does not assume any risks whatsoever with regard to any parts of the machine contained in this manual which are provided by third parties. You need to have the necessary experience in handling high-voltage electrical devices and class 4 laser beams to build the machine described in this manual. Otherwise you should seek professional advice for building the machine.
-
-
-How to Use this App
--------------------
+Planed
+=========
+  - Send Laser Job information to Odoo for payment purposes.
+  - Show estimated Laser Job duration and total job cost before starting the job.
 
 
-* make sure you have Python 2.7
-* copy `backend/config.json.example` to `backend/config.json`
-* run *python backend/app.py*
-* The GUI will open in a browser at *http://localhost:4444*
-  (supported are Firefox, Chrome, and likely future Safari 6+ or IE 10+)
-
-For more information see the [Lasersaur Software Setup Guide](http://www.lasersaur.com/manual/software).
+Finished
+=========
+  - Add materials that can be selected and have their own cutting parameters - materials are extracted from odoo
+  - Add ID Card authentification, Users are saved in odoo.
+  -
 
 
 
-Notes on Creating Standalone Apps
-----------------------------------
+Using the lasaurapp with odoo
+==========
+An instance of Odoo 10.0 is required.
+The module machine_management has to be installed
 
-With [PyInstaller](http://www.pyinstaller.org) it's possible to convert a python app to a standalone, single file executable. This allows us to make the setup process much easier and remove all the the prerequisites on the target machine (including python).
+The following models have to be created:
+  - Lab->Machine: This is the LaserSaur as seen in Odoo. Most parameters should be self-explanatory.
+    - 'name': "LaserSaur"
+    - 'status': "running" or "out of order"
+    - 'rules': "free for all" to allow anyone with an ID Card to use the Laser, "restricted" to only allow users in "users" and "owners" to use it, "no access" to disable access
+    - 'users': List of allowed Users. Each User should have an ID Card assigned to him
+    - 'owners': currently same as "users", they are the peaple responsible for the LaserSaur
+    - 'Product Tag 1': Used to tag products that are materials to be used with the Laser
+    - 'Product tag 2': Used to tag products functioning as services containing the cost per minute of the use
 
-From a shell/Terminal do the following:
+  - Stock->Products: There is an additional tab "machien stuff" added wich contains material parameters.
+    - 'parameter 1': Cut speed (mm/min)
+    - 'parameter 2': Cut intensity (0-100%)
+    - 'parameter 3': Engrave speed (mm/min)
+    - 'parameter 4': Engrave intensity (0-100%)
 
-* go to LasaurApp/other directory
-* run 'python pyinstaller/pyinstaller.py --onefile app.spec'
-* the executable will be other/dist/lasaurapp (or dist/lasaurapp.exe on Windows)
+  - Lab->ID-Card: Contains information about the ID Cards, cards have to be assigned to a user (res.partner) to be used. Currently only Serial Number authentification is used
+    - 'card number': Serial Number of the Card, currently used for authentification
+    - 'assigned client': the user (res.partner) to whom the Card belongs.
+    - 'status': only "active" cards are functional.
+    - 'card type': currently only "Serial Number" is supported
+  - Settings->Users:
+    You have to create a new User Account wich functions as the LaserSaur machine's user. It needs be in the security group "machine_users"
 
-Most of the setup for making this happen is in the app.spec file. Here all the accessory data and frontend files are listed for inclusion in the executable. In the actual code the data root directory can be found in 'sys._MEIPASS'.
 
-
-Notes on Testing on a Virtual Windows System
----------------------------------------------
-When running VirtualBox on OSX it has troubles accessing the USB port even when all the VirtualBox settings are correct. This is because OSX captures the device. To make it available in VirtualBox one has to unload it in OSX first. The following works for Arduino Unos:
-
-- sudo kextunload -b com.apple.driver.AppleUSBCDC
-
-After the VirtualBox session this can be undone with:
-
-- sudo kextload -b com.apple.driver.AppleUSBCDC
-
-For other USB devices thee following may be useful too:
-- sudo kextunload -b com.apple.driver.AppleUSBCDCWCM
-- sudo kextunload -b com.apple.driver.AppleUSBCDCACMData
-- sudo kextunload -b com.apple.driver.AppleUSBCDCACMControl

@@ -377,6 +377,10 @@ def material_set_service(id):
 def material_set_comment(comment=""):
     SerialManager.job_comment = str(comment)
 
+@app.route('/material/set_material_qty/<qty>')
+def material_set_comment(qty):
+    SerialManager.job_comment = float(qty)
+
 
 @app.route('/material/get_sell_mode')
 def get_sell_mode():

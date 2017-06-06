@@ -221,6 +221,7 @@ function show_job(i) {
         product =
         $('#job_modal_title').text(job['name']);
         $('#job_material').text(job['odoo_product_name']);
+        $('#job_material_qty').text(job['odoo_product_qty']);
         $('#job_service').text(job['odoo_service_name']);
         $('#job_comment_').text(job['comment']);
         $('#job_start_time').text(new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss'));
@@ -714,11 +715,11 @@ $(document).ready(function(){
 
 
  $('#material_modal').on('show.bs.modal', function (e) {
-    $("#job_comment_input").value = "";
+    $('#job_comment_input').val("");
+    $('#job_material_qty_input').val(1);
     $('#job_materials').val([]);
     //$('#job_services').val([]);
-    //TODO: Fix hard coded default
-    $('#job_services').val(20);
+    $('#job_services').val([]);
     //$("#job_services").val = [$("option[value='20']")];
     $('#material_selected').removeClass("btn-primary");
 });
@@ -848,11 +849,13 @@ $("#material_selected").click(function(e) {
       return;
     odoo_product = $('#job_materials').val();
     odoo_service = $('#job_services').val();
-    job_comment = document.querySelector('input[name = "job_comment_input"]').value;
+    job_comment = $('#job_comment_input').val();
+    job_material_qty = $('#job_material_qty_input').val();
 
     $.get("/material/set_product/" + odoo_product, function(e){ });
     $.get("/material/set_service/" + odoo_service, function(e){ });
     $.get("/material/set_comment/" + job_comment, function(e){ });
+    $.get("/material/set_material_qty/" + job_material_qty, function(e){ });
 
     $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
     $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
@@ -864,7 +867,9 @@ $("#material_selected").click(function(e) {
     //$('#material_selected').trigger("addToQueue");
 });
 
-
+$('#create_account_btn').click(function(){
+    window.open("http://127.0.0.1:8069/web/signup", "_blank");
+});
 
 
 /// PASSES //////////////////////////////////////

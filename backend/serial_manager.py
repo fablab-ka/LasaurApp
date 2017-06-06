@@ -60,6 +60,7 @@ class SerialManagerClass(object):
         self.odoo_service = {'id':-1, 'name':'Error'}
         self.odoo_product = {'id':-1, 'name':'Error'}
         self.job_comment = ""
+        self.job_material_qty = 1
 
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
@@ -87,12 +88,15 @@ class SerialManagerClass(object):
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name,
             'user_id'    : user['id'],
+            'client_id'  : user['id'],
+            'client_name': user['name'],
             'user_name'  : user['name'],
             'odoo_service': self.odoo_service['id'],
             'odoo_service_name': self.odoo_service['name'],
             'odoo_product': self.odoo_product['id'],
             'odoo_product_name': self.odoo_product['name'],
-            'comment'     : self.job_comment
+            'comment'     : self.job_comment,
+            'odoo_material_qty': self.job_material_qty
         }
         self.logger.info(
             "Start Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
@@ -116,18 +120,21 @@ class SerialManagerClass(object):
             'total': int(current_total + jobtime),
             'user_id': self.job_accounting['user_id'],
             'user_name': self.job_accounting['user_name'],
+            'client_id': self.job_accounting['client_id'],
+            'client_name': self.job_accounting['client_name'],
             'odoo_service_id': self.job_accounting['odoo_service'],
             'odoo_service_name': self.job_accounting['odoo_service_name'],
             'odoo_product_id': self.job_accounting['odoo_product'],
             'odoo_product_name': self.job_accounting['odoo_product_name'],
-            'comment': self.job_accounting['comment']
+            'comment': self.job_accounting['comment'],
+            'odoo_material_qty': self.job_accounting['odoo_material_qty']
         }
 
         #Send the job information to Odoo
 
         print(self.odoo)
         if self.odoo:
-            self.odoo.helper.callAPI("/machine_management/registerUsage/123",job)
+            self.odoo.helper.callAPI("/machine_management/registerUsage/",job)
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs

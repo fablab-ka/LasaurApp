@@ -1,6 +1,4 @@
 import requests
-from requests.auth import HTTPBasicAuth
-#import BeautifulSoup
 import re
 import json
 import datedecoder
