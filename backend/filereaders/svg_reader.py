@@ -14,7 +14,7 @@ logging.basicConfig()
 log = logging.getLogger("svg_reader")
 # log.setLevel(logging.DEBUG)
 # log.setLevel(logging.INFO)
-log.setLevel(logging.WARN)
+log.setLevel(logging.INFO)
 
 
 try:
@@ -144,6 +144,7 @@ class SVGReader:
         # parse xml
         svgRootElement = ET.fromstring(svgstring)
         tagName = self._tagReader._get_tag(svgRootElement)
+        inkscapeVersion = None
 
         if tagName != 'svg':
             log.error("Invalid file, no 'svg' tag found.")
@@ -165,6 +166,7 @@ class SVGReader:
             # get width, height, unit
             width_str = svgRootElement.attrib.get('width')
             height_str = svgRootElement.attrib.get('height')
+            inkscapeVersion = svgRootElement.attrib.get('{http://www.inkscape.org/namespaces/inkscape}version')
             if width_str and height_str:
                 width, width_unit = parseScalar(width_str)
                 height, height_unit = parseScalar(height_str)
@@ -201,7 +203,14 @@ class SVGReader:
                 self.px2mm = width/vb_w * 10
                 log.info("px2mm by svg cm unit")
             elif unit == 'px' or unit == '':
-                log.info("SVG with viewbox and width and height, but no real world units in width and height")
+                if (inkscapeVersion <> None) and inkscapeVersion.startswith('0.91'):
+                    self.px2mm = 25.4/90
+                    log.info("Inkscape 0.91 without units: 90dpi forced!")
+                elif (inkscapeVersion <> None) and inkscapeVersion.startswith('0.92'):
+                    self.px2mm = 25.4/96
+                    log.info("Inkscape 0.92 without units: 96dpi forced!")
+                else:
+                    log.info("SVG with viewbox and width and height, but no real world units in width and height")
             else:
                 pass
                 log.error("SVG with unsupported unit.")
