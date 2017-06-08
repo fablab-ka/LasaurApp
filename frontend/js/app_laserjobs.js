@@ -240,26 +240,22 @@ function addPasses(num) {
     if (passnum != 1) {
       margintop = 'margin-top:6px;'
     }
-    var html = '<div class="row" style="margin:0px; '+margintop+
-                  ' padding:4px; background-color:#eeeeee">' +
-                '<div class="form-inline" style="margin-bottom:0px">' +
-                  '<label>Pass '+ passnum +': </label>' +
-                  '<div class="input-group" style="margin-left:6px">' +
-                    '<input type="button" title="Cut" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
-                    '<input type="button" title="Engrave" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
-                    '<span class="input-group-addon" style="margin-right:-5px;">F</span>' +
-                    '<input type="text" maxlength="4" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +//+ app_settings.default_feedrate +
-                      '" title="feedrate 1-'+app_settings.max_seek_speed+
-                      'mm/min" style="width:40px" data-delay="500">' +
-                  '</div>' +
-                  '<div class="input-group" style="margin-left:6px">' +
-                    '<span class="input-group-addon" style="margin-right:-5px;">%</span>' +
-                    '<input class="intensity" maxlength="3" id="intensity_' + passnum + '" type="textfield" value="'+
-                      default_cut_intensity + //app_settings.default_intensity +
-                      '" title="intensity 0-100%" style="width:35px;" data-delay="500">' +
-                  '</div>' +
-                  '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
-                '</div>' +
+    var html = '<div class="row" style="margin:0px; '+margintop+' padding:3px; background-color:#eeeeee">' +
+                 '<div class="form-inline" style="margin-bottom:0px">' +
+	               '<div class="input-group" style="margin-left:6px">' +
+                     '<label>Pass '+ passnum +':&nbsp; </label>' +
+                     '<input type="button" title="Cut" onclick="setDefaultCut('+passnum+')" id="btn_cut_'+passnum+'" value="C"/>' +
+                     '<input type="button" title="Engrave" onclick="setDefaultEngrave('+passnum+')" id="btn_engrave_'+passnum+'" value="E"/>' +
+                     '<label style="margin-left:8px;margin-right:4px;">F</label>' +
+                     '<input type="text" maxlength="4" id="feedrate_' + passnum + '" class="feedrate" value="'+ default_cut_speed +//+ app_settings.default_feedrate +
+                       '" title="feedrate 1-'+app_settings.max_seek_speed+
+                       'mm/min" style="width:40px;border:0;" data-delay="500">' +
+                     '<label style="margin-left:8px;margin-right:4px;"">%</label>' +
+                     '<input class="intensity" maxlength="3" id="intensity_' + passnum + '" type="text" value="'+
+                       default_cut_intensity + //app_settings.default_intensity +
+                       '" title="intensity 0-100%" style="width:35px;border:0;" data-delay="500">' +
+                   '<span class="colorbtns" style="margin-left:6px;">'+buttons+'</span>' +
+                 '</div>' +
               '</div>';
     // $('#passes').append(html);
     var pass_elem = $(html).appendTo('#passes');
