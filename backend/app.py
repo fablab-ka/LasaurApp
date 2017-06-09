@@ -64,7 +64,7 @@ SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
 erp = Odoo(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
 # odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
-SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, erp.remote, False)
+SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
 
 sensor_serial = None
 dummy_mode = False
@@ -95,7 +95,7 @@ def pauseIfCardNotAvailable():
 def setDummyMode():
     erp.remote.dummy_mode = True
     global SerialManager
-    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, erp.remote, True)
+    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
     dummy_mode = True
 
 
