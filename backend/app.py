@@ -1,26 +1,34 @@
 from __future__ import print_function
+
+import argparse
 import base64
-import sys, os, time
-import glob, json, argparse, copy
+import copy
+import glob
+import os
+import os.path
+import sys
 import tempfile
+import time
+import uuid
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
+
 import bottle
-from bottle import Bottle, static_file, request, debug, template
-from serial_manager import SerialManagerClass
-from flash import flash_upload, reset_atmega
+import i18n
+import readid
+import serial
+from backend.erp.odoo.odooHelper import *
+from backend.erp.odoo.odoo_remote import OdooRemote
+from backend.erp.odoo.odoo import Odoo
+#from bottle import Bottle, static_file, request, debug, template
+from bottle import *
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
-from serial import SerialException
-import serial
-import i18n
 import datedecoder
-import readid
-import os.path
-from odoo_remote import OdooRemote
-import SensorShield
-import uuid
-from odooHelper import *
+from flash import flash_upload, reset_atmega
+from serial import SerialException
+from serial_manager import SerialManagerClass
+import json
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
 
@@ -54,8 +62,9 @@ IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
 SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
 SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
-odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
-SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, odooremote, False)
+erp = Odoo(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
+# odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
+SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, erp.remote, False)
 
 sensor_serial = None
 dummy_mode = False
@@ -84,9 +93,9 @@ def pauseIfCardNotAvailable():
 
 
 def setDummyMode():
-    odooremote.dummy_mode = True
+    erp.remote.dummy_mode = True
     global SerialManager
-    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, odooremote, True)
+    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, erp.remote, True)
     dummy_mode = True
 
 
@@ -253,7 +262,7 @@ def has_valid_id():
         return True
     id = clean_id(readid.getId())
     global state
-    state = odooremote.check_access(id)
+    state = erp.remote.check_access(id)
     return state == "access"
 
 
@@ -337,23 +346,28 @@ def jobs_history():
     return json.dumps(jobs, default=datedecoder.default)
 
 
+@app.route('/erp/getData')
+def erp_get_data():
+    return json.dumps(erp.getWebInfo(), default=datedecoder.default)
+
+@app.route('/erp/setData', method='POST')
+def erp_set_data():
+    data = json.loads(request.body.read())
+    print(data)
+
+
 @app.route('/material/services')
 def material_services():
-    return json.dumps(odooremote.services, default=datedecoder.default)
+    return json.dumps(erp.remote.services, default=datedecoder.default)
 
 
 @app.route('/material/products')
 def material_products():
-    return json.dumps(odooremote.materials, default=datedecoder.default)
+    return json.dumps(erp.remote.materials, default=datedecoder.default)
 
 
 @app.route('/sensors/names')
 def get_sensorNames():
-    # out = list()
-    # for i in range(0, len(sensor_names), 1):
-    #    out += [(zip({"Name", "Value", "Symbol"}, {sensor_names[i], sensor_values[i], ""}))]
-    # print(dict(zip(["Sensor"] * len(sensor_names), out)))
-    # print(out)
     return json.dumps((sensor_names))
 
 
@@ -364,13 +378,13 @@ def get_sensor_values():
 
 @app.route('/material/set_service/<id>')
 def material_set_service(id):
-    SerialManager.odoo_service = odooremote.get_service(id)
+    SerialManager.odoo_service = erp.remote.get_service(id)
     return None
 
 
 @app.route('/material/set_product/<id>')
 def material_set_service(id):
-    SerialManager.odoo_product = odooremote.get_product(id)
+    SerialManager.odoo_product = erp.remote.get_product(id)
 
 @app.route('/material/set_comment/')
 @app.route('/material/set_comment/<comment>')
@@ -742,7 +756,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name, odooremote.last_user)
+        SerialManager.queue_gcode(job_data, name, erp.remote.last_user)
         return "__ok__"
     else:
         return "serial disconnected"

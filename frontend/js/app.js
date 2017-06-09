@@ -725,8 +725,8 @@ $(document).ready(function(){
 });
 
 useOdoo = true;
-//odoo_products;
-//odoo_services;
+var odoo_products = null;
+var odoo_services = null;
 
 
 $(document).ready(function() {
@@ -734,19 +734,14 @@ $(document).ready(function() {
         if(e=="true"){
              $('#account_drop').html(getCookie("user_name") + '<b class="caret">');
         }
-
     });
+
     //check if we use Odoo
     $.get('/material/get_sell_mode', function(e){
         useOdoo = e;
         odoo_product = 0;
         odoo_service = 0;
         job_comment = "";
-
-        default_cut_speed = 1500;
-        default_cut_intensity = 100;
-        default_engrave_speed = 4000;
-        default_engrave_intensity = 30;
 
         if(useOdoo == 'True'){
             var comment_div = document.getElementById('job_comment');
@@ -758,46 +753,28 @@ $(document).ready(function() {
             comment_input.setAttribute("value", "");
             comment_div.appendChild(comment_input);
 
-            $.getJSON('/material/services', function(services) {
-//              odoo_services = services
-              var select_list = document.getElementById('job_services');
-              for (var i in services) {
-                  var option = document.createElement("option");
-                  option.value = services[i].id;
-                  option.innerHTML = services[i].name;
-                  select_list.appendChild(option);
-              }
-              select_list.size = Math.min(services.length, select_list.size);
-            });
+            $.getJSON('/erp/getData', function(data){
+                odoo_services = data['services'];
+                var select_list = document.getElementById('job_services');
+                for (var i in odoo_services) {
+                    var option = document.createElement("option");
+                    option.value = odoo_services[i]['id'];
+                    option.innerHTML = odoo_services[i]['name'];
+                    select_list.appendChild(option);
+                }
+                select_list.size = Math.min(odoo_services.length, select_list.size);
 
-
-            $.getJSON('/material/products', function(products) {
-//              odoo_products = products;
-              var select_list = document.getElementById("job_materials");
-              for (var i in products) {
-                  var option = document.createElement("option");
-                  option.value = products[i].id;
-                  option.innerHTML = products[i].name;
-                  select_list.appendChild(option);
-              }
-              select_list.size = Math.min(products.length, select_list.size);
+                odoo_products = data['materials'];
+                var select_list = document.getElementById("job_materials");
+                for (var i in odoo_products) {
+                    var option = document.createElement("option");
+                    option.value = odoo_products[i]['id'];
+                    option.innerHTML = odoo_products[i]['name'];
+                    select_list.appendChild(option);
+                }
             });
         }
     });
-
-//    if(!useOdoo) {
-//
-//
-//        $.get("/material/set_product/" + odoo_product, function(e){ });
-//        $.get("/material/set_service/" + odoo_service, function(e){ });
-//        $.get("/material/set_comment/" + job_comment, function(e){ });
-//
-//        return();
-//    }
-
-//    $("#material_modal").modal('hide');
-//        return;
-//    }
   });
 
 var material_form_ok_clickable = false;
@@ -818,10 +795,10 @@ $('#job_materials').dblclick(function(){
         $("#material_selected").trigger("click");
 });
 
-default_cut_speed = 1500;
-default_cut_intensity = 100;
-default_engrave_speed = 4000;
-default_engrave_intensity = 20;
+var default_cut_speed = 1500;
+var default_cut_intensity = 100;
+var default_engrave_speed = 4000;
+var default_engrave_intensity = 20;
 
 var sensor_names = null;
 var sensor_values = null;
@@ -845,32 +822,81 @@ setInterval(function(){
 }, 3000);
 
 $("#material_selected").click(function(e) {
+
     if(!material_form_ok_clickable)
       return;
-    odoo_product = $('#job_materials').val();
-    odoo_service = $('#job_services').val();
+    odoo_product_id = $('#job_materials').val();
+    odoo_service_id = $('#job_services').val();
     job_comment = $('#job_comment_input').val();
     job_material_qty = $('#job_material_qty_input').val();
+
+    for(var product in odoo_products) {
+        if(odoo_products[product]['id'] == odoo_product_id) {
+            product = odoo_products[product];
+            default_cut_speed = product['machine_parameter_1'];
+            default_cut_intensity = product['machine_parameter_2'];
+            default_engrave_speed = product['machine_parameter_3'];
+            default_engrave_intensity = product['machine_parameter_4'];
+        }
+    }
 
     $.get("/material/set_product/" + odoo_product, function(e){ });
     $.get("/material/set_service/" + odoo_service, function(e){ });
     $.get("/material/set_comment/" + job_comment, function(e){ });
     $.get("/material/set_material_qty/" + job_material_qty, function(e){ });
 
-    $.get("/material/getCutSpeed", function(e) {default_cut_speed = e;});
-    $.get("/material/getCutIntensity", function(e) {default_cut_intensity = e;});
-    $.get("/material/getEngraveSpeed", function(e) {default_engrave_speed = e;});
-    $.get("/material/getEngraveIntensity", function(e) {default_engrave_intensity = e;});
-
     $("#material_modal").modal('hide');
-
-    //$('#material_selected').trigger("addToQueue");
 });
 
 $('#create_account_btn').click(function(){
     window.open("http://127.0.0.1:8069/web/signup", "_blank");
 });
 
+$('#job_submit').click(function(e) {
+    if ($('#door_status_btn').hasClass('btn-warning')) {
+        return;
+    }
+    send_erp_data();
+});
+
+$('#really_submit_job_btn').click(function() {
+  send_erp_data();
+});
+
+function send_erp_data() {
+    data_odoo_product = null;
+    for(var i in odoo_products) {
+        if(odoo_products[i]['id'] == odoo_product_id) {
+            data_odoo_product = odoo_products[i];
+            break;
+        }
+    }
+    data_odoo_service = null;
+    for(var i in odoo_services) {
+        if(odoo_services[i]['id'] == odoo_service_id) {
+            data_odoo_service = odoo_services[i];
+            break;
+        }
+    }
+    data = JSON.stringify({
+        'odoo_service': data_odoo_service['id'],
+        'odoo_service_name': data_odoo_service['name'],
+        'odoo_product': data_odoo_product['id'],
+        'odoo_product_name': data_odoo_product['name'],
+        'comment': job_comment,
+        'material_qty': job_material_qty,
+    });
+
+    alert(data)
+
+    $.post('/erp/setData', data=data);
+}
+
+//# 'user_id'    : user['id'],
+//# 'client_id'  : user['id'],
+//# 'client_name': user['name'],
+//# 'user_name'  : user['name'],
+//# 'odoo_material_qty': self.job_material_qty
 
 /// PASSES //////////////////////////////////////
 

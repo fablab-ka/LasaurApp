@@ -1,15 +1,16 @@
 from __future__ import print_function
+
 import os
 import sys
 import time
-import serial
-import json
-from remotelogger import RemoteLogger
 from datetime import datetime
-from serial.tools import list_ports
-from serial import dummy_serial
+
 import datedecoder
-from odoo_remote import OdooRemote
+import json
+import serial
+from remotelogger import RemoteLogger
+from serial import dummy_serial
+from serial.tools import list_ports
 
 dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
@@ -18,11 +19,10 @@ dummy_serial.DEFAULT_RESPONSE = '\n'
 #extended Class of Lasersaur project
 class SerialManagerClass(object):
 
-    def __init__(self, accountingFile, influxConfig, odoo, dummyMode=False):
+    def __init__(self, accountingFile, influxConfig, dummyMode=False):
         self.device = None
         self.dummyMode = dummyMode
 
-        self.odoo = odoo
         self.rx_buffer = ""
         self.tx_buffer = ""
         self.tx_index = 0
@@ -57,11 +57,6 @@ class SerialManagerClass(object):
         self.accountingFile = accountingFile
         self.reset_accounting()
 
-        self.odoo_service = {'id':-1, 'name':'Error'}
-        self.odoo_product = {'id':-1, 'name':'Error'}
-        self.job_comment = ""
-        self.job_material_qty = 1
-
         # Path to a json file, which stores the last n jobs.
         # stop_accounting is limiting the array size to a constant value
         if os.path.isfile(self.accountingFile):
@@ -76,9 +71,7 @@ class SerialManagerClass(object):
 
         self.logger.info("Init Accounting")
 
-    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>', user={'name':'unknown', 'id':'0'}):
-        if user == None:
-            user = {'name':'unknown', 'id':'0'}
+    def start_accounting(self, num_gcode_lines=0, job_name='<unnamed>'):
         # initialize all accounting data, get start time, write log information
         self.job_accounting = {
             'running'    : True,
@@ -87,16 +80,6 @@ class SerialManagerClass(object):
             'start_job'  : datetime.now(),
             'gcode_lines': num_gcode_lines,
             'job_name'   : job_name,
-            'user_id'    : user['id'],
-            'client_id'  : user['id'],
-            'client_name': user['name'],
-            'user_name'  : user['name'],
-            'odoo_service': self.odoo_service['id'],
-            'odoo_service_name': self.odoo_service['name'],
-            'odoo_product': self.odoo_product['id'],
-            'odoo_product_name': self.odoo_product['name'],
-            'comment'     : self.job_comment,
-            'odoo_material_qty': self.job_material_qty
         }
         self.logger.info(
             "Start Accounting: gcode-lines:", self.job_accounting['gcode_lines'],
@@ -118,23 +101,23 @@ class SerialManagerClass(object):
             'duration': jobtime,
             'lines': self.job_accounting['gcode_lines'],
             'total': int(current_total + jobtime),
-            'user_id': self.job_accounting['user_id'],
-            'user_name': self.job_accounting['user_name'],
-            'client_id': self.job_accounting['client_id'],
-            'client_name': self.job_accounting['client_name'],
-            'odoo_service_id': self.job_accounting['odoo_service'],
-            'odoo_service_name': self.job_accounting['odoo_service_name'],
-            'odoo_product_id': self.job_accounting['odoo_product'],
-            'odoo_product_name': self.job_accounting['odoo_product_name'],
-            'comment': self.job_accounting['comment'],
-            'odoo_material_qty': self.job_accounting['odoo_material_qty']
+            # 'user_id': self.job_accounting['user_id'],
+            # 'user_name': self.job_accounting['user_name'],
+            # 'client_id': self.job_accounting['client_id'],
+            # 'client_name': self.job_accounting['client_name'],
+            # 'odoo_service_id': self.job_accounting['odoo_service'],
+            # 'odoo_service_name': self.job_accounting['odoo_service_name'],
+            # 'odoo_product_id': self.job_accounting['odoo_product'],
+            # 'odoo_product_name': self.job_accounting['odoo_product_name'],
+            # 'comment': self.job_accounting['comment'],
+            # 'odoo_material_qty': self.job_accounting['odoo_material_qty']
         }
 
         #Send the job information to Odoo
 
-        print(self.odoo)
-        if self.odoo:
-            self.odoo.helper.callAPI("/machine_management/registerUsage/",job)
+        # print(self.odoo)
+        # if self.odoo:
+        #     self.odoo.helper.callAPI("/machine_management/registerUsage/",job)
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs

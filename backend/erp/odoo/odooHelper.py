@@ -1,7 +1,7 @@
 import requests
 import re
-import json
-import datedecoder
+import backend.json
+import backend.datedecoder
 
 
 class OdooHelper:
@@ -31,13 +31,13 @@ class OdooHelper:
         payload = None
         if data:
             try:
-                data = json.dumps(data, default=datedecoder.default, indent=4, separators=(',', ': '))
+                data = backend.json.dumps(data, default=backend.datedecoder.default, indent=4, separators=(',', ': '))
             except:
                 print("data is not JSON-compatible: " + str(data))
                 data = None
         req = self.session.post(self.url + path, data={"csrf_token": self.csrf_token, "params": data})
         try:
-            return json.loads(req.content)
+            return backend.json.loads(req.content)
         except ValueError:
             print("Couldn't decode JSON Element")
             return False

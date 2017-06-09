@@ -1,8 +1,11 @@
 from __future__ import print_function
-import time
-from odooHelper import *
 
+import time
 import traceback
+import json
+
+from backend.erp.odoo.odooHelper import *
+
 
 class OdooRemote():
     url = None
@@ -31,16 +34,6 @@ class OdooRemote():
     materials = None
     services = None
 
-
-    #def main(self):
-    #    self.init()
-    #    while(True):
-    #        self.get_access()
-    #        if self._mode == 'error':
-    #            return False
-    #        #if self.mode == 'backup':
-    #            #TODO: Try to go live again
-    #        time.sleep(1)
 
     def __init__(self, username, password, url, db, use_odoo):
         self.username = username
