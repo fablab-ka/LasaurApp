@@ -302,7 +302,7 @@ class SerialManagerClass(object):
         self.tx_buffer += gcode_processed
         self.job_active = True
         if (self.status['ready'] == False) and (len(lines) > 10):
-            self.start_accounting(len(lines), name, user_id) # as soon, as jobname is vailable, can be passed as second param
+            self.start_accounting(len(lines), name) # as soon, as jobname is vailable, can be passed as second param
 
     def cancel_queue(self):
         self.tx_buffer = ""
