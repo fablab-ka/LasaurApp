@@ -887,7 +887,7 @@ function send_erp_data() {
         'material_qty': job_material_qty,
     });
 
-    alert(data)
+//    alert(data)
 
     $.post('/erp/setData', data=data);
 }

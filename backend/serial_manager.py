@@ -22,6 +22,7 @@ class SerialManagerClass(object):
     def __init__(self, accountingFile, influxConfig, dummyMode=False):
         self.device = None
         self.dummyMode = dummyMode
+        self.job_additional_data = None
 
         self.rx_buffer = ""
         self.tx_buffer = ""
@@ -112,6 +113,13 @@ class SerialManagerClass(object):
             # 'comment': self.job_accounting['comment'],
             # 'odoo_material_qty': self.job_accounting['odoo_material_qty']
         }
+
+        if self.job_additional_data:
+            job.update(self.job_additional_data)
+            self.job_additional_data = None
+
+        if self.erp:
+            self.erp.
 
         #Send the job information to Odoo
 

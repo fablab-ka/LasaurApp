@@ -13,3 +13,6 @@ class Odoo:
             'materials': self.remote.materials,
         }
         return out
+
+    # def setInfo(self, info):
+

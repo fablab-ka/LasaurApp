@@ -353,6 +353,7 @@ def erp_get_data():
 @app.route('/erp/setData', method='POST')
 def erp_set_data():
     data = json.loads(request.body.read())
+    SerialManager.job_additional_data = data
     print(data)
 
 
