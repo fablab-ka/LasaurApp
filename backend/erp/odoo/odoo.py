@@ -23,6 +23,7 @@ class Odoo:
 
     def setInfo(self, info):
         info['client_id'] = info['user_id']
+        info['odoo_material_qty'] = 1
 
         if self.get_con_status():
             self.remote.helper.callAPI("/machine_management/registerUsage/", info)
