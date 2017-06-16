@@ -22,7 +22,7 @@ class Odoo:
         return out
 
     def setInfo(self, info):
-        list['client_id'] = list['user_id']
+        info['client_id'] = info['user_id']
 
         if self.get_con_status():
             self.remote.helper.callAPI("/machine_management/registerUsage/", info)
