@@ -118,10 +118,11 @@ class SerialManagerClass(object):
             job.update(self.job_additional_data)
             self.job_additional_data = None
 
-        # if self.erp:
-        #     self.erp.
+        # Send the job information to Odoo
+        if self.erp:
+            self.erp.setInfo(job)
 
-        #Send the job information to Odoo
+
 
         # print(self.odoo)
         # if self.odoo:

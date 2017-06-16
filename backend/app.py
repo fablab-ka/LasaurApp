@@ -1,14 +1,9 @@
 from __future__ import print_function
 
 import argparse
-import base64
 import copy
 import glob
-import os
 import os.path
-import sys
-import tempfile
-import time
 import uuid
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
@@ -18,9 +13,7 @@ import i18n
 import readid
 import serial
 from backend.erp.odoo.odooHelper import *
-from backend.erp.odoo.odoo_remote import OdooRemote
 from backend.erp.odoo.odoo import Odoo
-#from bottle import Bottle, static_file, request, debug, template
 from bottle import *
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
@@ -63,8 +56,8 @@ SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
 SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 
 erp = Odoo(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
-# odooremote = OdooRemote(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB, ODOO_USE)
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
+SerialManager.erp = erp
 
 sensor_serial = None
 dummy_mode = False
@@ -95,7 +88,7 @@ def pauseIfCardNotAvailable():
 def setDummyMode():
     erp.remote.dummy_mode = True
     global SerialManager
-    SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, True)
+    SerialManager.dummyMode = True
     dummy_mode = True
 
 
@@ -353,6 +346,8 @@ def erp_get_data():
 @app.route('/erp/setData', method='POST')
 def erp_set_data():
     data = json.loads(request.body.read())
+    data['user_id'] = erp.remote.last_user['id']
+    data['user_name'] = erp.remote.last_user['name']
     SerialManager.job_additional_data = data
     print(data)
 
