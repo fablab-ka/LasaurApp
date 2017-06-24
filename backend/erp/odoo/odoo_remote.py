@@ -48,6 +48,7 @@ class OdooRemote():
     def init(self):
         print("Initializing Odoo remote connection")
         if self.dummy_mode:
+            self.helper = OdooHelper(self.username, self.password, self.url, self.db)
             self.last_user = {'name':'Max Mustermann', 'id':'0'}
         try:
             self.helper = OdooHelper(self.username, self.password, self.url, self.db)

@@ -87,7 +87,7 @@ dictionary = {
     "NoIntensityForMove": "no laser intensity for move required",
     "Sensors": "Sensors",
     "Material_Selection": "Material Selection",
-    "Comment": "Comment",
+    "Comment": "(optional) Comment",
     "Laser_usage": "Laser usage",
     "Material": "Material",
 }

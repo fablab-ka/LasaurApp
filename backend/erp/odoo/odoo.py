@@ -12,7 +12,7 @@ class Odoo:
         self.remote = odoo_remote.OdooRemote(username, password, url, db, True)
 
     def get_con_status(self):
-        return self.remote._mode
+        return self.remote._mode == 'odoo'
 
     def getWebInfo(self):
         out = {
@@ -22,6 +22,8 @@ class Odoo:
         return out
 
     def setInfo(self, info):
+        if info['user_id'] < 3:
+            info['user_id'] = 3
         info['client_id'] = info['user_id']
         info['odoo_material_qty'] = 1
 

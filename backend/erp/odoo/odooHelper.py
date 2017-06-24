@@ -27,7 +27,6 @@ class OdooHelper:
 
 
     def callAPI(self, path, data=None):
-        print("API call " + path)
         payload = None
         if data:
             try:
@@ -39,5 +38,4 @@ class OdooHelper:
         try:
             return backend.json.loads(req.content)
         except ValueError:
-            print("Couldn't decode JSON Element")
             return False

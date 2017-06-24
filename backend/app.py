@@ -349,7 +349,6 @@ def erp_set_data():
     data['user_id'] = erp.remote.last_user['id']
     data['user_name'] = erp.remote.last_user['name']
     SerialManager.job_additional_data = data
-    print(data)
 
 
 @app.route('/material/services')

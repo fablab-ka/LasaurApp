@@ -229,7 +229,7 @@ function show_job(i) {
         duration = job['duration']
         $('#job_duration').text(Math.floor(duration / 60) + ":" + ((duration % 60 < 10) ? "0" : "") + (duration % 60));
         $('#job_laser_user').text(job['user_name']);
-
+        $('#job_laser_client').text(job['client'])
         $('#job_modal').modal('show');
 
     });
@@ -674,7 +674,7 @@ $(document).ready(function(){
 
         var row = $('<tr/>');
         row.append($('<td />').append($('<span class="cell row-1" />').text(job.name).attr('data-original-title', job.name)));
-        row.append($('<td />').append($('<span class="cell row-2" />').text(job.user_id)));
+        row.append($('<td />').append($('<span class="cell row-2" />').text(job.client)));
         row.append($('<td />').append($('<span class="cell row-3" />').text(start_date)));
         row.append($('<td />').append($('<span class="cell row-4" />').text(end_date)));
         //row.append($('<td />').append($('<span class="cell row-5" />').text(job.lines)));
@@ -744,14 +744,14 @@ $(document).ready(function() {
         job_comment = "";
 
         if(useOdoo == 'True'){
-            var comment_div = document.getElementById('job_comment');
-            comment_div.innerHTML = "Comment: ";
-            var comment_input = document.createElement("input");
-            comment_input.setAttribute("id", "job_comment_input");
-            comment_input.setAttribute("type", "text");
-            comment_input.setAttribute("name", "job_comment_input");
-            comment_input.setAttribute("value", "");
-            comment_div.appendChild(comment_input);
+//            var comment_div = document.getElementById('job_comment');
+//            comment_div.innerHTML = "Comment: ";
+//            var comment_input = document.createElement("input");
+//            comment_input.setAttribute("id", "job_comment_input");
+//            comment_input.setAttribute("type", "text");
+//            comment_input.setAttribute("name", "job_comment_input");
+//            comment_input.setAttribute("value", "");
+//            comment_div.appendChild(comment_input);
 
             $.getJSON('/erp/getData', function(data){
                 odoo_services = data['services'];
@@ -779,8 +779,8 @@ $(document).ready(function() {
 
 var material_form_ok_clickable = false;
 
-$('#material_form').change(function(){
-    if($('#job_materials').val() != null && $('#job_services').val() != null) {
+$('#material_form').on('input',function(){
+    if($('#job_materials').val() != null && $('#job_services').val() != null && $('#job_client_input').val() != "") {
         material_form_ok_clickable = true;
         $('#material_selected').addClass("btn-primary");
     } else {
@@ -829,6 +829,7 @@ $("#material_selected").click(function(e) {
     odoo_service_id = $('#job_services').val();
     job_comment = $('#job_comment_input').val();
     job_material_qty = $('#job_material_qty_input').val();
+    job_client = $('#job_client_input').val();
 
     for(var product in odoo_products) {
         if(odoo_products[product]['id'] == odoo_product_id) {
@@ -840,10 +841,10 @@ $("#material_selected").click(function(e) {
         }
     }
 
-    $.get("/material/set_product/" + odoo_product, function(e){ });
-    $.get("/material/set_service/" + odoo_service, function(e){ });
-    $.get("/material/set_comment/" + job_comment, function(e){ });
-    $.get("/material/set_material_qty/" + job_material_qty, function(e){ });
+//    $.get("/material/set_product/" + odoo_product, function(e){ });
+//    $.get("/material/set_service/" + odoo_service, function(e){ });
+//    $.get("/material/set_comment/" + job_comment, function(e){ });
+//    $.get("/material/set_material_qty/" + job_material_qty, function(e){ });
 
     $("#material_modal").modal('hide');
 });
@@ -885,18 +886,13 @@ function send_erp_data() {
         'odoo_product_name': data_odoo_product['name'],
         'comment': job_comment,
         'material_qty': job_material_qty,
+        'client': job_client
     });
 
 //    alert(data)
 
     $.post('/erp/setData', data=data);
 }
-
-//# 'user_id'    : user['id'],
-//# 'client_id'  : user['id'],
-//# 'client_name': user['name'],
-//# 'user_name'  : user['name'],
-//# 'odoo_material_qty': self.job_material_qty
 
 /// PASSES //////////////////////////////////////
 
