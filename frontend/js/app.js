@@ -782,6 +782,7 @@ var material_form_ok_clickable = false;
 $('#material_form').on('input',function(){
     if($('#job_materials').val() != null && $('#job_services').val() != null && $('#job_client_input').val() != "") {
         material_form_ok_clickable = true;
+
         $('#material_selected').addClass("btn-primary");
     } else {
         material_form_ok_clickable = false;
