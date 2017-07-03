@@ -22,7 +22,7 @@ class Odoo:
         return out
 
     def setInfo(self, info):
-        if info['user_id'] < 3:
+        if not info['user_id']:
             info['user_id'] = 3
         info['client_id'] = info['user_id']
         info['odoo_material_qty'] = 1
