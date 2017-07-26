@@ -14,7 +14,10 @@ class OdooHelper:
 
         #Open Session with Odoo
         self.session = requests.session()
-        req1 = self.session.get(self.url + "/web?db=" + self.db)
+        if db:
+            req1 = self.session.get(self.url + "/web?db=" + self.db)
+        else:
+            req1 = self.session.get(self.url + "/web")
         self.csrf_token = re.findall(r'name="csrf_token" value="(.+?)"', req1.content)
         payload = {
             "login": self.username,

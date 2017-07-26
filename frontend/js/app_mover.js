@@ -132,7 +132,9 @@ $(document).ready(function(){
     }
   }
 
-
+$$("#offset_area").change(function(){
+    alert($("#offset_area").left);
+});
 
 
   $("#cutting_area").mousedown(function() {

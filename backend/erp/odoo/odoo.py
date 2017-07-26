@@ -12,6 +12,7 @@ class Odoo:
         self.remote = odoo_remote.OdooRemote(username, password, url, db, True)
 
     def get_con_status(self):
+    def get_con_status(self):
         return self.remote._mode == 'odoo'
 
     def getWebInfo(self):
