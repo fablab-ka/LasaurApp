@@ -132,7 +132,7 @@ $(document).ready(function(){
     }
   }
 
-$$("#offset_area").change(function(){
+$("#offset_area").change(function(){
     alert($("#offset_area").left);
 });
 
