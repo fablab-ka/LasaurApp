@@ -8,10 +8,9 @@ import os
 class Odoo:
     remote = None
 
-    def __init__(self, username, password, url, db,):
+    def __init__(self, username, password, url, db):
         self.remote = odoo_remote.OdooRemote(username, password, url, db, True)
 
-    def get_con_status(self):
     def get_con_status(self):
         return self.remote._mode == 'odoo'
 
