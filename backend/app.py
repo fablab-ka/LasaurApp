@@ -163,12 +163,6 @@ def run_with_callback(host, port):
     print("Serial is set to %d bps" % BITSPERSECOND)
     print("Point your browser to: ")
     print("http://%s:%d/      (local)" % ('127.0.0.1', port))
-    # if host == '':
-    # try:
-    #         print "http://%s:%d/   (public)" % (socket.gethostbyname(socket.gethostname()), port)
-    #     except socket.gaierror:
-    #         # print "http://beaglebone.local:4444/      (public)"
-    #         pass
     print("Use Ctrl-C to quit.")
     print("-----------------------------------------------------------------------------")
     print("")
@@ -214,14 +208,14 @@ def run_with_callback(host, port):
         try:
             SerialManager.send_queue_as_ready()
             server.handle_request()
-            try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
-                if sensor_serial and sensor_serial.inWaiting() > 10:
-                    str = sensor_serial.readline().split(';')
-                    for i in range(0, len(str), 1):
-                        sensor_values[i] = float(str[i])
-            except IOError:
-                print("Sensor Failure")
-                sensor_serial = None
+            # try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
+            #     if sensor_serial and sensor_serial.inWaiting() > 10:
+            #         str = sensor_serial.readline().split(';')
+            #         for i in range(0, len(str), 1):
+            #             sensor_values[i] = float(str[i])
+            # except IOError:
+            #     print("Sensor Failure")
+            #     sensor_serial = None
             pauseIfCardNotAvailable()
 
             time.sleep(0.0004)
@@ -229,6 +223,7 @@ def run_with_callback(host, port):
             break
     print("\nShutting down...")
     SerialManager.close()
+
 
 
 def clean_id(id):
