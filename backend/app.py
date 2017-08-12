@@ -22,6 +22,8 @@ from flash import flash_upload, reset_atmega
 from serial import SerialException
 from serial_manager import SerialManagerClass
 import json
+# import WatchDogTimer
+import signal
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
 
@@ -206,8 +208,10 @@ def run_with_callback(host, port):
     server.timeout = 0
     while 1:
         try:
+            signal.alarm(5)
             SerialManager.send_queue_as_ready()
             server.handle_request()
+            signal.alarm(0)
             # try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
             #     if sensor_serial and sensor_serial.inWaiting() > 10:
             #         str = sensor_serial.readline().split(';')

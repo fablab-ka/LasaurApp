@@ -24,7 +24,9 @@ Finished
   - Add ID Card authentification, Users are saved in odoo.
   -
 
-
+Installing
+==========
+  - pip install requests
 
 Using the lasaurapp with odoo
 ==========
