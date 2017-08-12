@@ -208,7 +208,7 @@ def run_with_callback(host, port):
     server.timeout = 0
     while 1:
         try:
-            signal.alarm(5)
+            signal.alarm(20)
             SerialManager.send_queue_as_ready()
             server.handle_request()
             signal.alarm(0)
