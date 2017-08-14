@@ -463,10 +463,10 @@ class SerialManagerClass(object):
                 self.status['ready'] = False
                 sys.stdout.write(line + "\n")
                 sys.stdout.flush()
-            else:
-                if not self.dummyMode:
-                    sys.stdout.write(".")
-                sys.stdout.flush()
+            #else:
+            #    if not self.dummyMode:
+            #        sys.stdout.write(".")
+            #    sys.stdout.flush()
 
             if 'N' in line:
                 self.status['bad_number_format_error'] = True
