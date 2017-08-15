@@ -22,7 +22,7 @@ from flash import flash_upload, reset_atmega
 from serial import SerialException
 from serial_manager import SerialManagerClass
 import json
-# import WatchDogTimer
+import DebugHelper
 import signal
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
@@ -206,9 +206,12 @@ def run_with_callback(host, port):
 
     sys.stdout.flush()  # make sure everything gets flushed
     server.timeout = 0
+
+    DebugHelper.init()
+
     while 1:
         try:
-            signal.alarm(20)
+            DebugHelper.reset()
             SerialManager.send_queue_as_ready()
             server.handle_request()
             signal.alarm(0)
