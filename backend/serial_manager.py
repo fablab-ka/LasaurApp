@@ -11,6 +11,7 @@ import serial
 from remotelogger import RemoteLogger
 from serial import dummy_serial
 from serial.tools import list_ports
+import DebugHelper
 
 dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
@@ -354,6 +355,7 @@ class SerialManagerClass(object):
             try:
                 ### receiving
                 chars = self.device.read(self.RX_CHUNK_SIZE)
+                DebugHelper.log("Data recieved:" + chars)
                 if len(chars) > 0:
                     ## check for data request
                     if self.ready_char in chars:
@@ -387,6 +389,7 @@ class SerialManagerClass(object):
                                 sys.stdout.flush()
                         except serial.SerialTimeoutException:
                             # skip, report
+                            DebugHelper.log("SerialTimeoutException")
                             actuallySent = 0  # assume nothing has been sent
                             sys.stdout.write("\nsend_queue_as_ready: writeTimeoutError\n")
                             sys.stdout.flush()
@@ -428,6 +431,7 @@ class SerialManagerClass(object):
 
                 else:
                     if self.job_active:
+                        DebugHelper.log("job active")
                         # print("\nG-code stream finished!")
                         # print("(LasaurGrbl may take some extra time to finalize)")
                         self.tx_buffer = ""
@@ -439,13 +443,16 @@ class SerialManagerClass(object):
                         self.status['ready'] = True
             except OSError:
                 # Serial port appears closed => reset
+                DebugHelper.log("OSError")
                 self.close()
             except ValueError:
                 # Serial port appears closed => reset
+                DebugHelper.log("ValueError")
                 self.close()
         else:
             # serial disconnected
             self.status['ready'] = False
+            DebugHelper.log("Serial Disconnect")
 
     def process_status_line(self, line):
         if '#' in line[:3]:

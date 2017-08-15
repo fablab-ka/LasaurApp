@@ -212,8 +212,14 @@ def run_with_callback(host, port):
     while 1:
         try:
             DebugHelper.reset()
+            DebugHelper.log("Cycle started!")
+            DebugHelper.log("started SerialManager.send_queue_as_ready()")
             SerialManager.send_queue_as_ready()
+            DebugHelper.log("finished SerialManager.send_queue_as_ready()")
+            DebugHelper.log("started server.handle_request()")
             server.handle_request()
+            DebugHelper.log("started server.handle_request()")
+            DebugHelper.log("Cycle ended!")
             signal.alarm(0)
             # try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
             #     if sensor_serial and sensor_serial.inWaiting() > 10:

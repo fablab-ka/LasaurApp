@@ -7,9 +7,9 @@ alarmInterval = 20
 
 def log(content):
     global cache
-    cache += datetime.datetime.now().time()
+    cache += str(datetime.datetime.now().time())
     cache += ": "
-    cache += content
+    cache += str(content)
     cache += "\n"
 
 
