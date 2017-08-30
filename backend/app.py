@@ -453,7 +453,15 @@ def login():
     if not login_password:
         return "Password missing"
     helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
-    uid = helper.callAPI('/machine_management/getCurrentUser', {'tset': 2})
+    if not helper.connected:
+        #Could not connect to Odoo - trust the users to be serious and don't check password
+        #ToDo: Do something better
+        user = erp.remote.get_user(login_email)
+        if user == -1:
+            return "Odoo down, user not locally known!"
+        uid = user['id']
+    else:
+        uid = helper.callAPI('/machine_management/getCurrentUser', {'tset': 2})
     if not uid:
         return "Couldn't find Odoo User"
     info = {

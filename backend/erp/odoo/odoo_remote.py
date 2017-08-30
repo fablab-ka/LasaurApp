@@ -12,11 +12,11 @@ class OdooRemote():
     db = None
     username = 'admin'
     password = 'admin'
-    machine_name = 'LaserSaur' #TODO get machine name from Odoo (new machine field)
-    user_level = None
-    unlock_time = 5 #how many seconds is the machine unlocked?
-    dummy_mode = False
-    sell_mode = False
+    # machine_name = 'LaserSaur' #TODO get machine name from Odoo (new machine field)
+    # user_level = None
+    # unlock_time = 5 #how many seconds is the machine unlocked?
+    # dummy_mode = False
+    # sell_mode = False
     last_user = {'name':'Max Mustermann', 'id':0}
     use_odoo = False
 
@@ -143,14 +143,22 @@ class OdooRemote():
                 return "access"
         return "User not allowed"
 
-    def get_access(self):
-        if self.get_access_rfid():
-            self._last_acces = time.time()
-            return True
-        else:
-            if (time.time() - self._last_acces) < self.unlock_time:
-                return True
-        return False
+    # def get_access(self):
+    #     if self.get_access_rfid():
+    #         self._last_acces = time.time()
+    #         return True
+    #     else:
+    #         if (time.time() - self._last_acces) < self.unlock_time:
+    #             return True
+    #     return False
+
+    def get_user(self, email):
+        if not self.use_odoo:
+            return -1
+        out = filter(lambda user: user['email'] == email, self._users)
+        if len(out) != 1:
+            return -1
+        return out[0]
 
     def get_product(self, id):
         if not self.use_odoo:

@@ -11,6 +11,7 @@ class OdooHelper:
         self.password = password
         self.url = url
         self.db = db
+        self.connected = False
 
         #Open Session with Odoo
         self.session = requests.session()
@@ -25,6 +26,9 @@ class OdooHelper:
             "csrf_token": self.csrf_token,
         }
         req2 = self.session.post(self.url + "/web/login", data=payload)
+
+        if req2.status_code == 200:
+            self.connected = True
 
         #TODO find way of checking if /web/login or /web get reached
 
