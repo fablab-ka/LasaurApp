@@ -52,7 +52,7 @@ class OdooRemote():
             self.last_user = {'name':'Max Mustermann', 'id':'0'}
         try:
             self.helper = OdooHelper(self.username, self.password, self.url, self.db)
-            self._machine = self.helper.callAPI("/machine_management/getMachine/2")#TODO: find out index somehow
+            self._machine = self.helper.callAPI("/machine_management/getMachine/")#TODO: find out index somehow
             print(self._machine)
             self._id_cards = self.helper.callAPI("/machine_management/getIdCards/")
             self._users = self.helper.callAPI("/machine_management/getUsers/")
