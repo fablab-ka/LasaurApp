@@ -240,11 +240,7 @@ $(document).ready(function(){
   // setting up add to queue button
   $("#import_to_queue").click(function(e) {
     if (!(DataHandler.isEmpty())) {
-      //if(!useOdoo) {
         addToQueue();
-//      } else {
-//        $('#material_modal').modal();
-//      }
     } else {
       $().uxmessage('warning', "no data");
     }

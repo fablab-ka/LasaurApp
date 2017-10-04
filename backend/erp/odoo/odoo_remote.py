@@ -17,10 +17,10 @@ class OdooRemote():
     # unlock_time = 5 #how many seconds is the machine unlocked?
     # dummy_mode = False
     # sell_mode = False
-    last_user = {'name':'Max Mustermann', 'id':0}
-    use_odoo = False
+    # last_user = {'name':'Max Mustermann', 'id':0}
+    # use_odoo = False
 
-    _common = None
+    # _common = None
     _uid = None
     _models = None
     _mode = None

@@ -88,9 +88,9 @@ def pauseIfCardNotAvailable():
 
 
 def setDummyMode():
-    erp.remote.dummy_mode = True
     global SerialManager
     SerialManager.dummyMode = True
+    global dummy_mode
     dummy_mode = True
 
 
@@ -263,8 +263,12 @@ def has_valid_id():
         return True
     id = clean_id(readid.getId())
     global state
-    state = erp.remote.check_access(id)
-    return state == "access"
+    if dummy_mode:
+        state = "dummy"
+        return True
+    else:
+        state = erp.check_access(id)
+        return state == "access"
 
 
 app = Bottle()
@@ -354,19 +358,19 @@ def erp_get_data():
 @app.route('/erp/setData', method='POST')
 def erp_set_data():
     data = json.loads(request.body.read())
-    data['user_id'] = erp.remote.last_user['id']
-    data['user_name'] = erp.remote.last_user['name']
+    data['user_id'] = erp.last_user['id']
+    data['user_name'] = erp.last_user['name']
     SerialManager.job_additional_data = data
 
 
 @app.route('/material/services')
 def material_services():
-    return json.dumps(erp.remote.services, default=datedecoder.default)
+    return json.dumps(erp.services, default=datedecoder.default)
 
 
 @app.route('/material/products')
 def material_products():
-    return json.dumps(erp.remote.materials, default=datedecoder.default)
+    return json.dumps(erp.materials, default=datedecoder.default)
 
 
 @app.route('/sensors/names')
@@ -381,13 +385,13 @@ def get_sensor_values():
 
 @app.route('/material/set_service/<id>')
 def material_set_service(id):
-    SerialManager.odoo_service = erp.remote.get_service(id)
+    SerialManager.odoo_service = erp.get_service(id)
     return None
 
 
 @app.route('/material/set_product/<id>')
 def material_set_service(id):
-    SerialManager.odoo_product = erp.remote.get_product(id)
+    SerialManager.odoo_product = erp.get_product(id)
 
 @app.route('/material/set_comment/')
 @app.route('/material/set_comment/<comment>')
@@ -456,14 +460,14 @@ def login():
     if not helper.connected:
         #Could not connect to Odoo - trust the users to be serious and don't check password
         #ToDo: Do something better
-        user = erp.remote.get_user(login_email)
+        user = erp.get_user(login_email)
         if user == -1:
             return "Odoo down, user not locally known!"
         uid = user['id']
     else:
         uid = helper.callAPI('/machine_management/getCurrentUser', {'tset': 2})
     if not uid:
-        return "Couldn't find Odoo User"
+        return "Couldn't find Odoo User " + login_email
     info = {
         'session_id': str(uuid.uuid4()),
         'odoo_uid': uid,
@@ -767,7 +771,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name, erp.remote.last_user)
+        SerialManager.queue_gcode(job_data, name, erp.last_user)
         return "__ok__"
     else:
         return "serial disconnected"

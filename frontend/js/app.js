@@ -9,7 +9,7 @@ var progress_not_yet_done_flag = false;
 function getCookie(name) {
   var value = "; " + document.cookie;
   var parts = value.split("; " + name + "=");
-  if (parts.length == 2) return parts.pop().split(";").shift();
+  if (parts.length == 2) return parts.pop().split(";").shift().slice(1, -1);
 }
 
 (function($){
@@ -720,6 +720,11 @@ $(document).ready(function(){
     $('#job_materials').val([]);
     //$('#job_services').val([]);
     $('#job_services').val([]);
+    $.post('/checkLogin', function(e){
+        if(e=="true")
+            $('#job_client_input').val(getCookie('user_name'));
+    });
+
     //$("#job_services").val = [$("option[value='20']")];
     $('#material_selected').removeClass("btn-primary");
 });
@@ -744,15 +749,6 @@ $(document).ready(function() {
         job_comment = "";
 
         if(useOdoo == 'True'){
-//            var comment_div = document.getElementById('job_comment');
-//            comment_div.innerHTML = "Comment: ";
-//            var comment_input = document.createElement("input");
-//            comment_input.setAttribute("id", "job_comment_input");
-//            comment_input.setAttribute("type", "text");
-//            comment_input.setAttribute("name", "job_comment_input");
-//            comment_input.setAttribute("value", "");
-//            comment_div.appendChild(comment_input);
-
             $.getJSON('/erp/getData', function(data){
                 odoo_services = data['services'];
                 var select_list = document.getElementById('job_services');
@@ -841,12 +837,6 @@ $("#material_selected").click(function(e) {
             default_engrave_intensity = product['machine_parameter_4'];
         }
     }
-
-//    $.get("/material/set_product/" + odoo_product, function(e){ });
-//    $.get("/material/set_service/" + odoo_service, function(e){ });
-//    $.get("/material/set_comment/" + job_comment, function(e){ });
-//    $.get("/material/set_material_qty/" + job_material_qty, function(e){ });
-
     $("#material_modal").modal('hide');
 });
 
@@ -855,10 +845,16 @@ $('#create_account_btn').click(function(){
 });
 
 $('#job_submit').click(function(e) {
-    if ($('#door_status_btn').hasClass('btn-warning')) {
-        return;
-    }
-    send_erp_data();
+     $.post('/checkLogin', function(e){
+        if(e == "true") {
+            if ($('#door_status_btn').hasClass('btn-warning')) {
+                return;
+            }
+            send_erp_data();
+        } else {
+            $("#login_modal").modal('show');
+        }
+        });
 });
 
 $('#really_submit_job_btn').click(function() {
