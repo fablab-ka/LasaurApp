@@ -29,6 +29,9 @@ class OdooHelper:
 
         if req2.status_code == 200:
             self.connected = True
+            print("Odoo connection established!")
+        else:
+            print(req2.status_code)
 
         #TODO find way of checking if /web/login or /web get reached
 

@@ -78,13 +78,13 @@ else:
     GUESS_PREFIX = "no prefix"
 
 
-def pauseIfCardNotAvailable():
-    global lastCardCheck
-    if USE_ID_CARD_ACCESS_RESTRICTION:
-        if (time.time() - lastCardCheck) > IDCARD_TIMEOUT:
-            lastCardCheck = time.time()
-            if not has_valid_id():
-                SerialManager.set_pause(True)
+# def pauseIfCardNotAvailable():
+#     global lastCardCheck
+#     if USE_ID_CARD_ACCESS_RESTRICTION:
+#         if (time.time() - lastCardCheck) > IDCARD_TIMEOUT:
+#             lastCardCheck = time.time()
+#             if not has_valid_id():
+#                 SerialManager.set_pause(True)
 
 
 def setDummyMode():
@@ -229,7 +229,7 @@ def run_with_callback(host, port):
             # except IOError:
             #     print("Sensor Failure")
             #     sensor_serial = None
-            pauseIfCardNotAvailable()
+            # pauseIfCardNotAvailable()
 
             time.sleep(0.0004)
         except KeyboardInterrupt:
@@ -238,37 +238,36 @@ def run_with_callback(host, port):
     SerialManager.close()
 
 
+# def clean_id(id):
+#     if not isinstance(id, basestring):
+#         return None
+#     # remove comment
+#     id = id.split('#', 1)[0]
+#
+#     # remove separators
+#     id = id.replace('-', '')
+#     id = id.replace(':', '')
+#     id = id.replace(' ', '')
+#
+#     # remove any left over whitespace
+#     id = id.strip()
+#
+#     return id.lower()
 
-def clean_id(id):
-    if not isinstance(id, basestring):
-        return None
-    # remove comment
-    id = id.split('#', 1)[0]
-
-    # remove separators
-    id = id.replace('-', '')
-    id = id.replace(':', '')
-    id = id.replace(' ', '')
-
-    # remove any left over whitespace
-    id = id.strip()
-
-    return id.lower()
-
-state = "Uninitiated"
+# state = "Uninitiated"
 
 
-def has_valid_id():
-    if not USE_ID_CARD_ACCESS_RESTRICTION:
-        return True
-    id = clean_id(readid.getId())
-    global state
-    if dummy_mode:
-        state = "dummy"
-        return True
-    else:
-        state = erp.check_access(id)
-        return state == "access"
+# def has_valid_id():
+#     if not USE_ID_CARD_ACCESS_RESTRICTION:
+#         return True
+#     id = clean_id(readid.getId())
+#     global state
+#     if dummy_mode:
+#         state = "dummy"
+#         return True
+#     else:
+#         state = erp.check_access(id)
+#         return state == "access"
 
 
 app = Bottle()
@@ -323,8 +322,8 @@ def library_list_handler():
 
 @app.route('/has_valid_id')
 def has_valid_id_handler():
-    return json.dumps(has_valid_id())
-
+    # return json.dumps(has_valid_id())
+    return True
 
 ### QUEUE
 
@@ -656,15 +655,15 @@ def get_status():
     status = copy.deepcopy(SerialManager.get_hardware_status())
     status['serial_connected'] = SerialManager.is_connected()
     status['lasaurapp_version'] = VERSION
-    status['has_valid_id'] = has_valid_id()
-    status['id_card_status'] = state
+    status['has_valid_id'] = True
+    status['id_card_status'] = "access"
     return json.dumps(status)
 
 
 @app.route('/pause/:flag')
 def set_pause(flag):
-    if not has_valid_id():
-        return '0'
+    # if not has_valid_id():
+    #     return '0'
 
     # returns pause status
     if flag == '1':
@@ -754,9 +753,9 @@ def build_firmware_handler():
 
 @app.route('/reset_atmega')
 def reset_atmega_handler():
-    if not has_valid_id():
-        print("ERROR: Failed to reset Chip. No Valid ID entered.")
-        return '0'
+    # if not has_valid_id():
+    #     print("ERROR: Failed to reset Chip. No Valid ID entered.")
+    #     return '0'
 
     reset_atmega(HARDWARE)
     return '1'
@@ -764,9 +763,9 @@ def reset_atmega_handler():
 
 @app.route('/gcode', method='POST')
 def job_submit_handler():
-    if not has_valid_id():
-        print("cancel gcode post request because no valid ID is inserted")
-        return "no_id"
+    # if not has_valid_id():
+    #     print("cancel gcode post request because no valid ID is inserted")
+    #     return "no_id"
 
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
