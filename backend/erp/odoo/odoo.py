@@ -104,7 +104,7 @@ class Odoo:
 
     def setInfo(self, info):
         if not info['user_id']:
-            info['user_id'] = -1 #ToDo better simply return?
+            info['user_id'] = -1 # ToDo better simply return?
         info['client_id'] = info['user_id']
         info['odoo_material_qty'] = 1
 

@@ -221,15 +221,14 @@ def run_with_callback(host, port):
             DebugHelper.log("started server.handle_request()")
             DebugHelper.log("Cycle ended!")
             signal.alarm(0)
-            # try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
-            #     if sensor_serial and sensor_serial.inWaiting() > 10:
-            #         str = sensor_serial.readline().split(';')
-            #         for i in range(0, len(str), 1):
-            #             sensor_values[i] = float(str[i])
-            # except IOError:
-            #     print("Sensor Failure")
-            #     sensor_serial = None
-            # pauseIfCardNotAvailable()
+            try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
+                if sensor_serial and sensor_serial.inWaiting() > 10:
+                    str = sensor_serial.readline().split(';')
+                    for i in range(0, len(str), 1):
+                        sensor_values[i] = float(str[i])
+            except IOError:
+                print("Sensor Failure")
+                # sensor_serial = None
 
             time.sleep(0.0004)
         except KeyboardInterrupt:
@@ -238,36 +237,10 @@ def run_with_callback(host, port):
     SerialManager.close()
 
 
-# def clean_id(id):
-#     if not isinstance(id, basestring):
-#         return None
-#     # remove comment
-#     id = id.split('#', 1)[0]
-#
-#     # remove separators
-#     id = id.replace('-', '')
-#     id = id.replace(':', '')
-#     id = id.replace(' ', '')
-#
-#     # remove any left over whitespace
-#     id = id.strip()
-#
-#     return id.lower()
-
-# state = "Uninitiated"
-
-
-# def has_valid_id():
-#     if not USE_ID_CARD_ACCESS_RESTRICTION:
-#         return True
-#     id = clean_id(readid.getId())
-#     global state
-#     if dummy_mode:
-#         state = "dummy"
-#         return True
-#     else:
-#         state = erp.check_access(id)
-#         return state == "access"
+def has_valid_id():
+    if not USE_ID_CARD_ACCESS_RESTRICTION:
+        return True
+    return True # Todo disable access when not loged in
 
 
 app = Bottle()
@@ -322,8 +295,7 @@ def library_list_handler():
 
 @app.route('/has_valid_id')
 def has_valid_id_handler():
-    # return json.dumps(has_valid_id())
-    return True
+    return json.dumps(has_valid_id())
 
 ### QUEUE
 
@@ -655,15 +627,15 @@ def get_status():
     status = copy.deepcopy(SerialManager.get_hardware_status())
     status['serial_connected'] = SerialManager.is_connected()
     status['lasaurapp_version'] = VERSION
-    status['has_valid_id'] = True
+    status['has_valid_id'] = has_valid_id()
     status['id_card_status'] = "access"
     return json.dumps(status)
 
 
 @app.route('/pause/:flag')
 def set_pause(flag):
-    # if not has_valid_id():
-    #     return '0'
+    if not has_valid_id():
+        return '0'
 
     # returns pause status
     if flag == '1':
@@ -753,9 +725,9 @@ def build_firmware_handler():
 
 @app.route('/reset_atmega')
 def reset_atmega_handler():
-    # if not has_valid_id():
-    #     print("ERROR: Failed to reset Chip. No Valid ID entered.")
-    #     return '0'
+    if not has_valid_id():
+        print("ERROR: Failed to reset Chip. No Valid ID entered.")
+        return '0'
 
     reset_atmega(HARDWARE)
     return '1'
@@ -763,9 +735,9 @@ def reset_atmega_handler():
 
 @app.route('/gcode', method='POST')
 def job_submit_handler():
-    # if not has_valid_id():
-    #     print("cancel gcode post request because no valid ID is inserted")
-    #     return "no_id"
+    if not has_valid_id():
+        print("cancel gcode post request because no valid ID is inserted")
+        return "no_id"
 
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')

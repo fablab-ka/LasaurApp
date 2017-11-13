@@ -18,6 +18,7 @@ def reset():
     global cache
     cache = ""
 
+
 def init():
     signal.signal(signal.SIGALRM, alarmHandler)
 

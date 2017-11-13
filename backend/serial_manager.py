@@ -17,7 +17,6 @@ dummy_serial.RESPONSES = {'\x14': '\x12'}
 dummy_serial.DEFAULT_RESPONSE = '\n'
 
 
-#extended Class of Lasersaur project
 class SerialManagerClass(object):
 
     def __init__(self, accountingFile, influxConfig, dummyMode=False):
@@ -133,7 +132,7 @@ class SerialManagerClass(object):
 
         self.lastJobs.insert(0, job)
         del self.lastJobs[200:] # only last 200 jobs
-        #CHANGE_ME
+
         with open(self.accountingFile, 'w') as json_file:
             json.dump(self.lastJobs, json_file, default=datedecoder.default, indent=4, separators=(',', ': '))
         self.logger.info(
