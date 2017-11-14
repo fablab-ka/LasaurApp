@@ -78,15 +78,6 @@ else:
     GUESS_PREFIX = "no prefix"
 
 
-# def pauseIfCardNotAvailable():
-#     global lastCardCheck
-#     if USE_ID_CARD_ACCESS_RESTRICTION:
-#         if (time.time() - lastCardCheck) > IDCARD_TIMEOUT:
-#             lastCardCheck = time.time()
-#             if not has_valid_id():
-#                 SerialManager.set_pause(True)
-
-
 def setDummyMode():
     global SerialManager
     SerialManager.dummyMode = True
@@ -329,8 +320,6 @@ def erp_get_data():
 @app.route('/erp/setData', method='POST')
 def erp_set_data():
     data = json.loads(request.body.read())
-    data['user_id'] = erp.last_user['id']
-    data['user_name'] = erp.last_user['name']
     SerialManager.job_additional_data = data
 
 
@@ -354,24 +343,25 @@ def get_sensor_values():
     return json.dumps(sensor_values)
 
 
-@app.route('/material/set_service/<id>')
-def material_set_service(id):
-    SerialManager.odoo_service = erp.get_service(id)
-    return None
-
-
-@app.route('/material/set_product/<id>')
-def material_set_service(id):
-    SerialManager.odoo_product = erp.get_product(id)
-
-@app.route('/material/set_comment/')
-@app.route('/material/set_comment/<comment>')
-def material_set_comment(comment=""):
-    SerialManager.job_comment = str(comment)
-
-@app.route('/material/set_material_qty/<qty>')
-def material_set_comment(qty):
-    SerialManager.job_comment = float(qty)
+# @app.route('/material/set_service/<id>')
+# def material_set_service(id):
+#     SerialManager.odoo_service = erp.get_service(id)
+#     return None
+#
+#
+# @app.route('/material/set_product/<id>')
+# def material_set_service(id):
+#     SerialManager.odoo_product = erp.get_product(id)
+#
+#
+# @app.route('/material/set_comment/')
+# @app.route('/material/set_comment/<comment>')
+# def material_set_comment(comment=""):
+#     SerialManager.job_comment = str(comment)
+#
+# @app.route('/material/set_material_qty/<qty>')
+# def material_set_comment(qty):
+#     SerialManager.job_comment = float(qty)
 
 
 @app.route('/material/get_sell_mode')
@@ -379,24 +369,24 @@ def get_sell_mode():
     return str(ODOO_USE)
 
 
-@app.route('/material/getCutSpeed')
-def get_cut_speed():
-    return SerialManager.odoo_product['machine_parameter_1']
-
-
-@app.route('/material/getCutIntensity')
-def get_cut_intensity():
-    return SerialManager.odoo_product['machine_parameter_2']
-
-
-@app.route('/material/getEngraveSpeed')
-def get_engrave_speed():
-    return SerialManager.odoo_product['machine_parameter_3']
-
-
-@app.route('/material/getEngraveIntensity')
-def get_engrave_intensity():
-    return SerialManager.odoo_product['machine_parameter_4']
+# @app.route('/material/getCutSpeed')
+# def get_cut_speed():
+#     return SerialManager.odoo_product['machine_parameter_1']
+#
+#
+# @app.route('/material/getCutIntensity')
+# def get_cut_intensity():
+#     return SerialManager.odoo_product['machine_parameter_2']
+#
+#
+# @app.route('/material/getEngraveSpeed')
+# def get_engrave_speed():
+#     return SerialManager.odoo_product['machine_parameter_3']
+#
+#
+# @app.route('/material/getEngraveIntensity')
+# def get_engrave_intensity():
+#     return SerialManager.odoo_product['machine_parameter_4']
 
 
 @app.route('/checkLogin', method='POST')

@@ -214,7 +214,6 @@ function poll_job_history() {
   });
 }
 
-//TODO: Write and check
 function show_job(i) {
     $.getJSON('/jobs/history', function(history) {
         job = history[i];
@@ -231,7 +230,6 @@ function show_job(i) {
         $('#job_laser_user').text(job['user_name']);
         $('#job_laser_client').text(job['client'])
         $('#job_modal').modal('show');
-
     });
 }
 
@@ -276,10 +274,8 @@ $(document).ready(function(){
     $('#tab_logs div.alert').show();
   });
 
-  //TODO finish writing
   $('#tab_sensors_button').click(function(){
     $('#sensor_values').show();
-    //$('#tab_sensors div.alert').show();
   });
 
   if (app_settings.custom_buttons) {
@@ -715,17 +711,14 @@ $(document).ready(function(){
 
 
  $('#material_modal').on('show.bs.modal', function (e) {
-    $('#job_comment_input').val("");
+//    $('#job_comment_input').val("");
     $('#job_material_qty_input').val(1);
     $('#job_materials').val([]);
-    //$('#job_services').val([]);
-    $('#job_services').val([]);
+//    $('#job_services').val([]);
     $.post('/checkLogin', function(e){
         if(e=="true")
             $('#job_client_input').val(getCookie('user_name'));
     });
-
-    //$("#job_services").val = [$("option[value='20']")];
     $('#material_selected').removeClass("btn-primary");
 });
 
@@ -778,7 +771,6 @@ var material_form_ok_clickable = false;
 $('#material_form').on('input',function(){
     if($('#job_materials').val() != null && $('#job_services').val() != null && $('#job_client_input').val() != "") {
         material_form_ok_clickable = true;
-
         $('#material_selected').addClass("btn-primary");
     } else {
         material_form_ok_clickable = false;
@@ -819,7 +811,6 @@ setInterval(function(){
 }, 3000);
 
 $("#material_selected").click(function(e) {
-
     if(!material_form_ok_clickable)
       return;
     odoo_product_id = $('#job_materials').val();
@@ -844,18 +835,18 @@ $('#create_account_btn').click(function(){
     window.open("http://127.0.0.1:8069/web/signup", "_blank");
 });
 
-$('#job_submit').click(function(e) {
-     $.post('/checkLogin', function(e){
-        if(e == "true") {
-            if ($('#door_status_btn').hasClass('btn-warning')) {
-                return;
-            }
-            send_erp_data();
-        } else {
-            $("#login_modal").modal('show');
-        }
-        });
-});
+//$('#job_submit').click(function(e) {
+//     $.post('/checkLogin', function(e){
+//        if(e == "true") {
+//            if ($('#door_status_btn').hasClass('btn-warning')) {
+//                return;
+//            }
+//            send_erp_data();
+//        } else {
+//            $("#login_modal").modal('show');
+//        }
+//        });
+//});
 
 $('#really_submit_job_btn').click(function() {
   send_erp_data();

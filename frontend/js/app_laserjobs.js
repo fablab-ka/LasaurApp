@@ -3,7 +3,6 @@ var maxNumPassWidgets = 32;
 var preview_canvas_obj = null;
 
 
-
 $('#material_selected').click(function(){
   if($('#material_selected').hasClass('btn-primary')) {
     setTimeout(continue_load_into_job_widget, 1000);
@@ -19,7 +18,6 @@ function load_into_job_widget(name, jobdata) {
   tmp_jobdata = jobdata;
   //TODO dont show when no odoo is used
   $.get('/material/get_sell_mode', function(e){
-    //alert(document.cookie);
     if(e == 'True') {
        $('#material_modal').modal();
      } else {
@@ -343,11 +341,8 @@ function writePassesWidget() {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-
-
 
 $(document).ready(function(){
 
