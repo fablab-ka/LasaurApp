@@ -437,7 +437,7 @@
                                 </div><!-- end of log tab -->
                                 <div id="tab_sensors" class="tab-pane">
                                     <div id="sensor_values">
-                                        test
+                                        Sensor values not available!
                                     </div>
                                 </div><!-- end of sensor tab-->
                                 <!--content end-->
@@ -514,12 +514,6 @@
                             <div style="float:left; width:50%">
                                 <h4>{{Material}}:</h4>
                                 <select id="job_materials" size="15" style="width: 80%"></select>
-
-                                <h4>Material Quantity:</h4>
-                                <div id="material_qty">
-                                    <input type="number" step="any" name="Material Qty" value="" id="job_material_qty_input"/>
-                                </div>
-
                             </div>
                             <div style="float:left; width:50%">
                                 <h4>{{Comment}}:</h4>
@@ -528,9 +522,9 @@
                                 </div>
                                 <h4>{{Laser_usage}}:</h4>
                                 <select id="job_services" size="4" style="width: 80%"></select>
-                                <h4>Your Name:</h4>
+                                <h4>Your Account:</h4>
                                 <div id="job_client">
-                                    <input type="text" name="Comment" value="" id="job_client_input" placeholder="John D"/>
+                                    <!--<input type="label" name="Comment" value="" id="job_client_input" placeholder="John D"/>-->
                                 </div>
                             </div>
                         </div>
@@ -575,7 +569,28 @@
             </div>
         </div>
 
-
+        <!-- Quantity Modal -->
+        <div class="modal fade" id="qty_modal" tabindex="-1" role="dialog" aria-labelledby="material_modal_title">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form id="qty_form" method="post">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="qty_modal_title">Select Quantity of Material used</h4>
+                        </div>
+                        <div class="modal-body" style="overflow:auto; max-height:600px;">
+                            <div>
+                                <h4>Quantity:</h4>
+                                <input type="number" id="qty_quantity" name="qty_quantity", value="1" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="qty_submit" type="button" class="btn btn-primary">Ok</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Job Modal -->
         <div class="modal fade" id="job_modal" tabindex="-1" role="dialog" aria-labelledby="material_modal_title">
@@ -630,8 +645,9 @@
         <script src="/js/settings.js"></script>
         <script src="/js/app_datahandler.js"></script>
         <script src="/js/app_canvas.js"></script>
-        <script src="/js/app.js"></script>
+
         <script src="/js/app_laserjobs.js"></script>
+        <script src="/js/app.js"></script>
         <script src="/js/app_mover.js"></script>
         <script src="/js/app_import.js"></script>
         <script src="/js/ripples.min.js"></script>

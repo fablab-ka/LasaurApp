@@ -9,21 +9,19 @@ $('#material_selected').click(function(){
   }
 });
 
-
 var tmp_name;
 var tmp_jobdata;
 function load_into_job_widget(name, jobdata) {
-  // create some empty pass widgets
-  tmp_name = name;
-  tmp_jobdata = jobdata;
-  //TODO dont show when no odoo is used
-  $.get('/material/get_sell_mode', function(e){
-    if(e == 'True') {
-       $('#material_modal').modal();
-     } else {
-       continue_load_into_job_widget();
-     }
-   });
+     $.post('/checkLogin', function(e){
+        if(e == "true") {
+            tmp_name = name;
+            tmp_jobdata = jobdata;
+            continue_load_into_job_widget();
+
+        } else {
+            $("#login_modal").modal('show');
+        }
+    });
 }
 
 function continue_load_into_job_widget() {
@@ -40,7 +38,6 @@ function continue_load_into_job_widget() {
   // scroll to top
   $('html, body').animate({scrollTop:0}, 400);
 }
-
 
 function refresh_preview(reload_data, read_passes_widget) {
   if (reload_data === true) {
@@ -92,9 +89,6 @@ function populate_job_library() {
       return true;
     });
   });
-  // .success(function() { alert("second success"); })
-  // .error(function() { alert("error"); })
-  // .complete(function() { alert("complete"); });
 }
 
 var queue_num_index = 1;
@@ -192,7 +186,6 @@ function add_to_job_queue(name) {
   });
 }
 
-
 function remove_queue_item(li_item) {
   // request a delete
   name = $(li_item).find('a span:first').text();
@@ -274,11 +267,9 @@ function addPasses(num) {
   $('#passes_container').show();
 }
 
-
 function getNumPasses() {
   return $('#passes').children().length;
 }
-
 
 function readPassesWidget() {
   DataHandler.clearPasses();
@@ -340,7 +331,6 @@ function writePassesWidget() {
   }
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -372,6 +362,10 @@ $(document).ready(function(){
       $(this).css('cursor', 'pointer');
     }
   );
+
+  $("#qty_submit").click(function(e) {
+    submit_job();
+  });
 
   function submit_job() {
     var data = $('#job_data').val();
@@ -405,41 +399,44 @@ $(document).ready(function(){
 
   $("#progressbar").hide();
 
-  $('#job_submit').click(function(e) {
-      if ($('#door_status_btn').hasClass('btn-warning')) {
-        $('#door_open_warning_modal').modal();
-      } else {
-        submit_job();
-      }
-    return false;
+//  $('#job_submit').click(function(e) {
+//      if ($('#door_status_btn').hasClass('btn-warning')) {
+//        $('#door_open_warning_modal').modal();
+//      } else {
+//        submit_job();
+//      }
+//    return false;
+//  });
+
+  $('#qty_submit').click(function(e) {
+    submit_job();
   });
 
+//  $('#really_submit_job_btn').click(function() {
+//      submit_job();
+//      $('#door_open_warning_modal').modal('hide');
+//  });
 
-  $('#really_submit_job_btn').click(function() {
-      submit_job();
-      $('#door_open_warning_modal').modal('hide');
-  });
 
-
-  $('#job_bbox_submit').tooltip();
-  $("#job_bbox_submit").click(function(e) {
-    DataHandler.setByJson($('#job_data').val());
-    if (readPassesWidget()) {
-      var job_bbox = DataHandler.getJobBbox();
-      if (job_bbox[0] >= 0 &&
-          job_bbox[1] >= 0 &&
-          job_bbox[2] <= app_settings.work_area_dimensions[0] &&
-          job_bbox[3] <= app_settings.work_area_dimensions[1])
-      {
-        send_gcode(DataHandler.getBboxGcode(), "BBox G-Code sent to backend", true, $('#job_name').val());
-      } else {
-        $().uxmessage('warning', "rejecting, outside work area");
-      }
-    } else {
-      $().uxmessage('warning', "nothing to cut -> please assign colors to passes");
-    }
-    return false;
-  });
+//  $('#job_bbox_submit').tooltip();
+//  $("#job_bbox_submit").click(function(e) {
+//    DataHandler.setByJson($('#job_data').val());
+//    if (readPassesWidget()) {
+//      var job_bbox = DataHandler.getJobBbox();
+//      if (job_bbox[0] >= 0 &&
+//          job_bbox[1] >= 0 &&
+//          job_bbox[2] <= app_settings.work_area_dimensions[0] &&
+//          job_bbox[3] <= app_settings.work_area_dimensions[1])
+//      {
+//        send_gcode(DataHandler.getBboxGcode(), "BBox G-Code sent to backend", true, $('#job_name').val());
+//      } else {
+//        $().uxmessage('warning', "rejecting, outside work area");
+//      }
+//    } else {
+//      $().uxmessage('warning', "nothing to cut -> please assign colors to passes");
+//    }
+//    return false;
+//  });
 
   $('#job_save_to_queue').tooltip();
   $("#job_save_to_queue").click(function(e) {
@@ -463,7 +460,6 @@ $(document).ready(function(){
     return false;
   });
 
-
   $("#export_json_btn").click(function(e) {
     var filedata = $('#job_data').val();
     var filename = $('#job_name').val();
@@ -473,7 +469,6 @@ $(document).ready(function(){
     generate_download(filename, filedata);
     return false;
   });
-
 
   $("#export_gcode_btn").click(function(e) {
     DataHandler.setByJson($('#job_data').val());
@@ -486,7 +481,6 @@ $(document).ready(function(){
     generate_download(filename, filedata);
     return false;
   });
-
 
   $("#file_import_quick_btn").click(function(e) {
     $('#tab_import_button').trigger('click');

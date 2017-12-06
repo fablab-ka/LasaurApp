@@ -103,12 +103,7 @@ class Odoo:
         return out
 
     def setInfo(self, info):
-        if not 'user_id' in info:
-            info['user_id'] = -1 # ToDo better simply return?
-        info['client_id'] = info['user_id']
-        info['odoo_material_qty'] = 1
-
-        if self._active and info['user_id'] >= 0:
+        if self._active:
             self._helper.callAPI("/machine_management/registerUsage/", info)
 
         joblist = []

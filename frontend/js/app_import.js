@@ -240,11 +240,25 @@ $(document).ready(function(){
   // setting up add to queue button
   $("#import_to_queue").click(function(e) {
     if (!(DataHandler.isEmpty())) {
-        addToQueue();
+          $.post('/checkLogin', function(e){
+        if(e == "true") {
+            $('#material_modal').modal();
+        } else {
+            $("#login_modal").modal('show');
+        }
+      });
     } else {
       $().uxmessage('warning', "no data");
     }
     return false;
   });
+
+  $("#material_selected").click(function(e) {
+    if($('#material_selected').hasClass("btn-primary")) {
+      addToQueue();
+    }
+  });
+
+
 
 });  // ready

@@ -1,3 +1,24 @@
+User workflow:
+
+- Open Lasersaur Webpage
+- Click on "import", select file.
+  - get rid of DPI settings? They don't seem to work and are only confusing
+- Select wich colors should be imported, see preview with colors en/disabled
+- Click on "Add to Laser Queue"
+  - rename to "Continue"?
+- Select Material, Service, Comment and User.
+  - make the User fiele clickable, opening the login modal
+  - remove quantity field
+  - Show cookie'd user, if available
+  - use variants to split up the materials in two lists?
+- See preview, select passes/colors, assign cutting parameters
+- Click on "Send to LaserSaur"
+  - make the button change colors/grey out if the laser is not ready
+  - rename button to "Start Laserjob"?
+  - disable button when laser not ready?
+-Quantity Modal opens, asks how much material is used.
+-Laser job gets started, parameters get sent to backend
+
 
 
 CHANGE LOG

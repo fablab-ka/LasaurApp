@@ -238,6 +238,7 @@ $('#login_btn').click(function(){
 
     if(e == "true"){
       $('#account_drop').html(getCookie("user_name") + '<b class="caret">');
+      $('#job_client').html(getCookie("user_name"));
       $('#login_modal').modal('hide');
     }else {
       $('#login_text').text(e);
@@ -711,10 +712,8 @@ $(document).ready(function(){
 
 
  $('#material_modal').on('show.bs.modal', function (e) {
-//    $('#job_comment_input').val("");
     $('#job_material_qty_input').val(1);
     $('#job_materials').val([]);
-//    $('#job_services').val([]);
     $.post('/checkLogin', function(e){
         if(e=="true")
             $('#job_client_input').val(getCookie('user_name'));
@@ -725,7 +724,6 @@ $(document).ready(function(){
 useOdoo = true;
 var odoo_products = null;
 var odoo_services = null;
-
 
 $(document).ready(function() {
     $.post('/checkLogin', function(e){
@@ -816,8 +814,7 @@ $("#material_selected").click(function(e) {
     odoo_product_id = $('#job_materials').val();
     odoo_service_id = $('#job_services').val();
     job_comment = $('#job_comment_input').val();
-    job_material_qty = $('#job_material_qty_input').val();
-    job_client = $('#job_client_input').val();
+//    job_client = $('#job_client_input').html();
 
     for(var product in odoo_products) {
         if(odoo_products[product]['id'] == odoo_product_id) {
@@ -832,21 +829,29 @@ $("#material_selected").click(function(e) {
 });
 
 $('#create_account_btn').click(function(){
-    window.open("http://127.0.0.1:8069/web/signup", "_blank");
+    window.open("http://192.168.1.194:8095", "_blank");
 });
 
-//$('#job_submit').click(function(e) {
-//     $.post('/checkLogin', function(e){
-//        if(e == "true") {
-//            if ($('#door_status_btn').hasClass('btn-warning')) {
-//                return;
-//            }
-//            send_erp_data();
-//        } else {
-//            $("#login_modal").modal('show');
-//        }
-//        });
-//});
+$('#reset_pw_btn').click(function(){
+    alert("Sorry, not implemented yet - ask Philip Caroli for help.")
+});
+
+
+$('#job_submit').click(function(e) {
+     $.post('/checkLogin', function(e){
+        if(e == "true") {
+            $("#qty_modal").modal('show');
+        } else {
+            $("#login_modal").modal('show');
+        }
+    });
+});
+
+$("#qty_submit").click(function(e) {
+    $("#qty_modal").modal('hide');
+    job_material_qty = $('#qty_quantity').val();
+    send_erp_data();
+});
 
 $('#really_submit_job_btn').click(function() {
   send_erp_data();
@@ -874,12 +879,10 @@ function send_erp_data() {
         'odoo_product_name': data_odoo_product['name'],
         'comment': job_comment,
         'material_qty': job_material_qty,
-        'client': job_client
+        'client': getCookie("user_name"),
     });
-
-//    alert(data)
-
     $.post('/erp/setData', data=data);
+    alert(data);
 }
 
 /// PASSES //////////////////////////////////////
