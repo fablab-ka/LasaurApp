@@ -397,7 +397,9 @@ def checkLogin():
         bottle.response.delete_cookie('user_name')
         bottle.response.delete_cookie('session_id')
         return "false"
-    info = next(item for item in session_info if item['session_id'] == session_id)
+    for item in session_info:
+        if item['session_id'] == session_id:
+            info = item
     if not info:
         bottle.response.delete_cookie('user_name')
         bottle.response.delete_cookie('session_id')
@@ -419,8 +421,6 @@ def login():
         return "Password missing"
     helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
     if not helper.connected:
-        #Could not connect to Odoo - trust the users to be serious and don't check password
-        #ToDo: Do something better
         user = erp.get_user(login_email)
         if user == -1:
             return "Odoo down, user not locally known!"
