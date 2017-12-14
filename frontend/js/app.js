@@ -882,7 +882,6 @@ function send_erp_data() {
         'client': getCookie("user_name"),
     });
     $.post('/erp/setData', data=data);
-    alert(data);
 }
 
 /// PASSES //////////////////////////////////////

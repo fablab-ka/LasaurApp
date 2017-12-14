@@ -408,10 +408,6 @@ $(document).ready(function(){
 //    return false;
 //  });
 
-  $('#qty_submit').click(function(e) {
-    submit_job();
-  });
-
 //  $('#really_submit_job_btn').click(function() {
 //      submit_job();
 //      $('#door_open_warning_modal').modal('hide');
