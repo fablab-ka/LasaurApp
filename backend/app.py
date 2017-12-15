@@ -24,6 +24,7 @@ from serial_manager import SerialManagerClass
 import json
 import DebugHelper
 import signal
+import time
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
 
@@ -56,6 +57,9 @@ ODOO_USE = config.get("odoo_use", False)
 IDCARD_TIMEOUT = config.get("idcard_timeout", 10)
 SENSOR_SHIELD_PORT = config.get("sensor_shield_port", None)
 SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
+
+print("Sleeping for 5s...")
+time.sleep(5)
 
 erp = Odoo(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
