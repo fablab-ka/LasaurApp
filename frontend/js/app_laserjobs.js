@@ -9,6 +9,21 @@ $('#material_selected').click(function(){
   }
 });
 
+$('body').on('DOMSubtreeModified', function() {//ToDo: find working solution
+    if($('#door_status_btn').hasClass('btn-success')
+        && $('#connect_btn').hasClass('btn-success')) {
+        $('#job_submit').addClass('btn-primary');
+        $('#job_submit').removeClass('btn-warning');
+        $('#job_bbox_submit').addClass('btn-primary');
+        $('#job_bbox_submit').removeClass('btn-warning');
+    } else {
+        $('#job_submit').removeClass('btn-primary');
+        $('#job_submit').addClass('btn-warning');
+        $('#job_bbox_submit').removeClass('btn-primary');
+        $('#job_bbox_submit').addClass('btn-warning');
+    }
+});
+
 var tmp_name;
 var tmp_jobdata;
 function load_into_job_widget(name, jobdata) {

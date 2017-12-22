@@ -838,13 +838,15 @@ $('#reset_pw_btn').click(function(){
 
 
 $('#job_submit').click(function(e) {
-     $.post('/checkLogin', function(e){
-        if(e == "true") {
-            $("#qty_modal").modal('show');
-        } else {
-            $("#login_modal").modal('show');
-        }
-    });
+    if($('#job_submit').hasClass('btn-primary')) {
+         $.post('/checkLogin', function(e){
+            if(e == "true") {
+                $("#qty_modal").modal('show');
+            } else {
+                $("#login_modal").modal('show');
+            }
+        });
+    }
 });
 
 $("#qty_submit").click(function(e) {
