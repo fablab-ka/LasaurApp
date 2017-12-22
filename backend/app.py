@@ -401,10 +401,11 @@ def checkLogin():
         bottle.response.delete_cookie('user_name')
         bottle.response.delete_cookie('session_id')
         return "false"
+    info = None
     for item in session_info:
         if item['session_id'] == session_id:
             info = item
-    if not info:
+    if info is None:
         bottle.response.delete_cookie('user_name')
         bottle.response.delete_cookie('session_id')
         return "false"
