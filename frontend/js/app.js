@@ -787,25 +787,17 @@ var default_cut_intensity = 100;
 var default_engrave_speed = 4000;
 var default_engrave_intensity = 20;
 
-var sensor_names = null;
-var sensor_values = null;
-
 setInterval(function(){
-    str = "";
-    if(sensor_names && sensor_values){
+    $.getJSON("/sensors", function(data){
         str = "";
-        for(i = 0; i < sensor_names.length; i++) {
-            str += "<p>";
-            str += sensor_names[i];
-            str += ": ";
-            str += sensor_values[i];
-            str += "</p>";
-        }
-    }
-    document.getElementById('sensor_values').innerHTML = str;
-
-    $.getJSON("/sensors/names", function(e){sensor_names = e;})
-    $.getJSON("/sensors/values", function(e){sensor_values = e;})
+        $.each(result, function(i, item){
+            str += item['name'] + ": " + item['value'] + " " + item['unit'];
+        });
+//        for(sensor in e) {
+//            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
+//        }
+        $('#sensor_values').html(str);
+    });
 }, 3000);
 
 $("#material_selected").click(function(e) {
@@ -829,7 +821,7 @@ $("#material_selected").click(function(e) {
 });
 
 $('#create_account_btn').click(function(){
-    window.open("http://192.168.1.194:8095", "_blank");
+    window.open("http://192.168.1.194:8095/register", "_blank");
 });
 
 $('#reset_pw_btn').click(function(){

@@ -8,6 +8,7 @@ import uuid
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
 
+import datetime
 import bottle
 import i18n
 import readid
@@ -143,10 +144,6 @@ class HackedWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-sensor_names = None
-sensor_values = None
-
-
 def run_with_callback(host, port):
     """ Start a wsgiref server instance with control over the main loop.
         This is a function that I derived from the bottle.py run()
@@ -169,8 +166,6 @@ def run_with_callback(host, port):
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
 
-    global sensor_names
-    global sensor_values
     sensor_serial = None
     if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
         print("Initializing sensor board!")
@@ -179,13 +174,6 @@ def run_with_callback(host, port):
             # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
             time.sleep(1)
             sensor_serial.flushInput()
-            sensor_serial.readline()
-            str = sensor_serial.readline().replace('\r\n', '')
-            str = str.split(';')
-            sensor_names = [0.00] * len(str)
-            sensor_values = [0.00] * len(str)
-            for i in range(0, len(str), 1):
-                sensor_names[i] = str[i]
             print("Connected to sensor board!")
         except(SerialException):
             sensor_serial = None
@@ -216,15 +204,6 @@ def run_with_callback(host, port):
             DebugHelper.log("started server.handle_request()")
             DebugHelper.log("Cycle ended!")
             signal.alarm(0)
-            try: #TODO find out what is Wrong, s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
-                if sensor_serial and sensor_serial.inWaiting() > 10:
-                    str = sensor_serial.readline().split(';')
-                    for i in range(0, len(str), 1):
-                        sensor_values[i] = float(str[i])
-            except IOError:
-                print("Sensor Failure")
-                # sensor_serial = None
-
             time.sleep(0.0004)
         except KeyboardInterrupt:
             break
@@ -337,60 +316,21 @@ def material_products():
     return json.dumps(erp.materials, default=datedecoder.default)
 
 
-@app.route('/sensors/names')
-def get_sensorNames():
-    return json.dumps((sensor_names))
-
-
-@app.route('/sensors/values')
-def get_sensor_values():
-    return json.dumps(sensor_values)
-
-
-# @app.route('/material/set_service/<id>')
-# def material_set_service(id):
-#     SerialManager.odoo_service = erp.get_service(id)
-#     return None
-#
-#
-# @app.route('/material/set_product/<id>')
-# def material_set_service(id):
-#     SerialManager.odoo_product = erp.get_product(id)
-#
-#
-# @app.route('/material/set_comment/')
-# @app.route('/material/set_comment/<comment>')
-# def material_set_comment(comment=""):
-#     SerialManager.job_comment = str(comment)
-#
-# @app.route('/material/set_material_qty/<qty>')
-# def material_set_comment(qty):
-#     SerialManager.job_comment = float(qty)
-
+@app.route('/sensors')
+def get_sensors(): #ToDO: Finish
+    try:
+        if sensor_serial and sensor_serial.inWaiting() > 10: # ToDo: Find better criteria
+            str = sensor_serial.readline(1)
+            #sensorValues = json.loads(str)
+            return str
+    except IOError:
+        print("Sensor Failure")
+        sensor_serial = None
+    return ""
 
 @app.route('/material/get_sell_mode')
 def get_sell_mode():
     return str(ODOO_USE)
-
-
-# @app.route('/material/getCutSpeed')
-# def get_cut_speed():
-#     return SerialManager.odoo_product['machine_parameter_1']
-#
-#
-# @app.route('/material/getCutIntensity')
-# def get_cut_intensity():
-#     return SerialManager.odoo_product['machine_parameter_2']
-#
-#
-# @app.route('/material/getEngraveSpeed')
-# def get_engrave_speed():
-#     return SerialManager.odoo_product['machine_parameter_3']
-#
-#
-# @app.route('/material/getEngraveIntensity')
-# def get_engrave_intensity():
-#     return SerialManager.odoo_product['machine_parameter_4']
 
 
 @app.route('/checkLogin', method='POST')
@@ -426,20 +366,21 @@ def login():
         return "Password missing"
     helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
     if not helper.connected:
-        user = erp.get_user(login_email)
-        if user == -1:
-            return "Odoo down, user not locally known!"
-        uid = user['id']
+        return "Odoo down!"
     else:
-        uid = helper.callAPI('/machine_management/getCurrentUser', {'tset': 2})
+        uid = helper.callAPI('/machine_management/getCurrentUser')
     if not uid:
         return "Couldn't find Odoo User " + login_email
     info = {
         'session_id': str(uuid.uuid4()),
         'odoo_uid': uid,
-        'user_name': login_email
+        'user_name': login_email,
+        'last_login': datetime.datetime.now(),
     }
     session_info.append(info)
+    with open("session_info.json", "w") as file:
+        file.write(json.dumps(session_info, default=datedecoder.default))
+
     bottle.response.set_cookie('user_name', info['user_name'])
     bottle.response.set_cookie('session_id', info['session_id'])
     return "true"
