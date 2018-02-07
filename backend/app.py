@@ -8,7 +8,7 @@ import uuid
 import webbrowser
 from wsgiref.simple_server import WSGIRequestHandler, make_server
 
-import datetime
+from datetime import datetime
 import bottle
 import i18n
 import readid
@@ -374,7 +374,7 @@ def login():
         'session_id': str(uuid.uuid4()),
         'odoo_uid': uid,
         'user_name': login_email,
-        'last_login': datetime.datetime.now(),
+        'last_login': datetime.now(),
     }
     session_info.append(info)
     with open("session_info.json", "w") as file:

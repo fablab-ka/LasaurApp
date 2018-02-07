@@ -1,3 +1,3 @@
 #!/bin/bash
 export PYTHONPATH='.'
-python backend/app.py -p
+python2.7 backend/app.py -p
