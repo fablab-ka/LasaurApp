@@ -323,8 +323,7 @@ def get_sensors(): #ToDO: Finish
             str = sensor_serial.readline(1)
             #sensorValues = json.loads(str)
             return str
-    except IOError:
-        print("Sensor Failure")
+    except IOError, NameError:
         sensor_serial = None
     return ""
 
