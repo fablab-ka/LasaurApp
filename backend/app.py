@@ -319,7 +319,7 @@ def material_products():
 @app.route('/sensors')
 def get_sensors(): #ToDO: Finish
     try:
-        if sensor_serial and sensor_serial.inWaiting() > 10: # ToDo: Find better criteria
+        if sensor_serial is not None and sensor_serial.inWaiting() > 10: # ToDo: Find better criteria
             str = sensor_serial.readline(1)
             #sensorValues = json.loads(str)
             return str
