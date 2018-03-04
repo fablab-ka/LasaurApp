@@ -327,11 +327,6 @@ def get_sensors(): #ToDO: Finish
     #     sensor_serial = None
     return ""
 
-@app.route('/material/get_sell_mode')
-def get_sell_mode():
-    return str(ODOO_USE)
-
-
 @app.route('/checkLogin', method='POST')
 def checkLogin():
     session_id = bottle.request.get_cookie('session_id')
@@ -363,13 +358,15 @@ def login():
         return "Email missing"
     if not login_password:
         return "Password missing"
+    if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", login_email):
+        return "Invalid Email entered!"
     helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
     if not helper.connected:
-        return "Odoo down!"
+        return "Could not connect to Odoo, please contact philip@caroli.de!"
     else:
         uid = helper.callAPI('/machine_management/getCurrentUser')
     if not uid:
-        return "Couldn't find Odoo User " + login_email
+        return "Invalid Email or Password!"
     info = {
         'session_id': str(uuid.uuid4()),
         'odoo_uid': uid,

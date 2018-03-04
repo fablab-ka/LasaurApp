@@ -732,36 +732,33 @@ $(document).ready(function() {
         }
     });
 
-    //check if we use Odoo
-    $.get('/material/get_sell_mode', function(e){
-        useOdoo = e;
-        odoo_product = 0;
-        odoo_service = 0;
-        job_comment = "";
+    useOdoo = e;
+    odoo_product = 0;
+    odoo_service = 0;
+    job_comment = "";
 
-        if(useOdoo == 'True'){
-            $.getJSON('/erp/getData', function(data){
-                odoo_services = data['services'];
-                var select_list = document.getElementById('job_services');
-                for (var i in odoo_services) {
-                    var option = document.createElement("option");
-                    option.value = odoo_services[i]['id'];
-                    option.innerHTML = odoo_services[i]['name'];
-                    select_list.appendChild(option);
-                }
-                select_list.size = Math.min(odoo_services.length, select_list.size);
+    if(useOdoo == 'True'){
+        $.getJSON('/erp/getData', function(data){
+            odoo_services = data['services'];
+            var select_list = document.getElementById('job_services');
+            for (var i in odoo_services) {
+                var option = document.createElement("option");
+                option.value = odoo_services[i]['id'];
+                option.innerHTML = odoo_services[i]['name'];
+                select_list.appendChild(option);
+            }
+            select_list.size = Math.min(odoo_services.length, select_list.size);
 
-                odoo_products = data['materials'];
-                var select_list = document.getElementById("job_materials");
-                for (var i in odoo_products) {
-                    var option = document.createElement("option");
-                    option.value = odoo_products[i]['id'];
-                    option.innerHTML = odoo_products[i]['name'];
-                    select_list.appendChild(option);
-                }
-            });
-        }
-    });
+            odoo_products = data['materials'];
+            var select_list = document.getElementById("job_materials");
+            for (var i in odoo_products) {
+                var option = document.createElement("option");
+                option.value = odoo_products[i]['id'];
+                option.innerHTML = odoo_products[i]['name'];
+                select_list.appendChild(option);
+            }
+        });
+    }
   });
 
 var material_form_ok_clickable = false;
