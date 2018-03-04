@@ -719,6 +719,7 @@ def file_reader():
             if filename[-4:] in ['.dxf', '.DXF']:
                 res = read_dxf(filedata, TOLERANCE, optimize)
             elif filename[-4:] in ['.svg', '.SVG']:
+                print("parsing svg")
                 res = read_svg(filedata, dimensions, TOLERANCE, dpi_forced, optimize)
             elif filename[-4:] in ['.ngc', '.NGC']:
                 res = read_ngc(filedata, TOLERANCE, optimize)
