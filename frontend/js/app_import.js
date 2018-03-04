@@ -102,6 +102,7 @@ $(document).ready(function(){
              'optimize':path_optimize,
              'dimensions':JSON.stringify(app_settings.work_area_dimensions)},
       dataType: "json",
+      timeout: 60000,
       success: function (data) {
         if (ext == '.svg' || ext == '.SVG') {
           $().uxmessage('success', "SVG parsed.");

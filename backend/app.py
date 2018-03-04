@@ -687,6 +687,7 @@ def queue_pct_done_handler():
 
 @app.route('/file_reader', method='POST')
 def file_reader():
+    print("/file_reader invoked")
     """Parse SVG string."""
     filename = request.forms.get('filename')
     filedata = request.forms.get('filedata')
@@ -709,6 +710,8 @@ def file_reader():
         optimize = bool(int(request.forms.get('optimize')))
     except:
         pass
+
+    print("  checkes done")
 
     try:
         if filename and filedata:
