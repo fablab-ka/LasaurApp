@@ -321,8 +321,7 @@ def get_sensors(): #ToDO: Finish
     try:
         global sensor_serial
         #sensor_serial.flushInput()
-        #str = sensor_serial.readline(1000)
-        str = sensor_serial.read_until('\n')
+        str = sensor_serial.readline(1000)
         print(str)
         #sensorValues = json.loads(str)
         return json.dumps(str)
