@@ -170,7 +170,7 @@ def run_with_callback(host, port):
     if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
         print("Initializing sensor board!")
         try:
-            sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=5)
+            sensor_serial = serial.Serial(SENSOR_SHIELD_PORT, SENSOR_SHIELD_BAUD, timeout=1)
             # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
             time.sleep(1)
             sensor_serial.flushInput()
@@ -315,15 +315,16 @@ def material_services():
 def material_products():
     return json.dumps(erp.materials, default=datedecoder.default)
 
+sensor_values = ""
 
 @app.route('/sensors')
 def get_sensors(): #ToDO: Finish
     try:
-        global sensor_serial
-        #sensor_serial.flushInput()
-        str = sensor_serial.readline(1000)
-        print(str)
-        #sensorValues = json.loads(str)
+        global sensor_serial, sensor_values
+        while True:
+            str = sensor_serial.readline(1000)
+            if str != "":
+                sensor_values = str
         return json.dumps(str)
     except IOError, NameError:
         return "[{'Sensorboard':false}]"
