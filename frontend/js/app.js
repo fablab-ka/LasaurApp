@@ -788,9 +788,6 @@ setInterval(function(){
             str += data[i]['name'] + ": "
             + data[i]['value'] + " " + data[i]['unit'];
         }
-        $.each(result, function(i, item){
-
-        });
 //        for(sensor in e) {
 //            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
 //        }
