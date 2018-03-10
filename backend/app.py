@@ -320,14 +320,13 @@ def material_products():
 def get_sensors(): #ToDO: Finish
     try:
         global sensor_serial
-        if sensor_serial is not None and sensor_serial.inWaiting() > 10: # ToDo: Find better criteria
-            #sensor_serial.flushInput()
-            str = sensor_serial.readline(5)
-            print(str)
-            #sensorValues = json.loads(str)
-            return json.loads(str)
+        #sensor_serial.flushInput()
+        str = sensor_serial.readline(1)
+        print(str)
+        #sensorValues = json.loads(str)
+        return json.dumps(str)
     except IOError, NameError:
-        sensor_serial = None
+        return "[{'Sensorboard':false}]"
     return ""
 
 @app.route('/checkLogin', method='POST')
