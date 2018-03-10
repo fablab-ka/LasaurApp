@@ -319,6 +319,7 @@ def material_products():
 @app.route('/sensors')
 def get_sensors(): #ToDO: Finish
     try:
+        global sensor_serial
         if sensor_serial is not None and sensor_serial.inWaiting() > 10: # ToDo: Find better criteria
             sensor_serial.flushInput()
             str = sensor_serial.readline(1)
