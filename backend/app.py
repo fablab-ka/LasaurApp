@@ -321,12 +321,11 @@ sensor_values = ""
 def get_sensors(): #ToDO: Finish
     try:
         global sensor_serial, sensor_values
-        while True:
-            str = sensor_serial.readline(1000)
-            print(str)
-            if str != "":
-                sensor_values = str
-        return json.dumps(str)
+        sensor_serial.flushInput()
+        str = sensor_serial.readline(1000)
+        if str != "":
+            sensor_values = str
+        return json.dumps(sensor_values)
     except IOError, NameError:
         return "[{'Sensorboard':false}]"
     return ""
