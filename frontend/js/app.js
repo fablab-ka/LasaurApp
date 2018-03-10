@@ -784,10 +784,9 @@ var default_engrave_intensity = 20;
 setInterval(function(){
     $.getJSON("/sensors", function(data){
         str = "";
-        for(var i = 0; i < data.length; i++) {
-            str += data[i]['name'] + ": "
-            + data[i]['value'] + " " + data[i]['unit'];
-        }
+        $.each(data, function (key, sensor) {
+        str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
+        });
 //        for(sensor in e) {
 //            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
 //        }
