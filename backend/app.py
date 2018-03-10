@@ -323,8 +323,9 @@ def get_sensors(): #ToDO: Finish
         if sensor_serial is not None and sensor_serial.inWaiting() > 10: # ToDo: Find better criteria
             #sensor_serial.flushInput()
             str = sensor_serial.readline(5)
+            print(str)
             #sensorValues = json.loads(str)
-            return json.dumps(str)
+            return json.loads(str)
     except IOError, NameError:
         sensor_serial = None
     return ""
