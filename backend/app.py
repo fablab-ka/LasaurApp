@@ -324,8 +324,7 @@ def get_sensors(): #ToDO: Finish
         sensor_serial.flushInput()
         str = sensor_serial.readline(1000)
         if str != "":
-            sensor_values = str
-        print(sensor_values)
+            sensor_values = str.rstrip()
         return json.dumps(sensor_values)
     except IOError, NameError:
         return "[{'Sensorboard':false}]"
