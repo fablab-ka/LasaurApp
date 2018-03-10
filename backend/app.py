@@ -324,7 +324,7 @@ def get_sensors(): #ToDO: Finish
             sensor_serial.flushInput()
             str = sensor_serial.readline(1)
             #sensorValues = json.loads(str)
-            return str
+            return json.dumps(str)
     except IOError, NameError:
         sensor_serial = None
     return ""
