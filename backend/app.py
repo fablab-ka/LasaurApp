@@ -166,7 +166,7 @@ def run_with_callback(host, port):
         SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
     SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
 
-    sensor_serial = None
+    global sensor_serial
     if SENSOR_SHIELD_PORT and SENSOR_SHIELD_BAUD and not dummy_mode:
         print("Initializing sensor board!")
         try:
