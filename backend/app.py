@@ -323,6 +323,7 @@ def get_sensors(): #ToDO: Finish
         global sensor_serial, sensor_values
         while True:
             str = sensor_serial.readline(1000)
+            print(str)
             if str != "":
                 sensor_values = str
         return json.dumps(str)
