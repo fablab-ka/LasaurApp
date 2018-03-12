@@ -330,8 +330,7 @@ sensor_values = ""
 
 @app.route('/sensors')
 def get_sensors(): #ToDO: Finish
-
-    return ""
+    return sensor_values
 
 @app.route('/checkLogin', method='POST')
 def checkLogin():
