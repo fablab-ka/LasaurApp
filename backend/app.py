@@ -26,6 +26,7 @@ import json
 import DebugHelper
 import signal
 import time
+from thread import start_new_thread
 
 bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
 
@@ -88,6 +89,16 @@ def setDummyMode():
     SerialManager.dummyMode = True
     global dummy_mode
     dummy_mode = True
+
+def check_sensors():
+    try:
+        global sensor_serial, sensor_values
+        str = sensor_serial.readline(1000)
+        if str != "":
+            sensor_values = str.rstrip().strip('"')
+        return json.dumps(sensor_values, default=datedecoder.default)
+    except IOError, NameError:
+        pass
 
 
 def resources_dir():
@@ -174,6 +185,7 @@ def run_with_callback(host, port):
             # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
             time.sleep(1)
             sensor_serial.flushInput()
+            start_new_thread(check_sensors);
             print("Connected to sensor board!")
         except(SerialException):
             sensor_serial = None
@@ -319,15 +331,7 @@ sensor_values = ""
 
 @app.route('/sensors')
 def get_sensors(): #ToDO: Finish
-    try:
-        global sensor_serial, sensor_values
-        sensor_serial.flushInput()
-        str = sensor_serial.readline(1000)
-        if str != "":
-            sensor_values = str.rstrip().strip('"')
-        return json.dumps(sensor_values, default=datedecoder.default)
-    except IOError, NameError:
-        return "[{'Sensorboard':false}]"
+
     return ""
 
 @app.route('/checkLogin', method='POST')
