@@ -96,7 +96,6 @@ def check_sensors():
         str = sensor_serial.readline(1000)
         if str != "":
             sensor_values = str.rstrip().strip('"')
-        return json.dumps(sensor_values, default=datedecoder.default)
     except IOError, NameError:
         pass
 
