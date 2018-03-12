@@ -783,13 +783,15 @@ var default_engrave_intensity = 20;
 
 setInterval(function(){
     $.get("/sensors", function(data){
+    sensors = JSON.parse(data);
+
         str = "";
 //        $.each(data, function (key, sensor) {
 //            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
 //        });
-//        for(sensor in e) {
-//            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
-//        }
+        for(sensor in sensors) {
+            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
+        }
         $('#sensor_values').html(data);
     });
 }, 3000);
