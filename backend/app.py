@@ -95,7 +95,7 @@ def check_sensors():
         global sensor_serial, sensor_values
         str = sensor_serial.readline(1000)
         if str != "":
-            sensor_values = str.rstrip().strip('"')
+            sensor_values = str.rstrip().replace("'", '"')
     except IOError, NameError:
         pass
 
