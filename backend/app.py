@@ -91,13 +91,15 @@ def setDummyMode():
     dummy_mode = True
 
 def check_sensors():
-    try:
-        global sensor_serial, sensor_values
-        str = sensor_serial.readline(1000)
-        if str != "":
-            sensor_values = str.rstrip().replace("'", '"')
-    except IOError, NameError:
-        pass
+    while True:
+        try:
+            global sensor_serial, sensor_values
+            str = sensor_serial.readline(1000)
+            if str != "":
+                sensor_values = str.rstrip().replace("'", '"')
+        except IOError, NameError:
+            pass
+        time.sleep(0.1)
 
 
 def resources_dir():
