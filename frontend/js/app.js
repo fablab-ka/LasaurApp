@@ -784,12 +784,12 @@ var default_engrave_intensity = 20;
 setInterval(function(){
     $.getJSON("/sensors", function(data){
         str = "";
-//        $.each(data, function (key, sensor) {
-//        str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
-//        });
-        for(sensor in e) {
-            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
-        }
+        $.each(data, function (key, sensor) {
+            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
+        });
+//        for(sensor in e) {
+//            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
+//        }
         $('#sensor_values').html(data);
     });
 }, 3000);
