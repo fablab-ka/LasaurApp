@@ -184,7 +184,7 @@ def run_with_callback(host, port):
             # print("Sensor Shield at " + sensor_serial.name + + " with baudrate " + SENSOR_SHIELD_BAUD + " is (hopefully) ready!")
             time.sleep(1)
             sensor_serial.flushInput()
-            start_new_thread(check_sensors);
+            start_new_thread(check_sensors, ());
             print("Connected to sensor board!")
         except(SerialException):
             sensor_serial = None
