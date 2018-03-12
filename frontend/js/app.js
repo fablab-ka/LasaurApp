@@ -786,12 +786,12 @@ setInterval(function(){
     sensors = JSON.parse(data);
 
         str = "";
-        $.each(data, function (key, sensor) {
-            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
-        });
-//        for(sensor in sensors) {
-//            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
-//        }
+//        $.each(data, function (key, sensor) {
+//            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
+//        });
+        for(sensor in sensors) {
+            str += sensor['name'] + "\n";
+        }
         $('#sensor_values').html(str);
     });
 }, 3000);
