@@ -815,7 +815,7 @@ $("#material_selected").click(function(e) {
 });
 
 $('#create_account_btn').click(function(){
-    window.open("http://192.168.1.194:8095/register", "_blank");
+    window.open("https://odoo.fablab-karlsruhe.de/de_DE/web/signup", "_blank");
 });
 
 $('#reset_pw_btn').click(function(){
