@@ -791,7 +791,7 @@ setInterval(function(){
 //        });
         for(var i in data) {
             s = data[i]
-            str += s['name'] + ": " + s['value'] + " " + s['unit'] + "\n";
+            str += s['name'] + ": " + s['value'] + " " + s['unit'] + "<br>";
         }
         $('#sensor_values').html(str);
     });
