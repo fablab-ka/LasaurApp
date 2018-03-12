@@ -787,9 +787,9 @@ setInterval(function(){
 //        $.each(data, function (key, sensor) {
 //        str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
 //        });
-//        for(sensor in e) {
-//            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
-//        }
+        for(sensor in e) {
+            str += sensor['name']; + ": " + sensor['value'] + " " + sensor['unit'] + "\n";
+        }
         $('#sensor_values').html(data);
     });
 }, 3000);

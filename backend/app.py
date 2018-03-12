@@ -324,7 +324,7 @@ def get_sensors(): #ToDO: Finish
         sensor_serial.flushInput()
         str = sensor_serial.readline(1000)
         if str != "":
-            sensor_values = str.rstrip().strip('"')
+            sensor_values = str.rstrip()[1,-1]
         return json.dumps(sensor_values, default=datedecoder.default)
     except IOError, NameError:
         return "[{'Sensorboard':false}]"
