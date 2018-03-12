@@ -789,7 +789,6 @@ setInterval(function(){
 //        $.each(data, function (key, sensor) {
 //            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
 //        });
-        alert(sensors);
         for(sensor in sensors) {
             str += sensor['name'] + "\n";
         }
