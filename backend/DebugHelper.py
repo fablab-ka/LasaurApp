@@ -2,7 +2,7 @@ import signal
 import datetime
 
 cache = ""
-alarmInterval = 120
+alarmInterval = 600
 
 
 def log(content):
