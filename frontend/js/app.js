@@ -740,9 +740,11 @@ $(document).ready(function() {
         odoo_services = data['services'];
         var select_list = document.getElementById('job_services');
         for (var i in odoo_services) {
+            var s = odoo_services[i];
             var option = document.createElement("option");
-            option.value = odoo_services[i]['id'];
-            option.innerHTML = odoo_services[i]['name'];
+            option.value = s['id'];
+            option.innerHTML = s['name']
+              + "  " + s['price'] + " €/min";
             select_list.appendChild(option);
         }
         select_list.size = Math.min(odoo_services.length, select_list.size);
@@ -750,9 +752,10 @@ $(document).ready(function() {
         odoo_products = data['materials'];
         var select_list = document.getElementById("job_materials");
         for (var i in odoo_products) {
+            var s = odoo_products[i];
             var option = document.createElement("option");
-            option.value = odoo_products[i]['id'];
-            option.innerHTML = odoo_products[i]['name'];
+            option.value = s['id'];
+            option.innerHTML = s['name'] + (s['price'] != 0 ? "  " + s['price'] + " €" : "");
             select_list.appendChild(option);
         }
     });
