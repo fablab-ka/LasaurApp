@@ -378,7 +378,14 @@ $(document).ready(function(){
     }
   );
 
-  $("#qty_submit").click(function(e) {
+  //Fuck the coding police
+  $("#qty_btn_1").click(function(e) {
+    submit_job();
+  });
+  $("#qty_btn_0").click(function(e) {
+    submit_job();
+  });
+  $("#qty_btn_custom").click(function(e) {
     submit_job();
   });
 

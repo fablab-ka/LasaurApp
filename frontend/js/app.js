@@ -838,7 +838,19 @@ $('#job_submit').click(function(e) {
     }
 });
 
-$("#qty_submit").click(function(e) {
+$("#qty_btn_1").click(function(e) {
+    $("#qty_modal").modal('hide');
+    job_material_qty = 1;
+    send_erp_data();
+});
+
+$("#qty_btn_0").click(function(e) {
+    $("#qty_modal").modal('hide');
+    job_material_qty = 0;
+    send_erp_data();
+});
+
+$("#qty_btn_custom").click(function(e) {
     $("#qty_modal").modal('hide');
     job_material_qty = $('#qty_quantity').val();
     send_erp_data();
