@@ -112,17 +112,29 @@ function update_progress() {
       if (progress_not_yet_done_flag) {
         $("#progressbar").children().first().width('100%');
         $().uxmessage('notice', "Done.");
+        $("#invoice_modal").modal('show');
         progress_not_yet_done_flag = false;
         setTimeout(update_progress, 2000);
       } else {
         $('#progressbar').hide();
         $("#progressbar").children().first().width(0);
 
+
         poll_job_history();
       }
     }
   });
 }
+
+//ToDo: Remove, only for faster developing
+$("#door_status_btn").click(function() {
+        $("#invoice_modal").modal('show');
+});
+
+$("#invoice_btn").click(function() {
+    window.open("https://odoo.fablab-karlsruhe.de/de_DE/my/invoices", "_blank");
+    $("#invoice_modal").modal('hide');
+});
 
 
 function open_bigcanvas(scale, deselectedColors) {
