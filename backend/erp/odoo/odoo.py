@@ -103,8 +103,8 @@ class Odoo:
         return out
 
     def setInfo(self, info):
-        if self._active:
-            self._helper.callAPI("/machine_management/registerUsage/", info)
+        # if self._active:
+        #     self._helper.callAPI("/machine_management/registerUsage/", info)
 
         joblist = []
         if os.path.isfile('jobs.json'):
