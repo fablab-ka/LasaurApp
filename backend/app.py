@@ -13,8 +13,8 @@ import bottle
 import i18n
 import readid
 import serial
-from backend.erp.odoo.odooHelper import *
-from backend.erp.odoo.odoo import Odoo
+from backend.interface.odoo.odooHelper import *
+from backend.interface.odoo.odoo import Odoo
 from bottle import *
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
@@ -309,11 +309,11 @@ def jobs_history():
     return json.dumps(jobs, default=datedecoder.default)
 
 
-@app.route('/erp/getData')
+@app.route('/interface/getData')
 def erp_get_data():
     return json.dumps(erp.getWebInfo(), default=datedecoder.default)
 
-@app.route('/erp/setData', method='POST')
+@app.route('/interface/setData', method='POST')
 def erp_set_data():
     data = json.loads(request.body.read())
     SerialManager.job_additional_data = data

@@ -4,7 +4,7 @@ import time
 import traceback
 import json
 
-from backend.erp.odoo.odooHelper import *
+from backend.interface.odoo.odooHelper import *
 
 
 class OdooRemote():

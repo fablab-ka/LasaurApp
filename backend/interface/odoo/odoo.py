@@ -2,7 +2,7 @@ import json
 import traceback
 import backend.datedecoder
 import os
-from backend.erp.odoo.odooHelper import *
+from backend.interface.odoo.odooHelper import *
 
 
 class Odoo:

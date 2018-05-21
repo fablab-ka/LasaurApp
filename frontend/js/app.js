@@ -828,11 +828,11 @@ $("#material_selected").click(function(e) {
 });
 
 $('#create_account_btn').click(function(){
-    window.open("https://odoo.fablab-karlsruhe.de/de_DE/web/signup", "_blank");
+    window.open("https://ldap.fablab-karlsruhe.de", "_blank");
 });
 
 $('#reset_pw_btn').click(function(){
-    alert("Sorry, not implemented yet - ask Philip Caroli for help.")
+    window.open("https://ldap.fablab-karlsruhe.de", "_blank");
 });
 
 
