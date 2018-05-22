@@ -743,7 +743,7 @@ $(document).ready(function() {
     odoo_service = 0;
     job_comment = "";
 
-    $.getJSON('/erp/getData', function(data){
+    $.getJSON('/interface/getData', function(data){
         odoo_services = data['services'];
         var select_list = document.getElementById('job_services');
         for (var i in odoo_services) {
@@ -894,7 +894,7 @@ function send_erp_data() {
         'material_qty': job_material_qty,
         'client': getCookie("user_name"),
     });
-    $.post('/erp/setData', data=data);
+    $.post('/interface/setData', data=data);
 }
 
 /// PASSES //////////////////////////////////////
