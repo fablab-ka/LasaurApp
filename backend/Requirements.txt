@@ -1,2 +1,0 @@
-influxdb==2.6.0
-simplejson==3.7.3
