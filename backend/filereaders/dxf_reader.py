@@ -1,3 +1,5 @@
+
+
 # Adapted from dxf2svg.py by David S. Touretzky
 # Computer Science Department, Carnegie Mellon University
 # Released under the GNU GPL3 license.
@@ -73,7 +75,16 @@ class DXFReader:
 
     ################
     # Routines to read entries from the DXF file
-
+    def colorcodetohex(self,colorCode):
+        if colorCode == 0 return '#000000'
+        if colorCode == 1 return '#ff0000'
+        if colorCode == 2 return '#ffff00'
+        if colorCode == 3 return '#00ffff'
+        if colorCode == 4 return '#0000ff'
+        if colorCode == 5 return '#000000'
+        if colorCode == 6 return '#ff00ff'
+        else return '#000000'
+    
     def readtosection(self, codeval, stringval):
         self.dxfcode = None
         while (self.dxfcode != codeval) or (self.line != stringval):
@@ -106,6 +117,7 @@ class DXFReader:
     # Translate each type of entity (line, circle, arc, lwpolyline)
 
     def do_line(self):
+        hexcolor=self.colorcodetohex(self.readgroup(62))
         x1 = float(self.readgroup(10))
         y1 = float(self.readgroup(20))
         x2 = float(self.readgroup(11))
@@ -114,10 +126,14 @@ class DXFReader:
             x1 = x1*25.4
             y1 = y1*25.4        
             x2 = x2*25.4
-            y2 = y2*25.4        
-        self.black_boundarys.append([[x1,y1],[x2,y2]])
+            y2 = y2*25.4     
+        if hexcolor in self.boundarys:
+            self.boundarys[hexcolor].append([[x1,y1],[x2,y2]])
+        else:
+            self.boundarys[hexcolor] = [[[x1,y1],[x2,y2]]]
 
     def do_circle(self):
+        hexcolor=self.colorcodetohex(self.readgroup(62))
         cx = float(self.readgroup(10))
         cy = float(self.readgroup(20))
         r = float(self.readgroup(40))
@@ -130,9 +146,13 @@ class DXFReader:
         self.addArc(path, cx, cy+r, r, r, 0, 0, 0, cx+r, cy)
         self.addArc(path, cx+r, cy, r, r, 0, 0, 0, cx, cy-r)
         self.addArc(path, cx, cy-r, r, r, 0, 0, 0, cx-r, cy)
-        self.black_boundarys.append(path)
+        if hexcolor in self.boundarys:
+            self.boundarys[hexcolor].append(path)
+        else:
+            self.boundarys[hexcolor] = [path]
 
     def do_arc(self):
+        hexcolor=self.colorcodetohex(self.readgroup(62))
         cx = float(self.readgroup(10))
         cy = float(self.readgroup(20))
         r = float(self.readgroup(40))
@@ -154,9 +174,13 @@ class DXFReader:
         y2 = cy + r*math.sin(theta2)
         path = []
         self.addArc(path, x1, y1, r, r, 0, large_arc_flag, sweep_flag, x2, y2)
-        self.black_boundarys.append(path)
+        if hexcolor in self.boundarys:
+            self.boundarys[hexcolor].append(path)
+        else:
+            self.boundarys[hexcolor] = [path]
 
     def do_lwpolyline(self):
+        hexcolor=self.colorcodetohex(self.readgroup(62))
         numverts = int(self.readgroup(90))
         path = []
         self.black_boundarys.append(path)
@@ -166,7 +190,10 @@ class DXFReader:
             if self.metricflag == 0:
                 x = x*25.4
                 y = y*25.4
-            path.append([x,y])
+            if hexcolor in self.boundarys:
+                self.boundarys[hexcolor].append([x,y])
+            else:
+                self.boundarys[hexcolor] = [[x,y]]
 
     def complain_spline(self):
         print "Encountered a SPLINE at line", self.linecount
@@ -254,8 +281,4 @@ class DXFReader:
         path.append(c1Init)
         _recursiveArc(t1Init, t2Init, c1Init, c5Init, 0, self.tolerance2)
         path.append(c5Init)
-
-
-
-
 
