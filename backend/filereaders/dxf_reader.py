@@ -76,14 +76,14 @@ class DXFReader:
     ################
     # Routines to read entries from the DXF file
     def colorcodetohex(self,colorCode):
-        if colorCode == 0 return '#000000'
-        if colorCode == 1 return '#ff0000'
-        if colorCode == 2 return '#ffff00'
-        if colorCode == 3 return '#00ffff'
-        if colorCode == 4 return '#0000ff'
-        if colorCode == 5 return '#000000'
-        if colorCode == 6 return '#ff00ff'
-        else return '#000000'
+        if colorCode == 0: return '#000000'
+        elif colorCode == 1: return '#ff0000'
+        elif colorCode == 2: return '#ffff00'
+        elif colorCode == 3: return '#00ffff'
+        elif colorCode == 4: return '#0000ff'
+        elif colorCode == 5: return '#000000'
+        elif colorCode == 6: return '#ff00ff'
+        else: return '#000000'
     
     def readtosection(self, codeval, stringval):
         self.dxfcode = None
