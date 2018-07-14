@@ -15,7 +15,8 @@ GcodeWriter = {
   NDIGITS : 2,
 
   write : function(segments, scale, xoff, yoff) {
-    var glist = ["G30\n"];
+    var glist = [];
+    glist.push("G30/n");
     var nsegment = 0;
     var x_prev = 0.0;
     var y_prev = 0.0;
