@@ -99,7 +99,7 @@ DataHandler = {
     // write machinable gcode, organize by passes
     // header
     var glist = [];
-    glist.push("G90\nM80\n");
+    glist.push("G90\nM80\nG30\n");
     glist.push("G0F"+app_settings.max_seek_speed+"\n");
     // passes
     for (var i=0; i<this.passes.length; i++) {
