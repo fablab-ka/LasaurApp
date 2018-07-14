@@ -99,15 +99,19 @@ DataHandler = {
     // write machinable gcode, organize by passes
     // header
     var glist = [];
-    glist.push("G90\nM80\nG30\n");
-    glist.push("G0F"+app_settings.max_seek_speed+"\n");
+    glist.push("G90\nM80\nG30\n");//Metric Absolut Homeing
+      var x_phy = gcode_coordinate_offset[0]*app_settings.to_physical_scale + app_settings.table_offset[0];
+      var y_phy = gcode_coordinate_offset[1]*app_settings.to_physical_scale + app_settings.table_offset[1];
+      glist.push('G10 L2 P1 X'+ x_phy.toFixed(app_settings.num_digits) +
+' Y' + y_phy.toFixed(app_settings.num_digits) + '\nG55\n');//set offset and set offset to be used
+    glist.push("G0F"+app_settings.max_seek_speed+"\n");//seek movment with max speed
     // passes
     for (var i=0; i<this.passes.length; i++) {
       var pass = this.passes[i];
       var colors = pass['colors'];
       var feedrate = this.mapConstrainFeedrate(pass['feedrate']);
       var intensity = this.mapConstrainIntesity(pass['intensity']);
-      glist.push("G1F"+feedrate+"\nS"+intensity+"\n");
+      glist.push("G1F"+feedrate+"\nS"+intensity+"\n");//cut movent with speed and power
       for (var c=0; c<colors.length; c++) {
         var color = colors[c];
         var paths = this.paths_by_color[color];
@@ -118,12 +122,12 @@ DataHandler = {
             var x = path[vertex][0];
             var y = path[vertex][1];
             glist.push("G0X"+x.toFixed(app_settings.num_digits)+
-                         "Y"+y.toFixed(app_settings.num_digits)+"\n");
+                         "Y"+y.toFixed(app_settings.num_digits)+"\n");//seek
             for (vertex=1; vertex<path.length; vertex++) {
               var x = path[vertex][0];
               var y = path[vertex][1];
               glist.push("G1X"+x.toFixed(app_settings.num_digits)+
-                           "Y"+y.toFixed(app_settings.num_digits)+"\n");
+                           "Y"+y.toFixed(app_settings.num_digits)+"\n");//cut
             }
           }      
         }
