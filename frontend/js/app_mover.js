@@ -1,10 +1,10 @@
 
-var gcode_coordinate_offset = undefined;
+var gcode_coordinate_offset = [0.0,0.0];
 
 function reset_offset() {
   $("#offset_area").hide();
   $('#offset_area').css({'opacity':0.0, left:0, top:0});
-  gcode_coordinate_offset = undefined;
+  gcode_coordinate_offset = [0.0,0.0];
   $("#cutting_area").css('border', '1px dashed #ff0000');
   $("#offset_area").css('border', '1px dashed #aaaaaa');
   send_gcode('G54\n', "Offset reset.", false);
