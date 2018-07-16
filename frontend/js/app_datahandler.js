@@ -166,24 +166,24 @@ DataHandler = {
     // exclude_colors is optional
     canvas.background('#ffffff');
     canvas.noFill();
-    var x_prev = 0;
-    var y_prev = 0;
+    var x_prev = gcode_coordinate_offset[0];
+    var y_prev = gcode_coordinate_offset[1];
     for (var color in this.paths_by_color) {
       if (exclude_colors === undefined || !(color in exclude_colors)) {
         var paths = this.paths_by_color[color];
         for (var k=0; k<paths.length; k++) {
           var path = paths[k];
           if (path.length > 0) {
-            var x = path[0][0]*scale;
-            var y = path[0][1]*scale;
+            var x = path[0][0]*scale+gcode_coordinate_offset[0];
+            var y = path[0][1]*scale+gcode_coordinate_offset[1];
             canvas.stroke('#aaaaaa');
             canvas.line(x_prev, y_prev, x, y);
             x_prev = x;
             y_prev = y;
             canvas.stroke(color);
             for (vertex=1; vertex<path.length; vertex++) {
-              var x = path[vertex][0]*scale;
-              var y = path[vertex][1]*scale;
+              var x = path[vertex][0]*scale+gcode_coordinate_offset[0];
+              var y = path[vertex][1]*scale+gcode_coordinate_offset[1];
               canvas.line(x_prev, y_prev, x, y);
               x_prev = x;
               y_prev = y;
