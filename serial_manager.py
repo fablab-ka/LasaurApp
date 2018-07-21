@@ -15,7 +15,6 @@ class SerialManagerClass(object):
     def __init__(self, accountingFile, influxConfig, dummyMode=False):
         self.device = None
         self.dummyMode = dummyMode
-        self.job_additional_data = None
 
         self.rx_buffer = ""
         self.tx_buffer = ""
@@ -79,12 +78,10 @@ class SerialManagerClass(object):
             " jobname: ", self.job_accounting['job_name'])
 
     def stop_accounting(self):
-        # final time calculation, write log information, cleanup
         runtime = datetime.now() - self.job_accounting['start_job']
-        # Job summary
         jobtime = int(runtime.total_seconds()) - self.job_accounting['pause_time']
-        #    start time, end time, job name, job duration (sec), gcode elements, cumulated time (sec)
         current_total = 0
+
         if len(self.lastJobs) > 0 and len(self.lastJobs[0]) > 5:
             current_total = self.lastJobs[0]["total"]
         job = {
@@ -95,10 +92,6 @@ class SerialManagerClass(object):
             'lines': self.job_accounting['gcode_lines'],
             'total': int(current_total + jobtime),
         }
-
-        if self.job_additional_data:
-            job.update(self.job_additional_data)
-            self.job_additional_data = None
 
         print(job)
 
@@ -154,6 +147,7 @@ class SerialManagerClass(object):
         if not self.dummyMode:
             self.device = serial.Serial(port=port, baudrate=baudrate,
                                         timeout=0, write_timeout=1)
+            RemoteLogger.info("Connected to device!")
 
     def close(self):
         if self.device:
@@ -165,6 +159,7 @@ class SerialManagerClass(object):
             except:
                 self.device = None
             self.status['ready'] = False
+            RemoteLogger.info("Disconnected from device!")
             return True
         else:
             return False
@@ -223,7 +218,7 @@ class SerialManagerClass(object):
         gcode_processed = '\n'.join(job_list) + '\n'
         self.tx_buffer += gcode_processed
         self.job_active = True
-        if (self.status['ready'] == False) and (len(lines) > 10):
+        if (self.status['ready'] == False) and bool(name):
             self.start_accounting(len(lines), name) # as soon, as jobname is vailable, can be passed as second param
 
     def cancel_queue(self):
@@ -231,17 +226,14 @@ class SerialManagerClass(object):
         self.tx_index = 0
         self.job_active = False
 
-
     def is_queue_empty(self):
         return self.tx_index >= len(self.tx_buffer)
-
 
     def get_queue_percentage_done(self):
         buflen = len(self.tx_buffer)
         if buflen == 0:
             return ""
         return str(100*self.tx_index/float(buflen))
-
 
     def set_pause(self, flag):
         # returns pause status

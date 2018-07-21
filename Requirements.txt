@@ -1,9 +1,0 @@
-influxdb==2.6.0
-simplejson==3.7.3
-ldap3==2.2.4
-configparser
-bottle
-beaker
-gevent
-bottle-login
-influxdb

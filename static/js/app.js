@@ -4,6 +4,7 @@ var firmware_version_reported = false;
 var lasaurapp_version_reported = false;
 var progress_not_yet_done_flag = false;
 
+//Popup Messages
 (function($){
   $.fn.uxmessage = function(kind, text, max_length) {
     if (max_length == null) {
@@ -51,8 +52,6 @@ var progress_not_yet_done_flag = false;
 
 
 function send_gcode(gcode, success_msg, progress, name) {
-  // if (hardware_ready_state || gcode[0] == '!' || gcode[0] == '~') {
-  if (true) {
     if (typeof gcode === "string" && gcode != '') {
       $.ajax({
         type: "POST",
@@ -84,9 +83,6 @@ function send_gcode(gcode, success_msg, progress, name) {
     } else {
       $().uxmessage('error', "No gcode.");
     }
-  } else {
-    $().uxmessage('warning', "Not ready, request ignored.");
-  }
 }
 
 
@@ -171,13 +167,14 @@ function generate_download(filename, filedata) {
   });
 }
 
+
 function getDurationString(durationSeconds) {
     var hours   = Math.floor(durationSeconds / 3600);
     var minutes = Math.floor((durationSeconds - (hours * 3600)) / 60);
     var seconds = durationSeconds - (hours * 3600) - (minutes * 60);
-
     return hours + 'h ' + minutes + 'min ' + seconds + 's ';
 }
+
 
 function poll_job_history() {
   console.log("poll_job_history");
@@ -208,26 +205,27 @@ function show_job(i) {
         job = history[i];
         product =
         $('#job_modal_title').text(job['name']);
-        $('#job_material').text(job['odoo_product_name']);
-        $('#job_material_qty').text(job['odoo_product_qty']);
-        $('#job_service').text(job['odoo_service_name']);
+//        $('#job_material').text(job['odoo_product_name']);
+//        $('#job_material_qty').text(job['odoo_product_qty']);
+//        $('#job_service').text(job['odoo_service_name']);
         $('#job_comment_').text(job['comment']);
         $('#job_start_time').text(new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss'));
         $('#job_end_time').text(new Date(job.end.$date).format('dd.mm.yyyy hh:MM:ss'));
         duration = job['duration']
         $('#job_duration').text(Math.floor(duration / 60) + ":" + ((duration % 60 < 10) ? "0" : "") + (duration % 60));
-        $('#job_laser_user').text(job['user_name']);
-        $('#job_laser_client').text(job['client'])
+//        $('#job_laser_user').text(job['user_name']);
+//        $('#job_laser_client').text(job['client'])
         $('#job_modal').modal('show');
     });
 }
 
 $('#login_btn').click(function(){
-  $.post("/login", {'login_email': $('#login_email').val(), 'login_password': $('#login_password').val()}, function(e){
+  $.getJSON("/login", {'login_email': $('#login_email').val(), 'login_password': $('#login_password').val()}, function(e){
 
-    if(e == "true"){
-      //$('#account_drop').html(getCookie("user_name") + '<b class="caret">');
-      //$('#job_client').html(getCookie("user_name"));
+    if(e['result'] == true){ //ToDo: Better handling
+      username = e['payload']
+      $('#account_drop').html(username + '<b class="caret">');
+      $('#job_client').html(username);
       $('#login_modal').modal('hide');
     }else {
       $('#login_text').text(e);
@@ -247,11 +245,6 @@ $('#login_modal').bind('keypress', function(e) {
 
 
 $(document).ready(function(){
-    //window.location.replace("HTTP://127.0.0.1:8069/web/login/?redirect=http://127.0.0.1:8070/")
-//    $.post("http://127.0.0.1:8069/machine_management/getCurrentUser",function(e){
-//        alert(e);
-//    });//TODO add parameter
-//  $('#login_modal').modal('show');
   $().uxmessage('notice', "Frontend started.");
 
   $('#feedrate_field').val(app_settings.max_seek_speed);
@@ -765,12 +758,6 @@ var default_engrave_intensity = 20;
 
 setInterval(function(){
     $.getJSON("/sensors", function(data){
-    //sensors = JSON.parse(data);
-
-        str = "";
-//        $.each(data, function (key, sensor) {
-//            str += sensor['name'] + ": " + sensor['value'] + " " + sensor['unit']
-//        });
         for(var i in data) {
             s = data[i]
             str += s['name'] + ": " + s['value'] + " " + s['unit'] + "<br>";

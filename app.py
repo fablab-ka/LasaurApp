@@ -61,6 +61,7 @@ def check_sensors():
 
 
 def tick():
+    while True:
         SerialManager.send_queue_as_ready()
         time.sleep(0.0004)
 
@@ -90,9 +91,7 @@ def setup_request():
 @route('/static/<path:path>')
 def static_file_handler(path):
     path = "static/" + path
-    print(path)
-    return static_file(path, root=".") #ToDo fix
-
+    return static_file(path, root=".")
 
 ### LIBRARY
 
@@ -170,14 +169,24 @@ def get_sensors():
 def checkLogin():
     return "true"
 
+def gen_return(text, status=False):
+    return json.dumps({
+        'result': status,
+        'payload': text,
+    })
+
 @route('/login', method='POST')
 def login():
     login_email = request.forms.get('login_email')
     login_password = request.forms.get('login_password')
     if not login_email:
-        return "Email missing"
+        return gen_return("Error: Email missing")
     if not login_password:
-        return "Password missing"
+        return gen_return("Error: Password missing")
+
+    if login_email == config['machine']['admin_email'] and\
+                    login_password == config['machine']['admin_pw']:
+        return gen_return("OVERWRITE", True)
 
     ldapAdmin = Connection(server=config['ldap']['server'],
                           user=config['ldap']['bind_dn'],
@@ -187,7 +196,7 @@ def login():
                      search_filter="(&(objectClass=inetOrgPerson)(|(mail={0})(uid={0})))".format(login_email),
                      attributes=ALL_ATTRIBUTES)
     if len(users) != 1:
-        return "User not found!"
+        return gen_return("Error: User not found!")
     user_dn = users[0]['dn']
     try:
         Connection(server=config['ldap']['server'],
@@ -195,10 +204,12 @@ def login():
                    password=login_password,
                    auto_bind=True)
     except ldap3.core.exceptions.LDAPBindError:
-        return warning("Password not valid!")
+        return gen_return("Error: Password not valid!")
 
-    request.session['user'] = users[0]['attributes']['mail'][0] #ToDo set to uid when new DB is online
-    return "true"
+    request.session['mail'] = users[0]['attributes']['mail'][0]
+    request.session['user'] = users[0]['attributes']['uid'][0]
+
+    return  gen_return(request.session['user'], True)
 
 @route('/logout')
 def logout():
@@ -239,11 +250,8 @@ def serial_handler(connect):
         # print 'js is asking to connect serial'
         if not SerialManager.is_connected():
             try:
-                global SERIAL_PORT, BITSPERSECOND, GUESS_PREFIX
-                if not SERIAL_PORT:
-                    SERIAL_PORT = SerialManager.match_device(GUESS_PREFIX, BITSPERSECOND)
-                SerialManager.connect(SERIAL_PORT, BITSPERSECOND)
-                ret = "Serial connected to %s:%d." % (SERIAL_PORT, BITSPERSECOND) + '<br>'
+                SerialManager.connect(config['machine']['port'], config['machine']['baud'])
+                ret = "Serial connected to %s:%d." % (config['machine']['port'], int(config['machine']['baud'])) + '<br>'
                 time.sleep(1.0)  # allow some time to receive a prompt/welcome
                 SerialManager.flush_input()
                 SerialManager.flush_output()
