@@ -35,7 +35,7 @@ config.read("config.ini")
 #print("Sleeping for 5s...")
 #time.sleep(5) #ToDo uncomment
 
-SerialManager = SerialManagerClass(config['accounting']['log_file'], None, False)
+SerialManager = SerialManagerClass(config['accounting']['log_file'], False, False)
 
 sensor_serial = None
 dummy_mode = False
