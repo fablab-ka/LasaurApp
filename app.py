@@ -386,11 +386,11 @@ argparser.add_argument('--dummy', dest='dummy', action='store_true',
                        default=False, help='use this for developing without hardware')
 args = argparser.parse_args()
 
-if args.dummy or config.get("dummy_mode", False):
+if args.dummy or config['machine']['dummy_mode']:
     print("starting in Dummy Mode")
     setDummyMode()
     start()
 else:
     start()
 
-bottle.run(app=app, host='0.0.0.0', port=config['web']['port'], debug=True)
+bottle.run(app=app, host='0.0.0.0', port=config['web']['port'], debug=False)
