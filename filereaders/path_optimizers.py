@@ -16,8 +16,8 @@ __author__ = 'Stefan Hechenberger <stefan@nortd.com>'
 
 import math
 import logging
-from scipy import spatial
-import numpy as np
+# from scipy import spatial
+# import numpy as np
 
 #import kdtree
 
