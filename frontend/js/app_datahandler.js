@@ -99,7 +99,7 @@ DataHandler = {
     // write machinable gcode, organize by passes
     // header
     var glist = [];
-    glist.push("G90\nM80\nG30\n");//Metric Absolut Homeing
+    glist.push("G90\nM80\n");//Metric Absolut Homeing
       var x_phy = gcode_coordinate_offset[0]*app_settings.to_physical_scale + app_settings.table_offset[0];
       var y_phy = gcode_coordinate_offset[1]*app_settings.to_physical_scale + app_settings.table_offset[1];
       glist.push('G10 L2 P1 X'+ x_phy.toFixed(app_settings.num_digits) +
