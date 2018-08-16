@@ -32,8 +32,8 @@ bottle.BaseRequest.MEMFILE_MAX = 20 * 1024 * 1024  # 20MB max upload
 
 config = configparser.RawConfigParser()
 config.read("config.ini")
-#print("Sleeping for 5s...")
-#time.sleep(5) #ToDo uncomment
+print("Sleeping for 5s...")
+time.sleep(5) #ToDo uncomment
 
 SerialManager = SerialManagerClass(config['accounting']['log_file'], False, False)
 
@@ -67,7 +67,7 @@ def tick():
 
 
 def start():
-    SerialManager.connect(config['machine']['port'], config['machine']['port'])
+    SerialManager.connect(config['machine']['port'], config['machine']['baud'])
 
     if config['sensors']['use'] and not dummy_mode:
         try:
@@ -306,7 +306,7 @@ def set_pause(flag):
 
 @route('/reset_atmega')
 def reset_atmega_handler():
-    reset_atmega(HARDWARE)
+    #reset_atmega(HARDWARE)
     return '1'
 
 
@@ -316,7 +316,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name, erp.last_user)
+        SerialManager.queue_gcode(job_data, name)
         return "__ok__"
     else:
         return "serial disconnected"
@@ -386,11 +386,9 @@ argparser.add_argument('--dummy', dest='dummy', action='store_true',
                        default=False, help='use this for developing without hardware')
 args = argparser.parse_args()
 
-if args.dummy or config['machine']['dummy_mode']:
+if args.dummy or config['machine']['dummy_mode'] == "True":
     print("starting in Dummy Mode")
     setDummyMode()
-    start()
-else:
-    start()
+start()
 
 bottle.run(app=app, host='0.0.0.0', port=config['web']['port'], debug=False)

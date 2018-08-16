@@ -1,11 +1,3 @@
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
-
 $(document).ready(function(){
 
   var path_optimize = 1;
@@ -46,18 +38,12 @@ $(document).ready(function(){
   // file upload form
   $('#svg_upload_file').change(function(e){
     $('#file_import_btn').button('loading');
-    $('#svg_loading_hint').show();
     var input = $('#svg_upload_file').get(0)
-    var browser_supports_file_api = true;
     if (typeof window.FileReader !== 'function') {
-      browser_supports_file_api = false;
       $().uxmessage('notice', "This requires a modern browser with File API support.");
     } else if (!input.files) {
-      browser_supports_file_api = false;
       $().uxmessage('notice', "This browser does not support the files property.");
-    }
-
-    if (browser_supports_file_api) {
+    } else {
       if (input.files[0]) {
         var fr = new FileReader()
         fr.onload = sendToBackend
@@ -65,10 +51,8 @@ $(document).ready(function(){
       } else {
         $().uxmessage('error', "No file was selected.");
       }
-    } else {  // fallback
-      // $().uxmessage('notice', "Using fallback: file form upload.");
     }
-
+    }
     // reset file input form field so change event also triggers if
     // same file is chosen again (but with different dpi)
     $('#import_name').val($('#svg_upload_file').val().split('\\').pop().split('/').pop());
@@ -102,7 +86,7 @@ $(document).ready(function(){
              'optimize':path_optimize,
              'dimensions':JSON.stringify(app_settings.work_area_dimensions)},
       dataType: "json",
-      timeout: 60000,
+      timeout: 3 * 60000,
       success: function (data) {
         if (ext == '.svg' || ext == '.SVG') {
           $().uxmessage('success', "SVG parsed.");

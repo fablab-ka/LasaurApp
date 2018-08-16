@@ -150,22 +150,22 @@ function close_bigcanvas() {
 }
 
 
-function generate_download(filename, filedata) {
-  $.ajax({
-    type: "POST",
-    url: "/stash_download",
-    data: {'filedata': filedata},
-    success: function (data) {
-      window.open("/download/" + data + "/" + filename, '_blank');
-    },
-    error: function (data) {
-      $().uxmessage('error', "Timeout. LasaurApp server down?");
-    },
-    complete: function (data) {
-      // future use
-    }
-  });
-}
+//function generate_download(filename, filedata) {
+//  $.ajax({
+//    type: "POST",
+//    url: "/stash_download",
+//    data: {'filedata': filedata},
+//    success: function (data) {
+//      window.open("/download/" + data + "/" + filename, '_blank');
+//    },
+//    error: function (data) {
+//      $().uxmessage('error', "Timeout. LasaurApp server down?");
+//    },
+//    complete: function (data) {
+//      // future use
+//    }
+//  });
+//}
 
 
 function getDurationString(durationSeconds) {
@@ -205,16 +205,11 @@ function show_job(i) {
         job = history[i];
         product =
         $('#job_modal_title').text(job['name']);
-//        $('#job_material').text(job['odoo_product_name']);
-//        $('#job_material_qty').text(job['odoo_product_qty']);
-//        $('#job_service').text(job['odoo_service_name']);
         $('#job_comment_').text(job['comment']);
         $('#job_start_time').text(new Date(job.start.$date).format('dd.mm.yyyy hh:MM:ss'));
         $('#job_end_time').text(new Date(job.end.$date).format('dd.mm.yyyy hh:MM:ss'));
         duration = job['duration']
         $('#job_duration').text(Math.floor(duration / 60) + ":" + ((duration % 60 < 10) ? "0" : "") + (duration % 60));
-//        $('#job_laser_user').text(job['user_name']);
-//        $('#job_laser_client').text(job['client'])
         $('#job_modal').modal('show');
     });
 }

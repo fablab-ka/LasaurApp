@@ -17,7 +17,7 @@ class SerialManagerClass(object):
         self.dummyMode = dummyMode
 
         self.rx_buffer = ""
-        self.tx_buffer = ""
+        self.tx_buffer = b""
         self.tx_index = 0
         self.remoteXON = True
 
@@ -37,8 +37,8 @@ class SerialManagerClass(object):
 
         self.fec_redundancy = 2  # use forward error correction
 
-        self.ready_char = '\x12'
-        self.request_ready_char = '\x14'
+        self.ready_char = (u'\x12')
+        self.request_ready_char = u'\x14'
         self.last_request_ready = 0
 
         self.logger = RemoteLogger('Lasaur-Accounting', influxConfig)
@@ -139,7 +139,7 @@ class SerialManagerClass(object):
 
     def connect(self, port, baudrate):
         self.rx_buffer = ""
-        self.tx_buffer = ""
+        self.tx_buffer = b""
         self.tx_index = 0
         self.remoteXON = True
         self.reset_status()
@@ -216,13 +216,13 @@ class SerialManagerClass(object):
                 job_list.append(line)
 
         gcode_processed = '\n'.join(job_list) + '\n'
-        self.tx_buffer += gcode_processed
+        self.tx_buffer += gcode_processed.encode()
         self.job_active = True
         if (self.status['ready'] == False) and bool(name):
             self.start_accounting(len(lines), name) # as soon, as jobname is vailable, can be passed as second param
 
     def cancel_queue(self):
-        self.tx_buffer = ""
+        self.tx_buffer = b""
         self.tx_index = 0
         self.job_active = False
 
@@ -256,7 +256,7 @@ class SerialManagerClass(object):
         if self.device and not self.status['paused']:
             try:
                 ### receiving
-                chars = self.device.read(self.RX_CHUNK_SIZE)
+                chars = (self.device.read(self.RX_CHUNK_SIZE)).decode()
                 if len(chars) > 0:
                     ## check for data request
                     if self.ready_char in chars:
@@ -317,7 +317,7 @@ class SerialManagerClass(object):
                             # print("=========================== REQUEST READY")
                             try:
                                 t_prewrite = time.time()
-                                actuallySent = self.device.write(self.request_ready_char)
+                                actuallySent = self.device.write(self.request_ready_char.encode())
                                 if time.time()-t_prewrite > 0.02:
                                     sys.stdout.write("WARN: write delay 3\n")
                                     sys.stdout.flush()
@@ -333,7 +333,7 @@ class SerialManagerClass(object):
                     if self.job_active:
                         # print("\nG-code stream finished!")
                         # print("(LasaurGrbl may take some extra time to finalize)")
-                        self.tx_buffer = ""
+                        self.tx_buffer = b""
                         self.tx_index = 0
                         self.job_active = False
                         # ready whenever a job is done, including a status request via '?'
