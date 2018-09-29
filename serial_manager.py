@@ -19,7 +19,6 @@ class SerialManagerClass(object):
         self.rx_buffer = ""
         self.tx_buffer = b""
         self.tx_index = 0
-        self.remoteXON = True
 
         # TX_CHUNK_SIZE - this is the number of bytes to be
         # written to the device in one go. It needs to match the device.
@@ -37,13 +36,12 @@ class SerialManagerClass(object):
 
         self.fec_redundancy = 2  # use forward error correction
 
-        self.ready_char = (u'\x12')
+        self.ready_char = u'\x12'
         self.request_ready_char = u'\x14'
         self.last_request_ready = 0
 
         self.logger = RemoteLogger('Lasaur-Accounting', influxConfig)
 
-        self.job_accounting = {}
         self.lastJobs = []
         self.reset_status()
         self.accountingFile = accountingFile
@@ -138,10 +136,9 @@ class SerialManagerClass(object):
         }
 
     def connect(self, port, baudrate):
-        self.rx_buffer = ""
+        self.rx_buffer = b""
         self.tx_buffer = b""
         self.tx_index = 0
-        self.remoteXON = True
         self.reset_status()
 
         if not self.dummyMode:
@@ -260,7 +257,7 @@ class SerialManagerClass(object):
                 if len(chars) > 0:
                     ## check for data request
                     if self.ready_char in chars:
-                        # print("=========================== READY")
+                        print("=========================== READY")
                         self.nRequested = self.TX_CHUNK_SIZE
                         #remove control chars
                         chars = chars.replace(self.ready_char, "")
@@ -278,6 +275,7 @@ class SerialManagerClass(object):
                     if self.nRequested == 0:
                         time.sleep(0.001)  # no rx/tx, rest a bit
 
+
                 ### sending
                 if self.tx_index < len(self.tx_buffer):
                     if self.nRequested > 0:
@@ -285,6 +283,7 @@ class SerialManagerClass(object):
                             t_prewrite = time.time()
                             actuallySent = self.device.write(
                                 self.tx_buffer[self.tx_index:self.tx_index+self.nRequested])
+                            print(actuallySent)
                             if time.time()-t_prewrite > 0.02:
                                 sys.stdout.write("WARN: write delay 1\n")
                                 sys.stdout.flush()
@@ -301,6 +300,7 @@ class SerialManagerClass(object):
                         try:
                             t_prewrite = time.time()
                             actuallySent = self.device.write(self.tx_buffer[self.tx_index])
+                            print(actuallySent)
                             if time.time()-t_prewrite > 0.02:
                                 sys.stdout.write("WARN: write delay 2\n")
                                 sys.stdout.flush()
@@ -331,7 +331,7 @@ class SerialManagerClass(object):
 
                 else:
                     if self.job_active:
-                        # print("\nG-code stream finished!")
+                        print("\nG-code stream finished!")
                         # print("(LasaurGrbl may take some extra time to finalize)")
                         self.tx_buffer = b""
                         self.tx_index = 0
