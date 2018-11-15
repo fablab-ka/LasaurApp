@@ -13,8 +13,9 @@ import bottle
 import i18n
 import readid
 import serial
-from backend.interface.odoo.odooHelper import *
-from backend.interface.odoo.odoo import Odoo
+#from backend.interface.odoo.odooHelper import *
+#from backend.interface.odoo.odoo import Odoo
+import interface.interface as interface
 from bottle import *
 from build import build_firmware
 from filereaders import read_svg, read_dxf, read_ngc
@@ -63,9 +64,9 @@ SENSOR_SHIELD_BAUD = config.get("sensor_shield_baud", None)
 print("Sleeping for 5s...")
 time.sleep(5)
 
-erp = Odoo(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
+#erp = Odoo(ODOO_USERNAME, ODOO_PASSWORD, ODOO_URL, ODOO_DB)
 SerialManager = SerialManagerClass(ACCOUNTING_FILE, INFLUX_CONFIG, False)
-SerialManager.erp = erp
+#SerialManager.erp = erp
 
 sensor_serial = None
 dummy_mode = False
@@ -311,7 +312,11 @@ def jobs_history():
 
 @app.route('/interface/getData')
 def erp_get_data():
-    return json.dumps(erp.getWebInfo(), default=datedecoder.default)
+    data = {
+            'services': interface.get_services(),
+            'materials': interface.get_material(),
+        }
+    return json.dumps(data, default=datedecoder.default)
 
 @app.route('/interface/setData', method='POST')
 def erp_set_data():
@@ -321,12 +326,12 @@ def erp_set_data():
 
 @app.route('/material/services')
 def material_services():
-    return json.dumps(erp.services, default=datedecoder.default)
+    return json.dumps(interface.get_services(), default=datedecoder.default)
 
 
 @app.route('/material/products')
 def material_products():
-    return json.dumps(erp.materials, default=datedecoder.default)
+    return json.dumps(interface.get_material(), default=datedecoder.default)
 
 sensor_values = ""
 
@@ -369,18 +374,22 @@ def login():
             return "Email missing"
         if not login_password:
             return "Password missing"
-        if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", login_email):
-            return "Invalid Email entered!"
-        helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
-        if not helper.connected:
-            return "Could not connect to Odoo, please contact philip@caroli.de!"
-        else:
-            uid = helper.callAPI('/machine_management/getCurrentUser')
-        if not uid:
-            return "Invalid Email or Password!"
+        tmp = interface.authenticate(login_email, login_password)
+        if not tmp:
+            return "Invalid User!"
+
+        # if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", login_email):
+        #     return "Invalid Email entered!"
+        # helper = OdooHelper(login_email, login_password, ODOO_URL, ODOO_DB)
+        # if not helper.connected:
+        #     return "Could not connect to Odoo, please contact philip@caroli.de!"
+        # else:
+        #     uid = helper.callAPI('/machine_management/getCurrentUser')
+        # if not uid:
+        #     return "Invalid Email or Password!"
     info = {
         'session_id': str(uuid.uuid4()),
-        'odoo_uid': uid,
+        # 'odoo_uid': uid,
         'user_name': login_email,
         'last_login': datetime.now(),
     }
@@ -685,7 +694,7 @@ def job_submit_handler():
     name = request.forms.get('name')
     job_data = request.forms.get('job_data')
     if job_data and SerialManager.is_connected():
-        SerialManager.queue_gcode(job_data, name, erp.last_user)
+        SerialManager.queue_gcode(job_data, name, "test")#TODO add user from session
         return "__ok__"
     else:
         return "serial disconnected"

@@ -818,10 +818,10 @@ $("#material_selected").click(function(e) {
     for(var product in odoo_products) {
         if(odoo_products[product]['id'] == odoo_product_id) {
             product = odoo_products[product];
-            default_cut_speed = product['machine_parameter_1'];
-            default_cut_intensity = product['machine_parameter_2'];
-            default_engrave_speed = product['machine_parameter_3'];
-            default_engrave_intensity = product['machine_parameter_4'];
+            default_cut_speed = product['cut_speed'];
+            default_cut_intensity = product['cut_intensity'];
+            default_engrave_speed = product['engrave_speed'];
+            default_engrave_intensity = product['engrave_intensity'];
         }
     }
     $("#material_modal").modal('hide');

@@ -120,12 +120,6 @@ class SerialManagerClass(object):
 
         print(job)
 
-        # Send the job information to Odoo
-        if self.erp:
-            self.erp.setInfo(job)
-
-
-
         # print(self.odoo)
         # if self.odoo:
         #     self.odoo.helper.callAPI("/machine_management/registerUsage/",job)
